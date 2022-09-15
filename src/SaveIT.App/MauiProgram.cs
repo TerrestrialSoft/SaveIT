@@ -17,9 +17,9 @@ public static class MauiProgram
 
 		builder.Services.AddMauiBlazorWebView();
 		builder.Services.AddScoped<IGameProfileService, GameProfileService>();
-#if DEBUG
+		#if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
-#endif
+		#endif
 
 		return builder.Build();
 	}

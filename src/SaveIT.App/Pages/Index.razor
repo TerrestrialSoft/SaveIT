@@ -1,7 +1,23 @@
 ﻿@page "/"
+@inject IGameProfileService _profileService
 
-<h1>Hello, world!</h1>
+<h1>Game profiles</h1>
 
-Welcome to your new app.
+<ul>
+    @foreach(var item in _gameProfiles)
+    {
+        <li>@item.Nickname</li>
+    }
+</ul>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+
+@code
+{
+    private IEnumerable<GameProfile> _gameProfiles;
+
+
+    protected override void OnInitialized()
+    {
+        _gameProfiles = _profileService.GetGameProfiles();
+    }
+}

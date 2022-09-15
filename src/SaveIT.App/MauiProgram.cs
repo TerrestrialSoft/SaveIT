@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.WebView.Maui;
+using SaveIT.Core.Services;
 
 namespace SaveIT.App;
 
@@ -15,9 +16,10 @@ public static class MauiProgram
 			});
 
 		builder.Services.AddMauiBlazorWebView();
-		#if DEBUG
+		builder.Services.AddScoped<IGameProfileService, GameProfileService>();
+#if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
-		#endif
+#endif
 
 		return builder.Build();
 	}

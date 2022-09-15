@@ -1,0 +1,39 @@
+﻿@page "/profile/{Id:guid}"
+@inject IGameProfileService _gameProfileService
+
+<h3>Profile</h3>
+<button>Refresh</button>
+<div>
+    <span>Nickname</span>
+    <div>@_gameProfile.Nickname</div>
+</div>
+
+<div>
+    <span>Profile name</span>
+    <div>@_gameProfile.ProfileName</div>
+</div>
+
+<NavLink>
+    <span class="oi oi-cloud-download" aria-hidden="true"></span> Download
+</NavLink>
+<NavLink>
+    <span class="oi oi-cloud-upload" aria-hidden="true"></span> Upload
+</NavLink>
+<NavLink>
+    <span class="oi oi-cog" aria-hidden="true"></span> Options
+</NavLink>
+
+
+@code {
+ 
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private GameProfile _gameProfile { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        _gameProfile = _gameProfileService.GetGameProfile(Id);
+    }
+}

@@ -1,4 +1,4 @@
-﻿@page "/profile/{Id:guid}"
+﻿@page "/profiles/{Id:long}"
 @inject IGameProfileService _gameProfileService
 
 <h3>Profile</h3>
@@ -27,13 +27,13 @@
 @code {
  
     [Parameter]
-    public Guid Id { get; set; }
+    public long Id { get; set; }
 
     private GameProfile _gameProfile { get; set; }
 
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        _gameProfile = _gameProfileService.GetGameProfile(Id);
+        _gameProfile = await _gameProfileService.GetGameProfileAsync(Id);
     }
 }

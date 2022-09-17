@@ -1,23 +1,26 @@
 ﻿using SaveIT.Core.Entities;
-using SaveIT.Storage.Database;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SaveIT.Core.Repositories;
 
 namespace SaveIT.Core.Services
 {
 	public class GameProfileService : IGameProfileService
 	{
-		public GameProfile? GetGameProfile(Guid id)
+		private readonly IRepository<GameProfile> _repository;
+
+		public GameProfileService(IRepository<GameProfile> repository)
 		{
-			return ProfileService.GetProfile(id);
+			_repository = repository;
 		}
 
-		public IEnumerable<GameProfile> GetGameProfiles()
+		public async Task<GameProfile?> GetGameProfileAsync(long id)
 		{
-			return ProfileService.GetProfiles();
+            return await _repository.GetAsync(x => x.Id == id);
+		}
+
+		public async Task<IEnumerable<GameProfile>> GetGameProfilesAsync()
+		{
+			var x =  await _repository.GetAllAsync();
+			return x;
 		}
 	}
 }

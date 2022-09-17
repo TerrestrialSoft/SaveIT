@@ -1,23 +1,17 @@
 ﻿@page "/"
-@inject IGameProfileService _profileService
 
-<h1>Game profiles</h1>
+@inject NavigationManager MyNavigationManager
+@inject IGameProfileService _gameProfileService;
 
-<ul>
-    @foreach(var item in _gameProfiles)
+@code{
+    protected override async Task OnInitializedAsync()
     {
-        <li>@item.Nickname</li>
-    }
-</ul>
+        var gameProfiles = await _gameProfileService.GetGameProfilesAsync();
 
+        if (gameProfiles.Any())
+            MyNavigationManager.NavigateTo($"/profiles/{gameProfiles.First().Id}");
+        else
 
-@code
-{
-    private IEnumerable<GameProfile> _gameProfiles;
-
-
-    protected override void OnInitialized()
-    {
-        _gameProfiles = _profileService.GetGameProfiles();
+            MyNavigationManager.NavigateTo("/profiles/new");
     }
 }

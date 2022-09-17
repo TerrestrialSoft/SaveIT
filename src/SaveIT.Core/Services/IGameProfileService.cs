@@ -4,7 +4,7 @@ namespace SaveIT.Core.Services
 {
 	public interface IGameProfileService
 	{
-		IEnumerable<GameProfile> GetGameProfiles();
-		GameProfile? GetGameProfile(Guid id);
+		Task<IEnumerable<GameProfile>> GetGameProfilesAsync();
+		Task<GameProfile?> GetGameProfileAsync(long id);
 	}
 }

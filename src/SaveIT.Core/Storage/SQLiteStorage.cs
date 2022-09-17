@@ -6,6 +6,7 @@ namespace SaveIT.Core.Storage
     public class SQLiteStorage<T> : IStorage<T> where T : new()
     {
         // This doesn't work untill MAUI 8.0, Nov 10
+        // https://github.com/dotnet/runtime/issues/74884
         //private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SaveIT");
         private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SaveIT");
         private const string fileName = "data.db";

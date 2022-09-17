@@ -16,9 +16,18 @@ namespace SaveIT.Core.Storage
 
         public SQLiteStorage()
         {
-            var res = Directory.CreateDirectory(dataDirectory);
+            EnsureDirectoryExists();
+
             _connection = new SQLiteAsyncConnection(filePath, SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite);
             _ = _connection.CreateTableAsync<T>().Result;
+        }
+
+        private void EnsureDirectoryExists()
+        {
+            if (Directory.Exists(dataDirectory))
+                return;
+
+            Directory.CreateDirectory(dataDirectory);
         }
 
         public async Task CreateAsync(T item)

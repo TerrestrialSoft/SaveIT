@@ -14,7 +14,7 @@ namespace SaveIT.Core.Services
 
 		public async Task<GameProfile?> GetGameProfileAsync(long id)
 		{
-            return await _repository.GetAsync(x => x.Id == id);
+			return await _repository.GetAsync(x => x.Id == id);
 		}
 
 		public async Task<IEnumerable<GameProfile>> GetGameProfilesAsync()

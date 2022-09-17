@@ -22,7 +22,7 @@ namespace SaveIT.Core.Storage
             _ = _connection.CreateTableAsync<T>().Result;
         }
 
-        private void EnsureDirectoryExists()
+        private static void EnsureDirectoryExists()
         {
             if (Directory.Exists(dataDirectory))
                 return;

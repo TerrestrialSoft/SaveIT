@@ -1,7 +1,38 @@
 ﻿@page "/profiles/new"
+@inject IGameProfileService _gameProfileService
+@inject NavigationManager _navManager
 
-<h3>NewProfile</h3>
+
+<h3>Create Profile</h3>
+
+<EditForm Model="model" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div>
+        <label>
+            Profile name
+            <InputText @bind-Value="model.ProfileName" />
+        </label>
+    </div>
+    <div>
+        <label>
+            Nickname:
+            <InputText @bind-Value="model.Nickname" />
+        </label>
+    </div>
+    <div>
+        <button type="submit">Create</button>
+    </div>
+
+</EditForm>
 
 @code {
+    private CreateGameProfileModel model = new();
+
+    private async Task HandleValidSubmit()
+    {
+        await _gameProfileService.CreateGameProfileAsync(model.ProfileName, model.Nickname);
+        _navManager.NavigateTo("/");
+    }
 
 }

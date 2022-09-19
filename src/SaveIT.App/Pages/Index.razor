@@ -11,7 +11,6 @@
         if (gameProfiles.Any())
             MyNavigationManager.NavigateTo($"/profiles/{gameProfiles.First().Id}");
         else
-
             MyNavigationManager.NavigateTo("/profiles/new");
     }
 }

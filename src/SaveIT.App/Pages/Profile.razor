@@ -23,13 +23,12 @@
     <span class="oi oi-cog" aria-hidden="true"></span> Options
 </NavLink>
 
-
 @code {
- 
+
     [Parameter]
     public long Id { get; set; }
 
-    private GameProfile _gameProfile { get; set; }
+    private GameProfile _gameProfile = new();
 
 
     protected override async Task OnParametersSetAsync()

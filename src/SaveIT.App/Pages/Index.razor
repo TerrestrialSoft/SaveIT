@@ -6,7 +6,8 @@
 @code{
     protected override async Task OnInitializedAsync()
     {
-        var gameProfiles = await _gameProfileService.GetGameProfilesAsync();
+        var gameProfiles = (await _gameProfileService.GetGameProfilesAsync())
+            .OrderByDescending(x => x.DateCreated);
 
         if (gameProfiles.Any())
             MyNavigationManager.NavigateTo($"/profiles/{gameProfiles.First().Id}");

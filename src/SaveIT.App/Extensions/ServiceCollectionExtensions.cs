@@ -1,4 +1,5 @@
-﻿using SaveIT.Core.Entities;
+﻿using SaveIT.App.Context;
+using SaveIT.Core.Entities;
 using SaveIT.Core.Repositories;
 using SaveIT.Core.Services;
 using SaveIT.Core.Storage;
@@ -11,5 +12,8 @@ public static class ServiceCollectionExtensions
         => services.AddScoped<IStorage<GameProfile>, SQLiteStorage<GameProfile>>()
             .AddScoped<IGameProfileService, GameProfileService>()
             .AddScoped<IRepository<GameProfile>, GameProfileRepository>();
+
+	public static IServiceCollection AddCurrentContext(this IServiceCollection services)
+		=> services.AddSingleton<CurrentContext>();
 
 }

@@ -1,4 +1,7 @@
-﻿@inject IGameProfileService _gameProfileService;
+﻿@using SaveIT.App.Context
+
+@inject IGameProfileService _gameProfileService;
+@inject CurrentContext _currentContext
 
 <div class="top-row ps-3 navbar navbar-dark">
 	<div class="container-fluid">
@@ -12,7 +15,7 @@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
 	<nav class="flex-column">
 		<div class="nav-item px-3">
-			@foreach(var item in _gameProfiles)
+			@foreach (var item in _currentContext.GameProfiles.OrderByDescending(x => x.DateCreated))
 			{
 				<NavLink class="nav-link" href="@($"profiles/{item.Id}")" Match="NavLinkMatch.All">
 					<span class="oi oi-home" aria-hidden="true"></span> @item.Nickname
@@ -28,15 +31,14 @@
 @code {
 	private bool collapseNavMenu = true;
 	private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-	private List<GameProfile> _gameProfiles = new();
 
 	private void ToggleNavMenu()
 	{
 		collapseNavMenu = !collapseNavMenu;
 	}
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		_gameProfiles = (await _gameProfileService.GetGameProfilesAsync()).ToList();
+		_currentContext.OnChange += StateHasChanged;
 	}
 }

@@ -13,7 +13,5 @@ public class GameProfile
 	[NotNull]
 	public string Nickname { get; set; } = null!;
 
-	public string? IconPath { get; set; }
-
 	public DateTime DateCreated { get; set; }
 }

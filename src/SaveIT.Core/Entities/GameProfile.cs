@@ -1,20 +1,19 @@
 ﻿using SQLite;
 
-namespace SaveIT.Core.Entities
+namespace SaveIT.Core.Entities;
+
+public class GameProfile
 {
-	public class GameProfile
-	{
-		[PrimaryKey, AutoIncrement]
-		public long Id { get; set; }
+	[PrimaryKey, AutoIncrement]
+	public long Id { get; set; }
 
-		[NotNull, Unique]
-		public string ProfileName { get; set; } = null!;
+	[NotNull, Unique]
+	public string ProfileName { get; set; } = null!;
 
-		[NotNull]
-		public string Nickname { get; set; } = null!;
+	[NotNull]
+	public string Nickname { get; set; } = null!;
 
-		public string? IconPath { get; set; }
+	public string? IconPath { get; set; }
 
-		public DateTime DateCreated { get; set; }
-	}
+	public DateTime DateCreated { get; set; }
 }

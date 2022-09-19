@@ -1,10 +1,9 @@
 ﻿using SaveIT.Core.Entities;
 
-namespace SaveIT.Core.Services
+namespace SaveIT.Core.Services;
+
+public interface IGameProfileService
 {
-	public interface IGameProfileService
-	{
-		Task<IEnumerable<GameProfile>> GetGameProfilesAsync();
-		Task<GameProfile?> GetGameProfileAsync(long id);
-	}
+	Task<IEnumerable<GameProfile>> GetGameProfilesAsync();
+	Task<GameProfile?> GetGameProfileAsync(long id);
 }

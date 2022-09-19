@@ -23,5 +23,6 @@ public class CurrentContext
 		NotifyStateChanged();
 	}
 
-	private void NotifyStateChanged() => OnChange?.Invoke();
+	private void NotifyStateChanged()
+		=> OnChange?.Invoke();
 }

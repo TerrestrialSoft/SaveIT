@@ -13,23 +13,16 @@ public class GameProfileService : IGameProfileService
 	}
 
 	public async Task CreateGameProfileAsync(string profileName, string nickname)
-	{
-		await _repository.CreateAsync(new GameProfile
+		=> await _repository.CreateAsync(new GameProfile
 		{
 			ProfileName = profileName,
 			Nickname = nickname,
 			DateCreated = DateTime.Now,
 		});
-	}
 
 	public async Task<GameProfile?> GetGameProfileAsync(long id)
-	{
-		return await _repository.GetAsync(x => x.Id == id);
-	}
+		=> await _repository.GetAsync(x => x.Id == id);
 
 	public async Task<IEnumerable<GameProfile>> GetGameProfilesAsync()
-	{
-		var x =  await _repository.GetAllAsync();
-		return x;
-	}
+		=> await _repository.GetAllAsync();
 }

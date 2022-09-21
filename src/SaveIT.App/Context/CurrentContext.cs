@@ -10,14 +10,14 @@ public class CurrentContext
 	public CurrentContext(IGameProfileService gameProfileService)
 	{
 		_gameProfileService = gameProfileService;
-		_ = FetchNewProfilesAsync();
+		_ = RefreshProfilesAsync();
 	}
 
 	public List<GameProfile> GameProfiles = new();
 
 	public event Action OnChange;
 
-	public async Task FetchNewProfilesAsync()
+	public async Task RefreshProfilesAsync()
 	{
 		GameProfiles = (await _gameProfileService.GetGameProfilesAsync()).ToList();
 		NotifyStateChanged();

@@ -1,0 +1,34 @@
+﻿@page "/profiles/{Id:long}/options"
+
+@inject IGameProfileService _gameProfileService
+
+<h3>Options</h3>
+
+<div>
+    <span>Authorized: @_profile.IsAuthorized</span>
+
+    @if (!_profile.IsAuthorized)
+    {
+        <button @onclick="AuthorizeAccount">
+            <span class="oi oi-account-login" aria-hidden="true"></span> Authorization
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+    private GameProfile _profile = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _profile = await _gameProfileService.GetGameProfileAsync(Id);
+    }
+
+    private async Task AuthorizeAccount()
+    {
+        await _gameProfileService.AuthorizeAccount(Id);
+        _profile = await _gameProfileService.GetGameProfileAsync(Id);
+    }
+
+}

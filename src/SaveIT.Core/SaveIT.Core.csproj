@@ -11,4 +11,9 @@
     <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SaveIT.CloudStorage\SaveIT.CloudStorage.csproj" />
+    <ProjectReference Include="..\SaveIT.Storage\SaveIT.Storage.csproj" />
+  </ItemGroup>
+
 </Project>

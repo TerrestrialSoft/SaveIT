@@ -1,0 +1,18 @@
+﻿@page "/profiles/{Id:long}/upload"
+
+@inject IGameProfileService _gameProfileService
+
+<h3>Upload</h3>
+
+<button @onclick="CreateFile">Test</button>
+
+
+@code {
+    [Parameter]
+    public long Id { get; set; }
+
+    private async Task CreateFile()
+    {
+        await _gameProfileService.CreateFileAsync(Id);
+    }
+}

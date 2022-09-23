@@ -16,7 +16,8 @@ public static class ServiceCollectionExtensions
         => services.AddScoped<IStorage<GameProfile>, SQLiteStorage<GameProfile>>()
             .AddScoped<IGameProfileService, GameProfileService>()
             .AddScoped<IRepository<GameProfile>, GameProfileRepository>()
-			.AddScoped<ICloudStorage, GoogleDriveStorage>();
+			.AddScoped<ICloudStorage, GoogleDriveStorage>()
+			.AddScoped<IExternalStorageService, ExternalStorageService>();
 
 	public static IServiceCollection AddCurrentContext(this IServiceCollection services)
 		=> services.AddSingleton<CurrentContext>();

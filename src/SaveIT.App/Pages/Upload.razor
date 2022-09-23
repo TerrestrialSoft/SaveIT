@@ -1,6 +1,6 @@
 ﻿@page "/profiles/{Id:long}/upload"
 
-@inject IGameProfileService _gameProfileService
+@inject IExternalStorageService _externalStorageService
 
 <h3>Upload</h3>
 
@@ -13,6 +13,6 @@
 
     private async Task CreateFile()
     {
-        await _gameProfileService.CreateFileAsync(Id);
+        await _externalStorageService.CreateFileAsync(Id);
     }
 }

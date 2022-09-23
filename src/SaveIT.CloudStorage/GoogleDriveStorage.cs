@@ -1,4 +1,5 @@
 ﻿using Google.Apis.Auth.OAuth2;
+using Google.Apis.Auth.OAuth2.Flows;
 using Google.Apis.Drive.v3;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
@@ -50,15 +51,15 @@ public class GoogleDriveStorage : ICloudStorage
 	{
 		await AuthorizeAccount(accountId);
 
-		var file = new GoogleFile { Name = "TestFile", MimeType = "application/text"};
+		var file = new GoogleFile { Name = "SaveIT", MimeType = "application/vnd.google-apps.folder", Parents =  new List<string> { "1i1yCYL8nNSRL6G8zTtcTZPm_rjFougkc" } };
 
 		using var stream = new MemoryStream();
 		using var writer = new StreamWriter(stream);
-		writer.Write("My first file");
+		//writer.Write("My first file");
 		writer.Flush();
 		stream.Position = 0;
 
-		var request = _driveService.Files.Create(file, stream, "application/text");
+		var request = _driveService.Files.Create(file, stream, "application/vnd.google-apps.folder");
 		request.Fields = "id";
 		await request.UploadAsync();
 

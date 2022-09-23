@@ -1,6 +1,7 @@
 ﻿@page "/profiles/{Id:long}/options"
 
 @inject IGameProfileService _gameProfileService
+@inject IExternalStorageService _externalStorageService
 
 <h3>Options</h3>
 
@@ -27,7 +28,7 @@
 
     private async Task AuthorizeAccount()
     {
-        await _gameProfileService.AuthorizeAccount(Id);
+        await _externalStorageService.AuthorizeAccountAsync(Id);
         _profile = await _gameProfileService.GetGameProfileAsync(Id);
     }
 

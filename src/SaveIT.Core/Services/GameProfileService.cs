@@ -35,12 +35,6 @@ public class GameProfileService : IGameProfileService
 	public async Task<IEnumerable<GameProfile>> GetGameProfilesAsync()
 		=> await _repository.GetAllAsync();
 
-	public async Task CreateFileAsync(long id)
-		=> await _cloudStorage.CreateFileAsync(id);
-
-	public async Task GetFolders(long id)
-		=> await _cloudStorage.GetFolders(id);
-
 	public async Task AuthorizeAccount(long id)
 	{
 		var profile = await GetGameProfileAsync(id);
@@ -48,7 +42,7 @@ public class GameProfileService : IGameProfileService
 		if (profile is null)
 			return;
 
-		await _cloudStorage.AuthorizeAccount(id);
+		
 
 		profile.IsAuthorized = true;
 		await UpdateGameProfileAsync(profile);

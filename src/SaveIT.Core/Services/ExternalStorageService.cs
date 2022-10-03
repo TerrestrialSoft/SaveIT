@@ -10,9 +10,6 @@ public class ExternalStorageService : IExternalStorageService
 		_cloudStorage = cloudStorage;
 	}
 
-	public async Task AuthorizeAccountAsync(long profileId)
-		=> await _cloudStorage.AuthorizeAccount(profileId);
-
 	public async Task InitializeNewRepositoryAsync(long profileId, string name)
 	{
 

@@ -24,33 +24,8 @@ public class GoogleDriveStorage : ICloudStorage
 		_googleDriveOptions = googleDriveOptions.Value;
 	}
 
-	public async Task AuthorizeAccount(long accountId)
-	{
-		var client = new ClientSecrets
-		{
-			ClientId = _googleDriveOptions.ClientId,
-			ClientSecret = _googleDriveOptions.ClientSecret,
-		};
-
-		var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-			client,
-			Scopes,
-			accountId.ToString(),
-			CancellationToken.None,
-			new FileDataStore("identities")
-			);
-
-		_driveService = new DriveService(new BaseClientService.Initializer
-		{
-			HttpClientInitializer = credential,
-			ApplicationName = ApplicationName,
-		});
-	}
-
 	public async Task CreateFileAsync(long accountId)
 	{
-		await AuthorizeAccount(accountId);
-
 		var file = new GoogleFile { Name = "SaveIT", MimeType = "application/vnd.google-apps.folder", Parents =  new List<string> { "1i1yCYL8nNSRL6G8zTtcTZPm_rjFougkc" } };
 
 		using var stream = new MemoryStream();
@@ -68,8 +43,6 @@ public class GoogleDriveStorage : ICloudStorage
 
 	public async Task GetFolders(long accountId)
 	{
-		await AuthorizeAccount(accountId);
-
 		var request = _driveService.Files.Get("root");
 		//request.Q = "mimeType='application/vnd.google-apps.folder' and trashed=false";
 		var files = await request.ExecuteAsync();

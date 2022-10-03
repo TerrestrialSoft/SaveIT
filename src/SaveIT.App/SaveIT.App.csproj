@@ -43,17 +43,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Remove="appsettings.json" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Remove="Pages\NewFile1.txt" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Include="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
@@ -62,6 +52,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SaveIT.Core\SaveIT.Core.csproj" />
+      <ProjectReference Include="..\SaveIT.Storage\SaveIT.Storage.csproj" />
     </ItemGroup>
 
 </Project>

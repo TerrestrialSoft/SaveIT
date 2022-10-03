@@ -28,7 +28,6 @@
 
     private async Task AuthorizeAccount()
     {
-        await _externalStorageService.AuthorizeAccountAsync(Id);
         _profile = await _gameProfileService.GetGameProfileAsync(Id);
     }
 

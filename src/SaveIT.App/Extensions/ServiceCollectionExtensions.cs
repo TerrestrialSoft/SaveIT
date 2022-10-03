@@ -21,22 +21,4 @@ public static class ServiceCollectionExtensions
 
 	public static IServiceCollection AddCurrentContext(this IServiceCollection services)
 		=> services.AddSingleton<CurrentContext>();
-
-	public static IServiceCollection AddConfigurationProvider(this IServiceCollection services, ConfigurationManager configurationManager)
-	{
-		var assembly = Assembly.GetExecutingAssembly();
-		using var stream = assembly.GetManifestResourceStream("SaveIT.App.appsettings.json");
-
-		var config = new ConfigurationBuilder()
-			.AddJsonStream(stream)
-			.Build();
-
-		configurationManager.AddConfiguration(config);
-		services.Configure<GoogleDriveOAuthOptions>(x =>
-			configurationManager.GetSection(GoogleDriveOAuthOptions.Position)
-			.Bind(x));
-
-		return services;
-	}
-
 }

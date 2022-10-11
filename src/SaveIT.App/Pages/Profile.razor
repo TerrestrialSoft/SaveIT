@@ -1,8 +1,23 @@
 ﻿@page "/profiles/{Id:long}"
 @inject IGameProfileService _gameProfileService
+@inject CurrentContext _currentContext
+@inject NavigationManager _navManager
 
 <h3>Profile</h3>
-<button>Refresh</button>
+<button>
+    <span class="oi oi-reload" aria-hidden="true"></span> Refresh
+    </button>
+<button @onclick="DeleteProfile">
+    <span class="oi oi-trash" aria-hidden="true"></span> Delete
+</button>
+
+<div>
+    <div>
+        <span>Authorized:</span>
+        <div>@_gameProfile.IsAuthorized</div>
+    </div>
+</div>
+
 <div>
     <span>Nickname</span>
     <div>@_gameProfile.Nickname</div>
@@ -13,15 +28,22 @@
     <div>@_gameProfile.ProfileName</div>
 </div>
 
-<NavLink>
-    <span class="oi oi-cloud-download" aria-hidden="true"></span> Download
-</NavLink>
-<NavLink>
-    <span class="oi oi-cloud-upload" aria-hidden="true"></span> Upload
-</NavLink>
-<NavLink>
-    <span class="oi oi-cog" aria-hidden="true"></span> Options
-</NavLink>
+<div>
+    <NavLink class="nav-link" href="@($"profiles/{Id}/download")" Match="NavLinkMatch.All" >
+        <span class="oi oi-cloud-download" aria-hidden="true"></span> Download
+    </NavLink>
+</div>
+<div>
+    <NavLink class="nav-link" href="@($"profiles/{Id}/upload")" Match="NavLinkMatch.All">
+        <span class="oi oi-cloud-upload" aria-hidden="true"></span> Upload
+    </NavLink>
+</div>
+<div>
+    <NavLink class="nav-link" href="@($"profiles/{Id}/options")" Match="NavLinkMatch.All">
+        <span class="oi oi-cog" aria-hidden="true"></span> Options
+    </NavLink>
+</div>
+
 
 @code {
 
@@ -32,7 +54,12 @@
 
 
     protected override async Task OnParametersSetAsync()
+        => _gameProfile = await _gameProfileService.GetGameProfileAsync(Id);
+
+    private async Task DeleteProfile()
     {
-        _gameProfile = await _gameProfileService.GetGameProfileAsync(Id);
+        await _gameProfileService.DeleteGameProfileAsync(Id);
+        await _currentContext.RefreshProfilesAsync();
+        _navManager.NavigateTo("/");
     }
 }

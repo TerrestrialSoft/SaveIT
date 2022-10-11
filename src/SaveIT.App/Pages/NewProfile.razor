@@ -1,7 +1,5 @@
 ﻿@page "/profiles/new"
 
-@using SaveIT.App.Context
-
 @inject IGameProfileService _gameProfileService
 @inject NavigationManager _navManager
 @inject CurrentContext _currentContext
@@ -35,7 +33,7 @@
     private async Task HandleValidSubmit()
     {
         await _gameProfileService.CreateGameProfileAsync(model.ProfileName, model.Nickname);
-        await _currentContext.FetchNewProfilesAsync();
+        await _currentContext.RefreshProfilesAsync();
         _navManager.NavigateTo("/");
     }
 

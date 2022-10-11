@@ -13,5 +13,7 @@ public class GameProfile
 	[NotNull]
 	public string Nickname { get; set; } = null!;
 
+	public bool IsAuthorized { get; set; } = false;
+
 	public DateTime DateCreated { get; set; }
 }

@@ -1,5 +1,5 @@
 ﻿using SaveIT.Core.Entities;
-using SaveIT.Core.Storage;
+using SaveIT.Storage;
 using System.Linq.Expressions;
 
 namespace SaveIT.Core.Repositories;
@@ -13,7 +13,7 @@ public class GameProfileRepository : IRepository<GameProfile>
         _storage = storage;
     }
 
-	public async Task CreateAsync(GameProfile item)
+	public async Task<GameProfile> CreateAsync(GameProfile item)
 		=> await _storage.CreateAsync(item);
 
 	public async Task UpdateAsync(Expression<Func<GameProfile, bool>> exp, GameProfile item)

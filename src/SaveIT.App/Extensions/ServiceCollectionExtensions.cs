@@ -21,4 +21,7 @@ public static class ServiceCollectionExtensions
 
 	public static IServiceCollection AddCurrentContext(this IServiceCollection services)
 		=> services.AddSingleton<CurrentContext>();
+
+	public static IServiceCollection AddExternalServices(this IServiceCollection services)
+		=> services.AddHttpClient();
 }

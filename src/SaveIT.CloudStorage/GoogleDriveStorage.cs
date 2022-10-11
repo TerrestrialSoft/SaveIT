@@ -1,52 +1,73 @@
-﻿using Google.Apis.Auth.OAuth2;
-using Google.Apis.Auth.OAuth2.Flows;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
-using Microsoft.Extensions.Options;
-using SaveIT.CloudStorage;
+﻿using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json;
+using SaveIT.CloudStorage.Models;
 using SaveIT.CloudStorage.Options;
-using System.IO;
-using GoogleFile = Google.Apis.Drive.v3.Data.File;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace SaveIT.Core.Storage;
 
 public class GoogleDriveStorage : ICloudStorage
 {
-	private static DriveService _driveService;
-	private static readonly string[] Scopes = { DriveService.Scope.Drive };
-	private const string ApplicationName = "SaveIT";
-
 	private readonly GoogleDriveOAuthOptions _googleDriveOptions;
+	private readonly IHttpClientFactory _httpClientFactory;
 
-	public GoogleDriveStorage(IOptions<GoogleDriveOAuthOptions> googleDriveOptions)
+	private const string GoogleApiUrl = "https://www.googleapis.com/";
+	private const string UploadFileUrl = "upload/drive/v3/files?uploadType=multipart";
+
+	public GoogleDriveStorage(IOptions<GoogleDriveOAuthOptions> googleDriveOptions, IHttpClientFactory httpClientFactory)
 	{
 		_googleDriveOptions = googleDriveOptions.Value;
+		_httpClientFactory = httpClientFactory;
 	}
 
 	public async Task CreateFileAsync(long accountId)
 	{
-		var file = new GoogleFile { Name = "SaveIT", MimeType = "application/vnd.google-apps.folder", Parents =  new List<string> { "1i1yCYL8nNSRL6G8zTtcTZPm_rjFougkc" } };
+		var token = "[access_token]";
+		var filePath = "[file_path]";
+		var fileName = "file.txt";
 
-		using var stream = new MemoryStream();
-		using var writer = new StreamWriter(stream);
-		//writer.Write("My first file");
-		writer.Flush();
-		stream.Position = 0;
+		var client = _httpClientFactory.CreateClient();
+		client.BaseAddress = new Uri(GoogleApiUrl);
+		client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-		var request = _driveService.Files.Create(file, stream, "application/vnd.google-apps.folder");
-		request.Fields = "id";
-		await request.UploadAsync();
+		using var fileStream = File.OpenRead(filePath);
+		var fileContent = new StreamContent(fileStream);
+		fileContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+		{
+			Name = "\"file\""
+		};
 
-		var response = request.ResponseBody;
+		var metadata = new GoogleMetadata(fileName, "text/plain", new List<string> { "root" });
+		var jsonMetadata = JsonConvert.SerializeObject(metadata);
+		var metadataContent = new StringContent(jsonMetadata, Encoding.UTF8, "application/json");
+		metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+		{
+			Name = "\"metadata\""
+		};
+
+		var boundary = DateTime.Now.Ticks.ToString();
+		var multiPartFormDataContent = new MultipartFormDataContent(boundary);
+		multiPartFormDataContent.Headers.Remove("Content-Type");
+		multiPartFormDataContent.Headers.TryAddWithoutValidation("Content-Type", "multipart/related; boundary=" + boundary);
+		
+		multiPartFormDataContent.Add(metadataContent);
+		multiPartFormDataContent.Add(fileContent);
+
+		var result = await client.PostAsync(UploadFileUrl, multiPartFormDataContent);
+
+		if(!result.IsSuccessStatusCode)
+		{
+			// autoretry
+			// refresh token
+		}
 	}
 
 	public async Task GetFolders(long accountId)
 	{
-		var request = _driveService.Files.Get("root");
-		//request.Q = "mimeType='application/vnd.google-apps.folder' and trashed=false";
-		var files = await request.ExecuteAsync();
-	}
 
-	public Task DownloadFile() => throw new NotImplementedException();
+	}
 }

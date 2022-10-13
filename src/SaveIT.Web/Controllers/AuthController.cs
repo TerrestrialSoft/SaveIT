@@ -5,20 +5,15 @@ using System.Diagnostics;
 
 namespace SaveIT.Web.Controllers;
 
-public class HomeController : Controller
+public class AuthController : Controller
 {
 	private readonly IOAuthService _oAuthService;
 	private readonly IConfiguration _configuration;
 
-	public HomeController(IOAuthService oAuthService, IConfiguration configuration)
+	public AuthController(IOAuthService oAuthService, IConfiguration configuration)
 	{
 		_oAuthService = oAuthService;
 		_configuration = configuration;
-	}
-
-	public IActionResult Index()
-	{
-		return View();
 	}
 
 	public IActionResult AuthorizeAccount(string code)
@@ -35,7 +30,7 @@ public class HomeController : Controller
 			"include_granted_scopes=true&" +
 			"response_type=code&" +
 			$"state={code}&" +
-			"redirect_uri=https://localhost:44307/Home/authorized&" +
+			"redirect_uri=https://localhost:44307/Auth/authorized&" +
 			$"client_id={_configuration["GoogleDriveOauth:ClientId"]}");
 	}
 

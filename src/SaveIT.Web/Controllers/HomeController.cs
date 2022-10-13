@@ -50,6 +50,10 @@ public class HomeController : Controller
 	public ActionResult<OAuthToken?> GetToken(string code)
 	{
 		var token = _oAuthService.GetToken(code);
+
+		if (token is null)
+			return NotFound();
+
 		return Json(token);
 	}
 

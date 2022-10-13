@@ -1,4 +1,5 @@
-﻿using SaveIT.Core.Entities;
+﻿using SaveIT.Core.Dtos;
+using SaveIT.Core.Entities;
 
 namespace SaveIT.Core.Services;
 

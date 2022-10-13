@@ -1,5 +1,6 @@
 ﻿@page "/profiles/{Id:long}"
 @inject IGameProfileService _gameProfileService
+@inject ITokenService _tokenService
 @inject CurrentContext _currentContext
 @inject NavigationManager _navManager
 
@@ -14,7 +15,7 @@
 <div>
     <div>
         <span>Authorized:</span>
-        <div>@_gameProfile.IsAuthorized</div>
+        <div>@_isAuthorized</div>
     </div>
 </div>
 
@@ -51,10 +52,14 @@
     public long Id { get; set; }
 
     private GameProfile _gameProfile = new();
+    private bool _isAuthorized = false;
 
 
     protected override async Task OnParametersSetAsync()
-        => _gameProfile = await _gameProfileService.GetGameProfileAsync(Id);
+    {
+        _gameProfile = await _gameProfileService.GetGameProfileAsync(Id);
+        _isAuthorized = await _tokenService.TokenExists(Id);
+    }
 
     private async Task DeleteProfile()
     {

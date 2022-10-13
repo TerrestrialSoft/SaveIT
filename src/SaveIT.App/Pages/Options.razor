@@ -1,14 +1,19 @@
 ﻿@page "/profiles/{Id:long}/options"
+@using System.Security.Cryptography
+@using Newtonsoft.Json
+@using SaveIT.Core.Dtos
 
 @inject IGameProfileService _gameProfileService
-@inject IExternalStorageService _externalStorageService
+@inject ITokenService _tokenService
+@inject NavigationManager _navigationManager
+@inject IHttpClientFactory _httpClientFactory
 
 <h3>Options</h3>
 
 <div>
-    <span>Authorized: @_profile.IsAuthorized</span>
+    <span>Authorized: @_isAuthorized</span>
 
-    @if (!_profile.IsAuthorized)
+    @if (!_isAuthorized)
     {
         <button @onclick="AuthorizeAccount">
             <span class="oi oi-account-login" aria-hidden="true"></span> Authorization
@@ -20,15 +25,44 @@
     [Parameter]
     public long Id { get; set; }
     private GameProfile _profile = new();
+    private bool _isAuthorized = false;
+    private int retryCount = 60;
+    private System.Timers.Timer _timer = new ();
+    private HttpClient _httpClient;
+    private string _secret;
 
     protected override async Task OnParametersSetAsync()
     {
+        _isAuthorized = await _tokenService.TokenExists(Id);
         _profile = await _gameProfileService.GetGameProfileAsync(Id);
+        _httpClient ??= _httpClientFactory.CreateClient();
+        _timer.Interval = 5000;
+        _timer.AutoReset = false;
+        _timer.Elapsed += OnTimerElapsed;
+        _secret = _tokenService.GetSecret();
     }
 
-    private async Task AuthorizeAccount()
+    private void AuthorizeAccount()
     {
-        _profile = await _gameProfileService.GetGameProfileAsync(Id);
+        _navigationManager.NavigateTo($"https://localhost:44307/Home/AuthorizeAccount?code={_secret}");
+        _timer.Start();
     }
 
+    private async void OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+    {
+        var response = await _httpClient.GetAsync($"https://localhost:44307/Home/token?code={_secret}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeObject<OAuthTokenDto>(content);
+
+            await _tokenService.CreateTokenAsync(Id, token);
+            _isAuthorized = true;
+            return;
+        }
+
+        if (retryCount-- > 0)
+            _timer.Start();
+    }
 }

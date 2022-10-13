@@ -1,4 +1,6 @@
-﻿using SaveIT.Core.Entities;
+﻿using Newtonsoft.Json;
+using SaveIT.Core.Dtos;
+using SaveIT.Core.Entities;
 using SaveIT.Core.Repositories;
 using SaveIT.Core.Storage;
 
@@ -34,17 +36,4 @@ public class GameProfileService : IGameProfileService
 
 	public async Task<IEnumerable<GameProfile>> GetGameProfilesAsync()
 		=> await _repository.GetAllAsync();
-
-	public async Task AuthorizeAccount(long id)
-	{
-		var profile = await GetGameProfileAsync(id);
-
-		if (profile is null)
-			return;
-
-		
-
-		profile.IsAuthorized = true;
-		await UpdateGameProfileAsync(profile);
-	}
 }

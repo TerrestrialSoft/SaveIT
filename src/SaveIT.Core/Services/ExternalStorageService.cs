@@ -1,9 +1,12 @@
-﻿using SaveIT.Core.Storage;
+﻿using Newtonsoft.Json;
+using SaveIT.Core.Entities;
+using SaveIT.Core.Storage;
 
 namespace SaveIT.Core.Services;
 public class ExternalStorageService : IExternalStorageService
 {
 	private readonly ICloudStorage _cloudStorage;
+
 
 	public ExternalStorageService(ICloudStorage cloudStorage)
 	{

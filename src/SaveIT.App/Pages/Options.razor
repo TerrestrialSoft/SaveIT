@@ -44,13 +44,13 @@
 
     private void AuthorizeAccount()
     {
-        _navigationManager.NavigateTo($"https://localhost:44307/Home/AuthorizeAccount?code={_secret}");
+        _navigationManager.NavigateTo($"https://localhost:44307/Auth/AuthorizeAccount?code={_secret}");
         _timer.Start();
     }
 
     private async void OnTimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
     {
-        var response = await _httpClient.GetAsync($"https://localhost:44307/Home/token?code={_secret}");
+        var response = await _httpClient.GetAsync($"https://localhost:44307/Auth/token?code={_secret}");
 
         if (response.IsSuccessStatusCode)
         {

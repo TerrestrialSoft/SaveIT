@@ -27,7 +27,7 @@ public class OAuthService : IOAuthService
 			{ "client_secret", _configuration["GoogleDriveOAuth:ClientSecret"] },
 			{ "code", code },
 			{ "grant_type", "authorization_code" },
-			{ "redirect_uri", "https://localhost:44307/Auth/authorized" },
+			{ "redirect_uri", "https://localhost:44307/auth/authorized" },
 		};
 
 		var client = _httpClientFactory.CreateClient();

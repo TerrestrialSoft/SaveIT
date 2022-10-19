@@ -1,10 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic.FileIO;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SaveIT.CloudStorage.Models;
-using SaveIT.CloudStorage.Options;
-using System;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -12,27 +7,27 @@ namespace SaveIT.Core.Storage;
 
 public class GoogleDriveStorage : ICloudStorage
 {
-	private readonly GoogleDriveOAuthOptions _googleDriveOptions;
 	private readonly IHttpClientFactory _httpClientFactory;
 
 	private const string GoogleApiUrl = "https://www.googleapis.com/";
 	private const string UploadFileUrl = "upload/drive/v3/files?uploadType=multipart";
+	private const string GetFileUrl = "drive/v3/files?q={0}";
 
-	public GoogleDriveStorage(IOptions<GoogleDriveOAuthOptions> googleDriveOptions, IHttpClientFactory httpClientFactory)
+	private const string AccessToken = "[access_token]";
+
+	public GoogleDriveStorage(IHttpClientFactory httpClientFactory)
 	{
-		_googleDriveOptions = googleDriveOptions.Value;
 		_httpClientFactory = httpClientFactory;
 	}
 
-	public async Task CreateFileAsync(long accountId)
+	public async Task<GoogleFileModel> CreateFileAsync(long profileId)
 	{
-		var token = "[access_token]";
 		var filePath = "[file_path]";
 		var fileName = "file.txt";
 
 		var client = _httpClientFactory.CreateClient();
 		client.BaseAddress = new Uri(GoogleApiUrl);
-		client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
 		using var fileStream = File.OpenRead(filePath);
 		var fileContent = new StreamContent(fileStream);
@@ -41,7 +36,7 @@ public class GoogleDriveStorage : ICloudStorage
 			Name = "\"file\""
 		};
 
-		var metadata = new GoogleMetadata(fileName, "text/plain", new List<string> { "root" });
+		var metadata = new GoogleMetadataModel(fileName, "text/plain", new List<string> { "root" });
 		var jsonMetadata = JsonConvert.SerializeObject(metadata);
 		var metadataContent = new StringContent(jsonMetadata, Encoding.UTF8, "application/json");
 		metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
@@ -57,17 +52,68 @@ public class GoogleDriveStorage : ICloudStorage
 		multiPartFormDataContent.Add(metadataContent);
 		multiPartFormDataContent.Add(fileContent);
 
-		var result = await client.PostAsync(UploadFileUrl, multiPartFormDataContent);
+		var response = await client.PostAsync(UploadFileUrl, multiPartFormDataContent);
 
-		if(!result.IsSuccessStatusCode)
+		if(!response.IsSuccessStatusCode)
 		{
 			// autoretry
 			// refresh token
 		}
+
+		var content = await response.Content.ReadAsStringAsync();
+		return JsonConvert.DeserializeObject<GoogleFileModel>(content)!;
 	}
 
-	public async Task GetFolders(long accountId)
+	public async Task<GoogleFileModel?> GetFolderAsync(long profileId, string name)
 	{
+		var client = _httpClientFactory.CreateClient();
+		client.BaseAddress = new Uri(GoogleApiUrl);
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 
+		var response = await client.GetAsync(string.Format(GetFileUrl, $"trashed=false and mimeType = 'application/vnd.google-apps.folder' and name = '{name}' and 'root' in parents"));
+
+		if(!response.IsSuccessStatusCode)
+		{
+			// autoretry
+			// refresh token
+		}
+
+		var content = await response.Content.ReadAsStringAsync();
+		var folders = JsonConvert.DeserializeObject<GoogleFilesListModel>(content);
+
+		return folders?.Files.FirstOrDefault();
+	}
+
+	public async Task<GoogleFileModel> CreateFolderAsync(long profileId, string name)
+	{
+		var client = _httpClientFactory.CreateClient();
+		client.BaseAddress = new Uri(GoogleApiUrl);
+		client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+
+		var metadata = new GoogleMetadataModel(name, "application/vnd.google-apps.folder", new List<string> { "root" });
+		var jsonMetadata = JsonConvert.SerializeObject(metadata);
+		var metadataContent = new StringContent(jsonMetadata, Encoding.UTF8, "application/json");
+		metadataContent.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+		{
+			Name = "\"metadata\""
+		};
+
+		var boundary = DateTime.Now.Ticks.ToString();
+		var multiPartFormDataContent = new MultipartFormDataContent(boundary);
+		multiPartFormDataContent.Headers.Remove("Content-Type");
+		multiPartFormDataContent.Headers.TryAddWithoutValidation("Content-Type", "multipart/related; boundary=" + boundary);
+
+		multiPartFormDataContent.Add(metadataContent);
+
+		var response = await client.PostAsync(UploadFileUrl, multiPartFormDataContent);
+
+		if (!response.IsSuccessStatusCode)
+		{
+			// autoretry
+			// refresh token
+		}
+
+		var content = await response.Content.ReadAsStringAsync();
+		return JsonConvert.DeserializeObject<GoogleFileModel>(content)!;
 	}
 }

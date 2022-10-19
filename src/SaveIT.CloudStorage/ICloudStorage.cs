@@ -1,6 +1,9 @@
-﻿namespace SaveIT.Core.Storage;
+﻿using SaveIT.CloudStorage.Models;
+
+namespace SaveIT.Core.Storage;
 public interface ICloudStorage
 {
-	Task CreateFileAsync(long accountId);
-	Task GetFolders(long accountId);
+	Task<GoogleFileModel> CreateFileAsync(long profileId);
+	Task<GoogleFileModel> CreateFolderAsync(long profileId, string name);
+	Task<GoogleFileModel?> GetFolderAsync(long profileId, string name);
 }

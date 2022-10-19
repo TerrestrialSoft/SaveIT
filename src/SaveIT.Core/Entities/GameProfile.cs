@@ -13,5 +13,7 @@ public class GameProfile
 	[NotNull]
 	public string Nickname { get; set; } = null!;
 
+	public string? RepostioryId { get; set; } = null!;
+
 	public DateTime DateCreated { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/profiles/{Id:long}"
 @inject IGameProfileService _gameProfileService
 @inject ITokenService _tokenService
+@inject IExternalStorageService _externalStorageService
 @inject CurrentContext _currentContext
 @inject NavigationManager _navManager
 
@@ -17,7 +18,45 @@
         <span>Authorized:</span>
         <div>@_isAuthorized</div>
     </div>
+    <div>
+        <span>RepositoryId:</span>
+        <div>@_gameProfile.RepostioryId</div>
+    </div>
 </div>
+
+@if(_isAuthorized && _gameProfile.RepostioryId is null)
+{
+    <EditForm Model="@_initializeRepository" OnValidSubmit="@HandleValidRepositorySubmit">
+        
+        <div>
+            <h3>Create new repository</h3>
+
+            <div>
+                <label>
+                    New Repository name:
+                    <input type="text" @bind="@_initializeRepository.NewRepositoryName" disabled="@(!string.IsNullOrEmpty(_initializeRepository.ExistingRepositoryName))" />
+                </label>
+            </div>
+        </div>
+
+        <div>
+            <h3>... or insert existing repository name.</h3>
+
+            <div>
+                <label>
+                    Existing Repository name:
+                    <input type="text" @bind="@_initializeRepository.ExistingRepositoryName" disabled="@(!string.IsNullOrEmpty(_initializeRepository.NewRepositoryName))" />
+                </label>
+            </div>
+        </div>
+
+        <button type="submit">Submit</button>
+        
+    </EditForm>
+
+
+}
+
 
 <div>
     <span>Nickname</span>
@@ -51,6 +90,8 @@
     [Parameter]
     public long Id { get; set; }
 
+    private InitializeRepositoryModel _initializeRepository = new();
+
     private GameProfile _gameProfile = new();
     private bool _isAuthorized = false;
 
@@ -66,5 +107,16 @@
         await _gameProfileService.DeleteGameProfileAsync(Id);
         await _currentContext.RefreshProfilesAsync();
         _navManager.NavigateTo("/");
+    }
+
+    private async Task HandleValidRepositorySubmit()
+    {
+        var id = _initializeRepository.NewRepositoryName is not null
+        ? await _externalStorageService.InitializeNewRepositoryAsync(Id, _initializeRepository.NewRepositoryName)
+        : await _externalStorageService.GetExistingRepositoryAsync(Id, _initializeRepository.ExistingRepositoryName);
+
+        _gameProfile.RepostioryId = id;
+
+        await _gameProfileService.UpdateGameProfileAsync(_gameProfile);
     }
 }

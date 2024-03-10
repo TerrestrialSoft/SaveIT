@@ -1,0 +1,40 @@
+﻿@page "/auth/success"
+@page "/auth/failed"
+
+@using Microsoft.AspNetCore.WebUtilities;
+
+@inject NavigationManager NavManager
+
+@if(_success)
+{
+    <PageTitle>Authorization Success</PageTitle>
+
+    <div>Authorization was successfull!. You can close this window and return to the application.</div>
+}
+else
+{
+    <PageTitle>Authorization failed</PageTitle>
+
+    <div>Error occured</div>
+    <div>@_error</div>
+}
+
+@code {
+    private bool _success = false;
+    private string? _error;
+
+    protected override void OnInitialized()
+    {
+        var path = new Uri(NavManager.Uri).GetLeftPart(UriPartial.Path);
+
+        _success = path.EndsWith("success");
+
+        if(!_success)
+        {
+            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("error", out var value))
+                _error = value.ToString();
+        }
+    }
+}

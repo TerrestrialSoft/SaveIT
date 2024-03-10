@@ -1,0 +1,9 @@
+﻿@page "/{*Path}"
+
+<h3>404 - Page not found</h3>
+Route: @Path
+
+@code {
+    [Parameter]
+    public string Path { get; set; } = default!;
+}

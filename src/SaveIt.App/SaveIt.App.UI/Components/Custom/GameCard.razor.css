@@ -1,0 +1,4 @@
+﻿.prevent-select {
+    -webkit-user-select: none;
+    user-select: none;
+}

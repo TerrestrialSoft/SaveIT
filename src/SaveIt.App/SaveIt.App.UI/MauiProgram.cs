@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using SaveIt.App.Persistence.Extensions;
+using SaveIt.App.UI.Extensions;
 
 namespace SaveIt.App.UI;
 
@@ -12,6 +14,9 @@ public static class MauiProgram
             .ConfigureFonts(fonts => fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"));
 
         builder.Services.AddMauiBlazorWebView();
+
+        builder.Services.AddUI()
+            .AddPersistence();
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();

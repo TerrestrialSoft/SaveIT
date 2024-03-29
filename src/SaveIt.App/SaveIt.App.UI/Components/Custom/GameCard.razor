@@ -1,18 +1,43 @@
-﻿<div class="card m-2" style="width: 18rem;">
-    @* <img src="..." class="card-img-top" alt="..."> *@
-    <div class="card-body">
-        <h5 class="card-title">Card title</h5>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-        <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
+﻿<div class="card m-1 prevent-select" style="width: 18rem">
+    
+    @if (ShowDetail)
+    {
+        <div class="card-body">
+            <h5 class="card-title">@Game.Name</h5>
+            <div>
+                Profile:
+                <InputSelect @bind-Value="SelectedSave">
+                    @foreach(var save in Game.GameSaves)
+                    {
+                        <option value="@save">@save.Name</option>
+                    }
+                </InputSelect>
+            </div>
+        </div>
+    }
+    else
+    {
+        <img src="image-placeholder.svg" class="card-img-top" alt="@Game.Name">
+        <div class="card-body">
+            <h5 class="card-title">@Game.Name</h5>
+        </div>
+    }
+
+    
 </div>
 
 @code
 {
     [Parameter]
-    public required Guid GameId { get; set; }
+    public required Game Game { get; set; }
 
-    protected override void OnInitialized()
+    [Parameter]
+    public bool ShowDetail { get; set; }
+
+    private GameSave? SelectedSave { get; set; }
+
+
+    private void CardClicked()
     {
         
     }

@@ -9,5 +9,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPersistence(this IServiceCollection services)
         => services.AddScoped<IGameRepository, GameRepository>()
             .AddScoped<IGameSaveRepository, GameSaveRepository>()
+            .AddScoped<IStorageAccountRepository, StorageAccountRepository>()
             .AddSingleton<IDatabaseHandler, DatabaseHandler>();
 }

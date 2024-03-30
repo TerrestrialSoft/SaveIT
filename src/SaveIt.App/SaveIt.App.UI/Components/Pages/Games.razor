@@ -3,10 +3,11 @@
 @using SaveIt.App.Domain.Repositories
 @using SaveIt.App.Domain.Entities
 @inject IGameRepository gameRepository
+@inject IStorageAccountRepository storageAccountRepository
 
 <div class="d-flex m-3 justify-content-center">
     <SearchBar OnSearch="UpdateGames" />
-    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5">
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="ShowCreateNewGameModal">
         <Icon Name="IconName.PlusLg" /> Create new Game
     </Button>
 </div>
@@ -25,15 +26,80 @@
     }
 </div>
 
+<Modal @ref="_createNewGameModal" Title="Modal title" Size="ModalSize.ExtraLarge">
+    <BodyTemplate>
+        <EditForm Model="_selectedGame">
+            <div class="d-flex">
+                <div>
+                    <div>
+                        <label>
+                            Game Name
+                            <InputText @bind-Value="_selectedGame.Name" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Username
+                            <InputText @bind-Value="_selectedGame.Name" />
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <ImagePicker />
+                    </div>
+                    <div>
+                    
+                    </div>
+                </div>
+            </div>
+            
+            <h3>Game Save Information</h3>
+
+            <div>
+                <div>
+                    <div>
+                        <label>
+                            Game Save Name
+                            <InputText @bind-Value="_selectedGame.Name" />
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Storage Account
+                            <InputSelect @bind-Value="_selectedStorageAccount">
+                                @foreach(var account in _storageAccounts)
+                                {
+                                    <option value="@account">@account.Name</option>
+                                }
+                            </InputSelect>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+            
+        </EditForm>
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button Color="ButtonColor.Primary">Save changes</Button>
+    </FooterTemplate>
+</Modal>
+
 @code
 {
     private List<Game> _allGames = new();
     private List<Game> _filteredGames = new();
     private string _searchText = "";
-    private Game? _selectedGame = null;
+    private Game? _selectedGame = new();
+    private Modal _createNewGameModal = default!;
+    private StorageAccount _selectedStorageAccount = new();
+    private List<StorageAccount> _storageAccounts = new();
 
     protected override async Task OnInitializedAsync()
     {
+        _storageAccounts = (await storageAccountRepository.GetAllStorageAccounts()).ToList();
         _allGames = (await gameRepository.GetAllGamesAsync()).ToList();
         _filteredGames = _allGames.ToList();
     }
@@ -46,5 +112,10 @@
     private void GameCardClicked(Game g)
     {
         _selectedGame = g;
+    }
+
+    private Task ShowCreateNewGameModal()
+    {
+        return _createNewGameModal.ShowAsync();
     }
 }

@@ -1,0 +1,40 @@
+﻿<div style="width: 11rem; height: 11rem;">
+    <div class="d-flex">
+        <div>
+            <Icon Name="IconName.Image" /> Game Image
+            <InputFile OnChange="LoadFile" accept="image/png,image/jpg,image/jpeg" />
+        </div>
+        <div>
+            @if (!string.IsNullOrEmpty(_base64) && _error is null)
+            {
+                <img class="upload-image" alt="Image" src="@_base64" style="max-width: 10rem; max-height: 10rem;" />
+            }
+        </div>
+    </div>
+    @if (!string.IsNullOrEmpty(_error))
+    {
+        <Alert Color="AlertColor.Danger">@_error</Alert>
+    }
+</div>
+
+@code {
+    private string? _base64 { get; set; }
+    private const long _maxFileSize = 5 * 1024 * 1024;
+    private string? _error = null;
+
+    private async Task LoadFile(InputFileChangeEventArgs e)
+    {
+        using MemoryStream memoryStream = new MemoryStream();
+
+        if(e.File.Size > _maxFileSize)
+        {
+            _error = "File size is too large";
+            return;
+        }
+
+        await e.File.OpenReadStream(_maxFileSize)
+            .CopyToAsync(memoryStream);
+        byte[] bytes = memoryStream.ToArray();
+        _base64 = "data:image/png;base64," + Convert.ToBase64String(bytes);
+    }
+}

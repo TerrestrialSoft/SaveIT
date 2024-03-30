@@ -1,4 +1,4 @@
-﻿<div class="card m-1 prevent-select" style="width: 18rem">
+﻿<div class="card m-1 prevent-select" style="width: 18rem; height:18rem;" @onclick="ToggleDetailShowing">
     
     @if (ShowDetail)
     {
@@ -22,7 +22,6 @@
             <h5 class="card-title">@Game.Name</h5>
         </div>
     }
-
     
 </div>
 
@@ -32,13 +31,17 @@
     public required Game Game { get; set; }
 
     [Parameter]
-    public bool ShowDetail { get; set; }
+    public EventCallback<Game> OnCardClicked { get; set; }
+
+    [Parameter]
+    public bool ShowDetail { get; set; } = false;
 
     private GameSave? SelectedSave { get; set; }
 
 
-    private void CardClicked()
+    private async Task ToggleDetailShowing()
     {
-        
+        ShowDetail = !ShowDetail;
+        await OnCardClicked.InvokeAsync(Game);
     }
 }

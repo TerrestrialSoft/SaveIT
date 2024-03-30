@@ -1,4 +1,8 @@
-﻿<input @bind="searchText" @oninput="OnSearchTextChanged" class="form-control" placeholder="Search games..." />
+﻿<input @bind="searchText"
+    @oninput="OnSearchTextChanged"
+    class="form-control"
+    style="max-width: 40rem"
+    placeholder="Search games..." />
 
 @code {
     private string searchText = "";
@@ -8,7 +12,7 @@
 
     private async Task OnSearchTextChanged(ChangeEventArgs e)
     {
-        searchText = e.Value.ToString();
+        searchText = e.Value?.ToString() ?? "";
         await OnSearch.InvokeAsync(searchText);
     }
 }

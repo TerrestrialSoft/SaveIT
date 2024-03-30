@@ -4,16 +4,24 @@
 @using SaveIt.App.Domain.Entities
 @inject IGameRepository gameRepository
 
-<h1>Game</h1>
-
-<div class="d-flex">
+<div class="d-flex m-3 justify-content-center">
     <SearchBar OnSearch="UpdateGames" />
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5">
+        <Icon Name="IconName.PlusLg" /> Create new Game
+    </Button>
 </div>
 
 <div class="d-flex flex-wrap">
     @foreach (var game in _filteredGames)
     {
-        <GameCard Game="game" ShowDetail="true"/>
+        if(game == _selectedGame)
+        {
+            <GameCard Game="game" ShowDetail="true" OnCardClicked="GameCardClicked" />
+        }
+        else
+        {
+            <GameCard Game="game" ShowDetail="false" OnCardClicked="GameCardClicked" />
+        }
     }
 </div>
 
@@ -22,6 +30,7 @@
     private List<Game> _allGames = new();
     private List<Game> _filteredGames = new();
     private string _searchText = "";
+    private Game? _selectedGame = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,8 +38,13 @@
         _filteredGames = _allGames.ToList();
     }
 
-    void UpdateGames(string searchText)
+    private void UpdateGames(string searchText)
     {
         _filteredGames = _allGames.Where(g => g.Name.Contains(searchText)).ToList();
+    }
+
+    private void GameCardClicked(Game g)
+    {
+        _selectedGame = g;
     }
 }

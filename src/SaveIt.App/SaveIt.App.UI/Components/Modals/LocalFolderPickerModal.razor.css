@@ -1,0 +1,21 @@
+﻿.selected-directory {
+    background-color: #0987e8;
+    border-radius: 5px;
+}
+
+.folder-item {
+    width: 6rem;
+    height: 8rem;
+}
+
+.directory-img {
+    width: 6rem;
+    height: 6rem;
+}
+
+.directory-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 6rem;
+}

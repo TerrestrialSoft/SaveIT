@@ -1,0 +1,129 @@
+﻿
+<div class="m-3">
+    <div class="d-flex align-items-center mb-3">
+        <div class="me-4">
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory">
+                <Icon Name="IconName.ArrowLeft" />
+            </Button>
+        </div>
+        <div class="fs-5">@_currentPath</div>
+    </div>
+
+    @if (_error is not null)
+    {
+        <div>
+            <Alert Color="AlertColor.Warning">@_error</Alert>
+        </div>
+    }
+    
+    <div class="d-flex flex-wrap">
+        @foreach (var directory in _directories)
+        {
+            <div class="d-flex flex-column align-items-center m-2 @(directory.IsSelected ? "selected-directory" : "") folder-item"
+                @ondblclick="() => MoveToDirectory(directory)"
+                @onclick="() => SelectDirectory(directory)">
+                <img src="folder.svg" alt="Folder" class="directory-img" />
+                <Tooltip Title="@directory.Name" Placement="TooltipPlacement.Bottom">
+                    <p class="directory-name">@directory.Name</p>
+                </Tooltip>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex mt-3 justify-content-end">
+        <Button Color="ButtonColor.Primary" @onclick="PickDirectoryAsync" Class="fs-5 p-2 pe-3 ps-3">Select folder</Button>
+    </div>
+</div>
+
+
+
+@code {
+    private string _currentPath = string.Empty;
+    private List<DirectoryModel> _directories = new ();
+    private string? _error;
+
+    [Parameter]
+    public EventCallback<string> OnDirectorySelected { get; set; }
+
+    [Parameter]
+    public string InitialPath { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        try
+        {
+            _currentPath = string.IsNullOrEmpty(InitialPath)
+                ? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
+                : InitialPath;
+
+            RedrawDirectories();
+        }
+        catch (Exception)
+        {
+            _error = "Application has no permission to view the contents of this folder.";
+            return;
+        }
+    }
+
+    private void RedrawDirectories()
+    {
+        _error = null;
+        try
+        {
+            var directories = Directory.GetDirectories(_currentPath);
+
+            _directories = directories.Select(x => new DirectoryModel
+            {
+                Name = Path.GetFileName(x)!,
+                Path = x
+            }).ToList();
+        }
+        catch (Exception)
+        {
+            _directories.Clear();
+            _error = "Application has no permission to view the contents of this folder.";
+        }
+    }
+
+    private void MoveToDirectory(DirectoryModel model)
+    {
+        _currentPath = model.Path;
+        RedrawDirectories();
+    }
+
+    private void ChangeToParentDirectory()
+    {
+        var parent = Directory.GetParent(_currentPath);
+
+        if (parent is null)
+        {
+            return;
+        }
+
+        _currentPath = parent.FullName;
+        RedrawDirectories();
+    }
+
+    private void SelectDirectory(DirectoryModel directory)
+    {
+        var selectedDirectory = _directories.FirstOrDefault(x => x.IsSelected);
+
+        if(selectedDirectory is not null)
+        {
+            selectedDirectory.IsSelected = false;
+        }
+
+        directory.IsSelected = true;
+    }
+
+    private async Task PickDirectoryAsync()
+    {
+        var selectedDirectory = _directories.FirstOrDefault(x => x.IsSelected);
+
+        string path = selectedDirectory is null
+            ? _currentPath
+            : selectedDirectory.Path;
+
+        await OnDirectorySelected.InvokeAsync(path);
+    }
+}

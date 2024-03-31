@@ -52,10 +52,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Models\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\SaveIt.App.Infrastructure\SaveIt.App.Infrastructure.csproj" />
       <ProjectReference Include="..\SaveIt.App.Persistence\SaveIt.App.Persistence.csproj" />
     </ItemGroup>

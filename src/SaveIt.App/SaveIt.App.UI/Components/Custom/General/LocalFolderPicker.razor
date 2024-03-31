@@ -1,3 +1,29 @@
-﻿@code {
+﻿<div class="m-1">
+    <div class="">
+        <Icon Name="IconName.PcDisplayHorizontal" />
+        Local Game Save Location
+    </div>
+    <div>
+        <Button Color="ButtonColor.Primary"
+            Outline="true"
+            Class="ms-4 me-3"
+            @onclick="ShowModal">
+            Select Location
+        </Button>
+        @Path
+    </div>
+</div>
 
+
+@code {
+    [Parameter]
+    public EventCallback OnPickerClicked { get; set; }
+
+    [Parameter]
+    public string Path { get; set; } = "";
+
+    private async Task ShowModal()
+    {
+        await OnPickerClicked.InvokeAsync();
+    }
 }

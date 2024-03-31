@@ -15,14 +15,7 @@
 <div class="d-flex flex-wrap">
     @foreach (var game in _filteredGames)
     {
-        if(game == _selectedGame)
-        {
-            <GameCard Game="game" ShowDetail="true" OnCardClicked="GameCardClicked" />
-        }
-        else
-        {
-            <GameCard Game="game" ShowDetail="false" OnCardClicked="GameCardClicked" />
-        }
+        <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" />
     }
 </div>
 
@@ -56,7 +49,7 @@
             
             <h3>Game Save Information</h3>
 
-            <div>
+            <div class="d-flex">
                 <div>
                     <div>
                         <label>
@@ -77,6 +70,9 @@
                     </div>
                 </div>
                 <div>
+                    <div>
+                        <LocalFolderPicker Path="@_selectedLocalFolderPath" OnPickerClicked="ShowLocalFolderPickerModal" />
+                    </div>
                 </div>
             </div>
             
@@ -87,13 +83,19 @@
     </FooterTemplate>
 </Modal>
 
+<Modal @ref="_localFolderPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal"/>
+
 @code
 {
+    private Modal _createNewGameModal = default!;
+    private Modal _localFolderPickerModal = default!;
+    private string _selectedLocalFolderPath = "";
+
+
     private List<Game> _allGames = new();
     private List<Game> _filteredGames = new();
     private string _searchText = "";
     private Game? _selectedGame = new();
-    private Modal _createNewGameModal = default!;
     private StorageAccount _selectedStorageAccount = new();
     private List<StorageAccount> _storageAccounts = new();
 
@@ -114,8 +116,27 @@
         _selectedGame = g;
     }
 
-    private Task ShowCreateNewGameModal()
+    private async Task ShowCreateNewGameModal()
     {
-        return _createNewGameModal.ShowAsync();
+        await _createNewGameModal.ShowAsync();
+    }
+
+    private async Task ShowLocalFolderPickerModal()
+    {
+        await _createNewGameModal.HideAsync();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(LocalFolderPickerModal.InitialPath), _selectedLocalFolderPath },
+            {
+                nameof(LocalFolderPickerModal.OnDirectorySelected),
+                EventCallback.Factory.Create<string>(this, async (path) =>
+                {
+                    _selectedLocalFolderPath = path;
+                    await _localFolderPickerModal.HideAsync();
+                    await _createNewGameModal.ShowAsync();
+                })
+            },
+        };
+        await _localFolderPickerModal.ShowAsync<LocalFolderPickerModal>("Select Game Save Folder", parameters: parameters);
     }
 }

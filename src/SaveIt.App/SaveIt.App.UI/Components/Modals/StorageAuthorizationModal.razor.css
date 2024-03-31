@@ -1,0 +1,28 @@
+﻿.storage-container {
+    border-radius: 15px;
+    border-style: solid;
+    border-color: black;
+    border-width: 2px;
+    cursor: pointer;
+}
+
+    .storage-container img {
+        width: 17rem;
+        height: 17rem;
+    }
+
+.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    border-color: gray;
+    background-color: rgba(128, 128, 128, 0.2); /* Gray color with 50% opacity */
+}
+
+    .disabled img {
+        filter: grayscale(100%);
+        opacity: 0.5;
+    }
+
+    .disabled p {
+        color: gray;
+    }

@@ -19,7 +19,7 @@
     }
 </div>
 
-<Modal @ref="_createNewGameModal" Title="Modal title" Size="ModalSize.ExtraLarge">
+<Modal @ref="_createNewGameModal" Title="Modal title" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true">
     <BodyTemplate>
         <EditForm Model="_selectedGame">
             <div class="d-flex">
@@ -66,6 +66,9 @@
                                     <option value="@account">@account.Name</option>
                                 }
                             </InputSelect>
+                            <div>
+                                or <b @onclick="ShowAuthorizeStorageModal">create a new one</b>.
+                            </div>
                         </label>
                     </div>
                 </div>
@@ -83,12 +86,15 @@
     </FooterTemplate>
 </Modal>
 
-<Modal @ref="_localFolderPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal"/>
+<Modal @ref="_localFolderPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
+
+<Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 
 @code
 {
     private Modal _createNewGameModal = default!;
     private Modal _localFolderPickerModal = default!;
+    private Modal _authorizeStorageModal = default!;
     private string _selectedLocalFolderPath = "";
 
 
@@ -138,5 +144,13 @@
             },
         };
         await _localFolderPickerModal.ShowAsync<LocalFolderPickerModal>("Select Game Save Folder", parameters: parameters);
+    }
+
+    private async Task ShowAuthorizeStorageModal()
+    {
+        await _createNewGameModal.HideAsync();
+        var parameters = new Dictionary<string, object>();
+
+        await _authorizeStorageModal.ShowAsync<StorageAuthorizationModal>("Authorize new Cloud Storage", parameters: parameters);
     }
 }

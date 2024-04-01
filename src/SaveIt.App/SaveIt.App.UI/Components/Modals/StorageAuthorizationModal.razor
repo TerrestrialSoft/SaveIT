@@ -1,4 +1,6 @@
-﻿<div>
+﻿@inject IAuthService _authService
+
+<div>
     @switch(_authState)
     {
         case AuthorizationScreenState.SelectProvider:
@@ -78,8 +80,9 @@
 
     private AuthorizationScreenState _authState = AuthorizationScreenState.SelectProvider;
 
-    private void SelectGoogleProvider()
+    private async Task SelectGoogleProvider()
     {
+        var url = await _authService.GetAuthorizationUrlAsync();
         _authState = AuthorizationScreenState.AuthorizeProviderSuccess;
         AuthorizeProvider();
     }

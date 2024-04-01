@@ -1,6 +1,6 @@
 ﻿namespace SaveIt.App.UI;
 
-public partial class App : Application
+public partial class App : Microsoft.Maui.Controls.Application
 {
     public App()
     {

@@ -106,7 +106,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await RefreshStoreAccountsAsync();
+        await RefreshStorageAccountsAsync();
         _allGames = (await gameRepository.GetAllGamesAsync()).ToList();
         _filteredGames = _allGames.ToList();
     }
@@ -154,7 +154,7 @@
                 nameof(StorageAuthorizationModal.OnClose),
                 EventCallback.Factory.Create(this, async () =>
                 {
-                    await RefreshStoreAccountsAsync();
+                    await RefreshStorageAccountsAsync();
                     await _authorizeStorageModal.HideAsync();
                     await _createNewGameModal.ShowAsync();
                 })
@@ -163,7 +163,7 @@
         await _authorizeStorageModal.ShowAsync<StorageAuthorizationModal>("Authorize new Cloud Storage", parameters: parameters);
     }
 
-    private async Task RefreshStoreAccountsAsync()
+    private async Task RefreshStorageAccountsAsync()
     {
         _storageAccounts = (await storageAccountRepository.GetAllStorageAccounts()).ToList();
     }

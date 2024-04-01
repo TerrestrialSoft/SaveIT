@@ -17,12 +17,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.AddApplicationEndpoints();
+app.AddApplicationEndpoints(); // I add custom EPs here
 
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
+app.UseAntiforgery(); // Antiforgery is enabled here
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

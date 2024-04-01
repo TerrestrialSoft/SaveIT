@@ -10,14 +10,17 @@ public static class ApiEndpoints
 
     public static void AddApplicationEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet(pattern: "auth/google", (Guid requestId, IGoogleAuthService authService) =>
+        var apiGroup = app.MapGroup("api/auth")
+            .DisableAntiforgery();
+
+        apiGroup.MapGet("google", (Guid requestId, IGoogleAuthService authService) =>
         {
             var authorization = authService.RegisterAuthorizationRequest(requestId);
 
-            return Results.Redirect(authorization.Uri.ToString(), true);
+            return Results.Ok(authorization.Uri.ToString());
         });
 
-        app.MapGet(pattern: "auth/google/callback", async (string state, string? code, string? error, CancellationToken cancellationToken,
+        apiGroup.MapGet("google/callback", async (string state, string? code, string? error, CancellationToken cancellationToken,
             IGoogleAuthService authService, ILogger<GoogleAuthService> _logger) =>
         {
             if (!string.IsNullOrEmpty(error) || string.IsNullOrEmpty(code))
@@ -35,10 +38,11 @@ public static class ApiEndpoints
                 path = string.Format(_failedAuth, errors);
             }
 
-            return Results.Redirect(_successAuth);
+            return Results.Redirect(path);
         });
 
-        app.MapGet(pattern: "auth/retrieve", async (Guid requestId, CancellationToken token, IGoogleAuthService authService) =>
+        apiGroup.MapGet(pattern: "retrieve", async (Guid requestId, CancellationToken token,
+            IGoogleAuthService authService) =>
         {
             var result = await authService.RetrieveTokensAsync(requestId, token);
 

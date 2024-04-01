@@ -1,5 +1,9 @@
 [*.cs]
 
+### Guidelines ###
+guidelines = 130
+guidelines_style = 2px dotted greenyellow
+
 # IDE0058: Expression value is never used
 dotnet_diagnostic.IDE0058.severity = none
 
@@ -18,7 +22,7 @@ csharp_style_expression_bodied_operators = false:silent
 csharp_style_expression_bodied_properties = true:silent
 csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_accessors = true:silent
-csharp_style_expression_bodied_lambdas = true:error
+csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = true:error
 csharp_style_throw_expression = true:suggestion
 

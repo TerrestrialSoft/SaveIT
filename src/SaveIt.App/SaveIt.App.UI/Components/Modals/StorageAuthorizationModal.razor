@@ -1,4 +1,5 @@
 ﻿@inject IAuthService _authService
+@inject NavigationManager _navigationManager
 
 <div>
     @switch(_authState)
@@ -36,7 +37,7 @@
                     <Spinner Type="SpinnerType.Border" Size="SpinnerSize.ExtraLarge"/>
                 </div>
                 <p class="fs-2 text-center mt-4 p-4 mt-0">Waiting for Authorization...</p>
-                <p class="fs-5 text-center text-muted p-2">Please login through the opened browser window using your Google account for authorization.</p>
+                <p class="fs-5 text-center text-muted p-2">Please login through the opened browser window for authorization.</p>
                 <div class="text-center">
                     <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-2 mt-2" @onclick="BackToProviderSelection"> Cancel </Button>
                 </div>
@@ -80,31 +81,34 @@
 
     private AuthorizationScreenState _authState = AuthorizationScreenState.SelectProvider;
 
-    private async Task SelectGoogleProvider()
-    {
-        var url = await _authService.GetAuthorizationUrlAsync();
-        _authState = AuthorizationScreenState.AuthorizeProviderSuccess;
-        AuthorizeProvider();
-    }
+    private Task SelectGoogleProvider()
+        => AuthorizeProviderAsync();
 
     private void BackToProviderSelection()
     {
         _authState = AuthorizationScreenState.SelectProvider;
     }
 
-    private void AuthorizeProvider()
+    private async Task AuthorizeProviderAsync()
     {
+        _authState = AuthorizationScreenState.AuthorizationInProgress;
+
+        var url = await _authService.GetAuthorizationUrlAsync();
+
+        if (url is null)
+        {
+            _authState = AuthorizationScreenState.AuthorizeProviderError;
+            return;
+        }
+
+        _navigationManager.NavigateTo("https://learn.microsoft.com/en-us/dotnet/maui/");
     }
 
-    private void RetryAuthorization()
-    {
-        AuthorizeProvider();
-    }
+    private Task RetryAuthorization()
+        => AuthorizeProviderAsync();
 
-    private async Task FinishAuthorization()
-    {
-        await OnClose.InvokeAsync();
-    }
+    private Task FinishAuthorization()
+        => OnClose.InvokeAsync();
 
     private enum AuthorizationScreenState
     {

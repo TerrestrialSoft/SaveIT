@@ -22,7 +22,7 @@
             <div class="d-flex flex-column align-items-center m-2 @(directory.IsSelected ? "selected-directory" : "") folder-item"
                 @ondblclick="() => MoveToDirectory(directory)"
                 @onclick="() => SelectDirectory(directory)">
-                <img src="folder.svg" alt="Folder" class="directory-img" />
+                <img src="img/icons/folder-icon.svg" alt="Folder" class="directory-img" />
                 <Tooltip Title="@directory.Name" Placement="TooltipPlacement.Bottom">
                     <p class="directory-name">@directory.Name</p>
                 </Tooltip>

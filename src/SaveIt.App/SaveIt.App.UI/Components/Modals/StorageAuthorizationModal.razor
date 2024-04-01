@@ -1,31 +1,113 @@
 ﻿<div>
-    <div>
-        <h4>Select one of the Storage providers</h4>
-    </div>
-    <div class="d-flex justify-content-around">
-        <div class="d-flex flex-column align-items-center m-3 p-4 pb-2 storage-container">
+    @switch(_authState)
+    {
+        case AuthorizationScreenState.SelectProvider:
             <div>
-                <img src="google-drive-logo.svg" alt="Google Drive Logo"/>
+                <h4>Select one of the Storage providers</h4>
             </div>
-            <div class="mt-5">
-                <p class="fw-bold fs-3">Google Drive</p>
+            <div class="d-flex justify-content-around">
+                <div class="d-flex flex-column align-items-center m-3 p-4 pb-2 storage-container" @onclick="SelectGoogleProvider">
+                    <div>
+                        <img src="img/logos/google-drive-logo.svg" alt="Google Drive Logo" />
+                    </div>
+                    <div class="mt-5">
+                        <p class="fw-bold fs-3">Google Drive</p>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-center m-3 p-4 pb-2 storage-container disabled">
+                    <div>
+                        <img src="img/logos/dropbox-logo.svg" alt="Google Drive Logo" />
+                    </div>
+                    <div class="mt-5">
+                        <p class="fw-bold fs-3">Dropbox</p>
+                    </div>
+                    <div>
+                        <p class="text-muted">Coming soon</p>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div class="d-flex flex-column align-items-center m-3 p-4 pb-2 storage-container disabled">
-            <div>
-                <img src="dropbox-logo.svg" alt="Google Drive Logo" />
+            break;
+
+        case AuthorizationScreenState.AuthorizationInProgress:
+            <div class="d-flex flex-column align-content-center justify-content-center m-4 p-4">
+                <div class="text-center">
+                    <Spinner Type="SpinnerType.Border" Size="SpinnerSize.ExtraLarge"/>
+                </div>
+                <p class="fs-2 text-center mt-4 p-4 mt-0">Waiting for Authorization...</p>
+                <p class="fs-5 text-center text-muted p-2">Please login through the opened browser window using your Google account for authorization.</p>
+                <div class="text-center">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-2 mt-2" @onclick="BackToProviderSelection"> Cancel </Button>
+                </div>
             </div>
-            <div class="mt-5">
-                <p class="fw-bold fs-3">Dropbox</p>
+            break;
+
+        case AuthorizationScreenState.AuthorizeProviderError:
+            <div class="d-flex flex-column align-content-center justify-content-center m-4 p-4">
+                <div class="text-center">
+                    <img src="img/icons/danger-icon.svg" alt="Danger Icon" style="width: 15%; height: 15%;" />
+                </div>
+                <p class="fs-2 text-center mt-4 p-4 mt-0">Authorization Failed</p>
+                <p class="fs-5 text-center text-muted p-2">There was an error during authorization process.<br> Please try again later.</p>
+                <div class="text-center">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-2 mt-2" @onclick="RetryAuthorization"> Retry </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-2 mt-2" @onclick="BackToProviderSelection"> Back to Provider selection </Button>
+                </div>
             </div>
-            <div>
-                <p class="text-muted">Coming soon</p>
+            break;
+
+        case AuthorizationScreenState.AuthorizeProviderSuccess:
+            <div class="d-flex flex-column align-content-center justify-content-center m-4 p-4">
+                <div class="text-center">
+                    <img src="img/icons/success-icon.svg" alt="Success Icon" style="width: 15%; height: 15%;" />
+                </div>
+                <p class="fs-2 text-center mt-4 p-4 mt-0">Authorization Successful</p>
+                <p class="fs-5 text-center text-muted p-2">You have successfully authorized the provider.<br> You may now close this window.</p>
+                <div class="text-center">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-2 mt-2" @onclick="FinishAuthorization"> Close </Button>
+                </div>
             </div>
-        </div>
-    </div>
+            break;
+
+    }
 </div>
 
 
 @code {
+    [Parameter]
+    public EventCallback OnClose { get; set; }
 
+    private AuthorizationScreenState _authState = AuthorizationScreenState.SelectProvider;
+
+    private void SelectGoogleProvider()
+    {
+        _authState = AuthorizationScreenState.AuthorizeProviderSuccess;
+        AuthorizeProvider();
+    }
+
+    private void BackToProviderSelection()
+    {
+        _authState = AuthorizationScreenState.SelectProvider;
+    }
+
+    private void AuthorizeProvider()
+    {
+    }
+
+    private void RetryAuthorization()
+    {
+        AuthorizeProvider();
+    }
+
+    private async Task FinishAuthorization()
+    {
+        await OnClose.InvokeAsync();
+    }
+
+    private enum AuthorizationScreenState
+    {
+        SelectProvider,
+        AuthorizationInProgress,
+        AuthorizeProviderError,
+        AuthorizeProviderSuccess
+    }
 }

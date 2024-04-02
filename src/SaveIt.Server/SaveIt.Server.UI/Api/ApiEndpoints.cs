@@ -10,18 +10,18 @@ public static class ApiEndpoints
 
     public static void AddApplicationEndpoints(this IEndpointRouteBuilder app)
     {
-        var apiGroup = app.MapGroup("api/auth")
-            .DisableAntiforgery();
+        var apiGroup = app.MapGroup("api/auth");
 
-        apiGroup.MapGet("google", (Guid requestId, IGoogleAuthService authService) =>
+        apiGroup.MapPost("google", (RequestModel model, HttpContext context, IGoogleAuthService authService) =>
         {
-            var authorization = authService.RegisterAuthorizationRequest(requestId);
+            var serverUrl = GetServerUrl(context.Request);
+            var authorization = authService.RegisterAuthorizationRequest(model.RequestId, serverUrl);
 
             return Results.Ok(authorization.Uri.ToString());
         });
 
-        apiGroup.MapGet("google/callback", async (string state, string? code, string? error, CancellationToken cancellationToken,
-            IGoogleAuthService authService, ILogger<GoogleAuthService> _logger) =>
+        apiGroup.MapGet("google/callback", async (string state, string? code, string? error, HttpContext context,
+            CancellationToken cancellationToken, IGoogleAuthService authService, ILogger<GoogleAuthService> _logger) =>
         {
             if (!string.IsNullOrEmpty(error) || string.IsNullOrEmpty(code))
             {
@@ -29,8 +29,10 @@ public static class ApiEndpoints
                 return Results.Redirect(string.Format(_failedAuth, error));
             }
 
-            string path = _successAuth;
-            var result = await authService.GetTokensAsync(code, state, cancellationToken);
+            var serverUrl = GetServerUrl(context.Request);
+            var result = await authService.GetTokensAsync(code, state, serverUrl, cancellationToken);
+
+            var path = _successAuth;
 
             if (result.IsFailed)
             {
@@ -41,14 +43,17 @@ public static class ApiEndpoints
             return Results.Redirect(path);
         });
 
-        apiGroup.MapGet(pattern: "retrieve", async (Guid requestId, CancellationToken token,
+        apiGroup.MapPost("retrieve", async (RequestModel model, CancellationToken token,
             IGoogleAuthService authService) =>
         {
-            var result = await authService.RetrieveTokensAsync(requestId, token);
+            var result = await authService.RetrieveTokensAsync(model.RequestId, token);
 
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : Results.NoContent();
         });
     }
+
+    private static string GetServerUrl(HttpRequest request)
+        => $"{request.Scheme}://{request.Host}";
 }

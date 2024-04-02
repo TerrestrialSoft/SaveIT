@@ -1,27 +1,25 @@
 ﻿using SaveIt.App.Domain.Auth;
+using System.Net.Http.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 
 public class SaveItClient(HttpClient httpClient) : IAuthClientService
 {
-    private const string _authUrl = "authUrl";
+    private const string _authUrl = "google";
+    private const string _authGetTokens = "auth/retrieve";
 
     private readonly HttpClient _httpClient = httpClient;
 
-    public async Task<Uri> GetAuthorizationUrlAsync()
+    public async Task<Uri> GetAuthorizationUrlAsync(Guid requestId)
     {
         try
         {
-            var message = await _httpClient.GetAsync(_authUrl);
+            var response = await _httpClient.PostAsJsonAsync(_authUrl, new { requestId });
 
-            if (!message.IsSuccessStatusCode)
-            {
-                // problem
-                return null;
-            }
+            response.EnsureSuccessStatusCode();
 
-            var response = await message.Content.ReadAsStringAsync();
-            return new Uri(response);
+            var content = await response.Content.ReadAsStringAsync();
+            return new Uri(content);
 
         }
         catch (Exception)

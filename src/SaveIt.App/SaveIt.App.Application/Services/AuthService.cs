@@ -5,6 +5,6 @@ public class AuthService(IAuthClientService saveItClient) : IAuthService
 {
     public async Task<Uri> GetAuthorizationUrlAsync()
     {
-        return await saveItClient.GetAuthorizationUrlAsync();
+        return await saveItClient.GetAuthorizationUrlAsync(Guid.NewGuid());
     }
 }

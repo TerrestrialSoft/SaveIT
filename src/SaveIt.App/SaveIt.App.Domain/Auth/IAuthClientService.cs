@@ -2,5 +2,5 @@
 
 public interface IAuthClientService
 {
-    Task<Uri> GetAuthorizationUrlAsync();
+    Task<Uri> GetAuthorizationUrlAsync(Guid requestId);
 }

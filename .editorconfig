@@ -25,7 +25,7 @@ csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = true:error
 csharp_style_throw_expression = true:suggestion
-
+csharp_prefer_braces_for_control_blocks = true:warning
 [*.{cs,vb}]
 #### Naming styles ####
 

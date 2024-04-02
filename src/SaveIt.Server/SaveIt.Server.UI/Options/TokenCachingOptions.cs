@@ -2,7 +2,9 @@
 
 public class TokenCachingOptions
 {
-    public int TokenRetrieveTimeSeconds { get; set; }
+    public const string Path = "TokenCaching";
+
+    public int TokenRetrieveDelaySeconds { get; set; }
     public int CacheEntryLifeTimeMinutes { get; set; }
     public int MaxTokenRetrieveTimeMinutes { get; set; }
 }

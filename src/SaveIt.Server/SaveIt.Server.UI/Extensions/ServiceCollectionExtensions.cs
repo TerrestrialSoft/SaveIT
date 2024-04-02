@@ -21,7 +21,8 @@ internal static class ServiceCollectionExtensions
         => services.AddMemoryCache();
 
     private static IServiceCollection AddCustomOptions(this IServiceCollection services, IConfiguration configuration)
-        => services.Configure<GoogleClientOptions>(configuration.GetSection(GoogleClientOptions.Path));
+        => services.Configure<GoogleClientOptions>(configuration.GetSection(GoogleClientOptions.Path))
+            .Configure<TokenCachingOptions>(configuration.GetSection(TokenCachingOptions.Path));
 
     private static IServiceCollection AddHttpClients(this IServiceCollection services, IConfiguration configuration)
     {

@@ -29,5 +29,6 @@ public record OAuthTokenModel
 
     [JsonConstructor]
     public OAuthTokenModel(string accessToken, string refreshToken, string scope, string tokenType, int expiresIn) =>
-            (AccessToken, RefreshToken, Scope, TokenType, ExpiresIn, ExpiresAt) = (accessToken, refreshToken, scope, tokenType, expiresIn, DateTime.UtcNow.AddSeconds(expiresIn));
+            (AccessToken, RefreshToken, Scope, TokenType, ExpiresIn, ExpiresAt)
+        = (accessToken, refreshToken, scope, tokenType, expiresIn, DateTime.UtcNow.AddSeconds(expiresIn));
 }

@@ -21,40 +21,37 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
     private readonly HttpClient _client = client;
     private readonly GoogleClientOptions _clientConfig = googleConfigOptions.Value;
 
-    private const string _redirectUri = "https://localhost:44375/auth/google/callback";
-    private const string _baseUrl = "https://accounts.google.com/o/oauth2/v2/auth";
-
-    public AuthorizationModel RegisterAuthorizationRequest(Guid requestId)
+    public AuthorizationModel RegisterAuthorizationRequest(Guid requestId, string serverUrl)
     {
         var token = _oAuthProvider.GetSecurityToken();
-
         var state = new StateModel(token, requestId);
         
         _tokenStorage.SetToken(requestId, new StoredRequest(state));
-
+        
+        var builder = new UriBuilder(_clientConfig.OAuthUrl);
+        var redirectUri = string.Format(_clientConfig.LocalRedirectUrl, serverUrl);
         var encodedState = HttpUtility.UrlEncode(JsonConvert.SerializeObject(state));
 
-        var builder = new UriBuilder(_baseUrl);
         builder.Query = builder.Query.SetQueryParams(new Dictionary<string, string>()
         {
             { "client_id", _clientConfig.ClientId },
             { "state", encodedState },
-            { "redirect_uri", _redirectUri },
+            { "redirect_uri", redirectUri },
             { "scope", "https://www.googleapis.com/auth/drive" },
             { "response_type", "code" },
             { "access_type", "offline" },
         });
 
-
         return new(builder.Uri, state);
     }
 
-    public async Task<Result> GetTokensAsync(string code, string urlEncodedState, CancellationToken cancellationToken)
+    public async Task<Result> GetTokensAsync(string code, string urlEncodedState, string serverUrl,
+        CancellationToken cancellationToken)
     {
         var decodedState = HttpUtility.UrlDecode(urlEncodedState);
         var state = JsonConvert.DeserializeObject<StateModel>(decodedState);
 
-        if (state is null || state.RequestId == default)
+        if (state is null || state.RequestId == Guid.Empty)
         {
             return Result.Fail("Provided data are invalid.");
         }
@@ -66,20 +63,24 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             return validationResult;
         }
 
+        var redirectUri = string.Format(_clientConfig.LocalRedirectUrl, serverUrl);
+
         var content = new Dictionary<string, string>()
         {
             { "client_id", _clientConfig.ClientId },
             { "client_secret", _clientConfig.ClientSecret },
             { "code", code },
             { "grant_type", "authorization_code" },
-            { "redirect_uri", _redirectUri },
+            { "redirect_uri", redirectUri },
         };
 
-        var result = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken); // Add retry mechanisms
+        // TODO: Add retry mechanisms:
+        var result = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
-            _logger.LogError("Error occured during communication with identity provider. {ReasonPhrase}", result.ReasonPhrase);
+            _logger.LogError("Error occured during communication with identity provider. {ReasonPhrase}",
+                result.ReasonPhrase);
             return Result.Fail($"Identity Provider communication error");
         }
 
@@ -107,6 +108,6 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
         return Result.Ok();
     }
 
-    public async Task<Result<OAuthTokenModel>> RetrieveTokensAsync(Guid requestId, CancellationToken cancellationToken)
-        => await _tokenStorage.WaitForToken(requestId, cancellationToken);
+    public Task<Result<OAuthTokenModel>> RetrieveTokensAsync(Guid requestId, CancellationToken cancellationToken)
+        => _tokenStorage.WaitForToken(requestId, cancellationToken);
 }

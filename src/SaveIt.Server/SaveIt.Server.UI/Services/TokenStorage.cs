@@ -6,13 +6,16 @@ using SaveIt.Server.UI.Options;
 
 namespace SaveIt.Server.UI.Services;
 
-public class TokenStorage(IMemoryCache cache, IOptions<TokenCachingOptions> _tokenCachingOptions, ILogger<TokenStorage> logger) : ITokenStorage
+public class TokenStorage(IMemoryCache _cache, IOptions<TokenCachingOptions> _tokenCachingOptions, ILogger<TokenStorage> logger)
+    : ITokenStorage
 {
-    private readonly IMemoryCache _cache = cache;
     private readonly ILogger<TokenStorage> _logger = logger;
-    private readonly TimeSpan _tokenRetrieveTimeSeconds = TimeSpan.FromSeconds(_tokenCachingOptions.Value.TokenRetrieveTimeSeconds);
-    private readonly TimeSpan _cacheEntryLifeTimeMinutes = TimeSpan.FromMinutes(_tokenCachingOptions.Value.CacheEntryLifeTimeMinutes);
-    private readonly TimeSpan _maxTokenRetrieveTimeMinutes = TimeSpan.FromMinutes(_tokenCachingOptions.Value.MaxTokenRetrieveTimeMinutes);
+    private readonly TimeSpan _tokenRetrieveDelaySeconds = TimeSpan
+        .FromSeconds(_tokenCachingOptions.Value.TokenRetrieveDelaySeconds);
+    private readonly TimeSpan _cacheEntryLifeTimeMinutes = TimeSpan
+        .FromMinutes(_tokenCachingOptions.Value.CacheEntryLifeTimeMinutes);
+    private readonly TimeSpan _maxTokenRetrieveTimeMinutes = TimeSpan
+        .FromMinutes(_tokenCachingOptions.Value.MaxTokenRetrieveTimeMinutes);
 
     private const string _cacheEntryTemplate = "AuthTokenRequest:{0}";
 
@@ -39,7 +42,7 @@ public class TokenStorage(IMemoryCache cache, IOptions<TokenCachingOptions> _tok
                     return Result.Fail("Token waiting cancelled");
                 }
 
-                await Task.Delay(_tokenRetrieveTimeSeconds, cancellationToken);
+                await Task.Delay(_tokenRetrieveDelaySeconds, cancellationToken);
                 continue;
             }
 

@@ -1,4 +1,5 @@
-﻿using SaveIt.Server.UI.Services.Auth;
+﻿using SaveIt.Server.UI.Models;
+using SaveIt.Server.UI.Services.Auth;
 using System.Web;
 
 namespace SaveIt.Server.UI.Api;
@@ -17,7 +18,7 @@ public static class ApiEndpoints
             var serverUrl = GetServerUrl(context.Request);
             var authorization = authService.RegisterAuthorizationRequest(model.RequestId, serverUrl);
 
-            return Results.Ok(authorization.Uri.ToString());
+            return Results.Ok(new AuthorizationUrlModel(authorization.Uri.ToString()));
         });
 
         apiGroup.MapGet("google/callback", async (string state, string? code, string? error, HttpContext context,

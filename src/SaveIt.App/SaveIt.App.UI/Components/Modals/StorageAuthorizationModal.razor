@@ -1,4 +1,5 @@
-﻿@inject IAuthService _authService
+﻿@inherits CancellableComponent
+@inject IAuthService _authService
 @inject NavigationManager _navigationManager
 
 <div>
@@ -93,15 +94,22 @@
     {
         _authState = AuthorizationScreenState.AuthorizationInProgress;
 
-        var url = await _authService.GetAuthorizationUrlAsync();
+        var requestId = Guid.NewGuid();
 
-        if (url is null)
+        var url = await _authService.GetAuthorizationUrlAsync(requestId, CancellationToken);
+
+        if (url.IsFailed)
         {
             _authState = AuthorizationScreenState.AuthorizeProviderError;
             return;
         }
 
-        _navigationManager.NavigateTo(url.ToString());
+        _navigationManager.NavigateTo(url.Value.ToString());
+        var authorizationResult = await _authService.WaitForAuthorizationAsync(requestId, CancellationToken);
+
+        _authState = authorizationResult.IsFailed
+            ? _authState = AuthorizationScreenState.AuthorizeProviderError
+            : _authState = AuthorizationScreenState.AuthorizeProviderSuccess;
     }
 
     private Task RetryAuthorization()

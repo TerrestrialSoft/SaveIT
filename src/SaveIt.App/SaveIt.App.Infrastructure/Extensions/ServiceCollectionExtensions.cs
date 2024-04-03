@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
 using SaveIt.App.Application.Extensions;
 using SaveIt.App.Domain.Auth;
 using SaveIt.App.Infrastructure.Api;
@@ -18,6 +20,14 @@ public static class ServiceCollectionExtensions
         {
             Uri uri = new Uri(configuration["SaveItApi:Url"]);
             client.BaseAddress = uri;
+        })
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .AddPolicyHandler(_ =>
+        {
+            return HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .OrResult(x => x.StatusCode == System.Net.HttpStatusCode.NotFound)
+                .WaitAndRetryAsync(2, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
         });
 
         return services;

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using SaveIt.App.Domain;
+using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Persistence.Extensions;
+using SaveIt.App.UI.Service.Local;
 using System.Reflection;
 
 namespace SaveIt.App.UI.Extensions;
@@ -12,7 +14,8 @@ internal static class ServiceCollectionExtensions
             .AddServices();
 
     private static IServiceCollection AddServices(this IServiceCollection services)
-        => services.AddScoped<IApplicationContext, ApplicationContext>();
+        => services.AddScoped<IApplicationContext, ApplicationContext>()
+            .AddScoped<IAccountSecretsService, AccountSecretsService>();
 
     internal static void AddAppJsonConfiguration(this IConfigurationManager configurationManager)
     {

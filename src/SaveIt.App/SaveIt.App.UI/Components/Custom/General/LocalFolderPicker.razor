@@ -13,17 +13,3 @@
         @Path
     </div>
 </div>
-
-
-@code {
-    [Parameter]
-    public EventCallback OnPickerClicked { get; set; }
-
-    [Parameter]
-    public string Path { get; set; } = "";
-
-    private async Task ShowModal()
-    {
-        await OnPickerClicked.InvokeAsync();
-    }
-}

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Components;
 using SaveIt.App.UI.Models;
 
 namespace SaveIt.App.UI.Components.Modals;
+
+// TODO: Needs refactoring breaking layers of abstraction
 public partial class LocalFolderPickerModal
 {
     private string _currentPath = string.Empty;

@@ -7,30 +7,29 @@ internal class AccountSecretsService : IAccountSecretsService
     private const string AccessTokenKey = "{0}:AccessToken";
     private const string RefreshToken = "{0}:RefreshToken";
 
-    private static async Task<string?> GetValue(string template, Guid accountId)
+    private static async Task<string?> GetValueAsync(string template, Guid accountId)
         => await SecureStorage.Default.GetAsync(string.Format(template, accountId));
 
-    private static async Task SetValue(string template, Guid accountId, string value)
+    private static async Task SetValueAsync(string template, Guid accountId, string value)
         => await SecureStorage.Default.SetAsync(string.Format(template, accountId), value);
 
-    public Task<string?> GetAccessToken(Guid accountId)
-        => GetValue(AccessTokenKey, accountId);
+    public Task<string?> GetAccessTokenAsync(Guid accountId)
+        => GetValueAsync(AccessTokenKey, accountId);
 
-    public Task<string?> GetRefreshToken(Guid accountId)
-        => GetValue(RefreshToken, accountId);
+    public Task<string?> GetRefreshTokenAsync(Guid accountId)
+        => GetValueAsync(RefreshToken, accountId);
 
     public async Task<Result> StoreTokensAsync(Guid accountId, string accessToken, string refreshToken)
     {
         try
         {
-            await SetValue(AccessTokenKey, accountId, accessToken);
-            await SetValue(RefreshToken, accountId, refreshToken);
+            await SetValueAsync(AccessTokenKey, accountId, accessToken);
+            await SetValueAsync(RefreshToken, accountId, refreshToken);
             return Result.Ok();
         }
         catch (Exception)
         {
             return Result.Fail("Failed to store data to storage");
         }
-        
     }
 }

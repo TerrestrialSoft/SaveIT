@@ -4,9 +4,9 @@ using SaveIt.App.Domain.Repositories;
 using SQLite;
 
 namespace SaveIt.App.Persistence.Repositories;
-internal class GameRepository(IDatabaseHandler dbHandler) : IGameRepository
+internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
 {
-    private readonly SQLiteAsyncConnection _db = dbHandler.CreateAsyncConnection();
+    private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
 
     public async Task<Game?> GetGame(Guid id)
     {

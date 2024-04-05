@@ -1,5 +1,9 @@
-﻿namespace SaveIt.App.Domain.Entities;
+﻿using SaveIt.App.Domain.Enums;
+
+namespace SaveIt.App.Domain.Entities;
 public class StorageAccount
 {
-    public string Name { get; init; } = default!;
+    public Guid Id { get; init; }
+    public string Email { get; init; } = default!;
+    public StorageAccountType Type { get; init; }
 }

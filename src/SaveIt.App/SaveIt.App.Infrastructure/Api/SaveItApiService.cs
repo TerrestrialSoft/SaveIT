@@ -1,12 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using SaveIt.App.Domain.Auth;
+﻿using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Infrastructure.Models;
 using System.Net.Http.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 
-public class SaveItClient(HttpClient httpClient) : IAuthClientService
+public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
 {
     private const string _authUrl = "google";
     private const string _tokensUrl = "retrieve";

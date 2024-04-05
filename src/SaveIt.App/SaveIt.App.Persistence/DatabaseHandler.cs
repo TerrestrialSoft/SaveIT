@@ -15,8 +15,14 @@ public class DatabaseHandler : IDatabaseHandler
             throw new InvalidOperationException("Database path is not set.");
 
         using var db = new SQLiteConnection(_databasePath);
+        CreateTables(db);
+    }
+
+    private static void CreateTables(SQLiteConnection db)
+    {
         db.CreateTable<Game>();
         db.CreateTable<GameSave>();
+        db.CreateTable<StorageAccount>();
     }
 
     public SQLiteConnection CreateConnection()

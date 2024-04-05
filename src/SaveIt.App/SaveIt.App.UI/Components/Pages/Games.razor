@@ -63,7 +63,7 @@
                             <InputSelect @bind-Value="_selectedStorageAccount">
                                 @foreach(var account in _storageAccounts)
                                 {
-                                    <option value="@account">@account.Name</option>
+                                    <option value="@account">@account.Email (@account.Type.ToString())</option>
                                 }
                             </InputSelect>
                             <div>

@@ -37,7 +37,7 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             { "client_id", _clientConfig.ClientId },
             { "state", encodedState },
             { "redirect_uri", redirectUri },
-            { "scope", "https://www.googleapis.com/auth/drive" },
+            { "scope", "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile" },
             { "response_type", "code" },
             { "access_type", "offline" },
         });

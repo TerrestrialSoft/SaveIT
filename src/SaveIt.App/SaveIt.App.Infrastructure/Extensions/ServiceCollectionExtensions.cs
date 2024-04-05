@@ -15,9 +15,20 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddTypedHttpClients(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddHttpClient<IAuthClientService, SaveItClient>(client =>
+        services.AddHttpClient<ISaveItApiService, SaveItApiService>(client =>
         {
             Uri uri = new Uri(configuration["SaveItApi:Url"]!);
+            client.BaseAddress = uri;
+        })
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .AddPolicyHandler(_ => HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .OrResult(x => !x.IsSuccessStatusCode)
+                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+
+        services.AddHttpClient<IExternalStorageService, GoogleApiService>(client =>
+        {
+            Uri uri = new Uri(configuration["GoogleApi:Url"]!);
             client.BaseAddress = uri;
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))

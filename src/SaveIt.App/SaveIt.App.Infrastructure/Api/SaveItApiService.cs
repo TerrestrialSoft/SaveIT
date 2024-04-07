@@ -9,6 +9,7 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
 {
     private const string _authUrl = "google";
     private const string _tokensUrl = "retrieve";
+    private const string _refreshUrl = "refresh";
 
     private readonly HttpClient _httpClient = httpClient;
 
@@ -23,14 +24,31 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
         return new Uri(content.Url);
     }
 
-    public async Task<OAuthTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
+    public async Task<OAuthCompleteTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
     {
         var response = await _httpClient.PostAsJsonAsync(_tokensUrl, new { requestId }, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        var token = await response.Content.ReadFromJsonAsync<OAuthTokenModel>(cancellationToken);
+        var token = await response.Content.ReadFromJsonAsync<OAuthCompleteTokenModel>(cancellationToken);
         ArgumentNullException.ThrowIfNull(token);
         
         return token;
+    }
+
+    public async Task<string> RefreshAccessTokenAsync(string refreshToken)
+    {
+        var dictionary = new Dictionary<string, string>
+        {
+            { "refresh_token", refreshToken }
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(_refreshUrl, dictionary);
+        response.EnsureSuccessStatusCode();
+
+        var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenModel>();
+
+        ArgumentNullException.ThrowIfNull(token);
+
+        return token.AccessToken;
     }
 }

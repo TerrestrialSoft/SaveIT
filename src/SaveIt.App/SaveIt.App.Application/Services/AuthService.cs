@@ -82,20 +82,20 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         }
     }
 
-    private async Task<Result<OAuthTokenModel>> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
+    private async Task<Result<OAuthCompleteTokenModel>> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
     {
-        var retryPipeline = new ResiliencePipelineBuilder<OAuthTokenModel?>()
+        var retryPipeline = new ResiliencePipelineBuilder<OAuthCompleteTokenModel?>()
         .AddRetry(new()
         {
-            MaxRetryAttempts = 3,
+            MaxRetryAttempts = 40,
             BackoffType = DelayBackoffType.Constant,
-            Delay = TimeSpan.FromSeconds(30),
-            ShouldHandle = new PredicateBuilder<OAuthTokenModel?>()
+            Delay = TimeSpan.FromSeconds(15),
+            ShouldHandle = new PredicateBuilder<OAuthCompleteTokenModel?>()
                 .Handle<HttpRequestException>(),
         })
         .Build();
 
-        OAuthTokenModel? token = null;
+        OAuthCompleteTokenModel? token = null;
 
         try
         {

@@ -106,6 +106,29 @@ public partial class CreateGameModal
         await ModalLocalFolderPicker.ShowAsync<LocalItemPickerModal>("Select Game Executable", parameters: parameters);
     }
 
+    private async Task ShowRemoteFolderPickerModal()
+    {
+        await ModalCurrent.HideAsync();
+        var parameters = new Dictionary<string, object>
+        {
+            //{ nameof(LocalItemPickerModal.InitialPath), EditGame.LocalExecutablePath! },
+            //{ nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
+            //{ nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
+            //{ nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
+            //{
+            //    nameof(LocalItemPickerModal.OnItemSelected),
+            //    EventCallback.Factory.Create<string>(this, async (path) =>
+            //    {
+            //        EditGame.LocalExecutablePath = path;
+            //        await ModalLocalFolderPicker.HideAsync();
+            //        await ModalCurrent.ShowAsync();
+            //    })
+            //},
+        };
+
+        await ModalLocalFolderPicker.ShowAsync<RemoteRepositoryPickerModal>("Select Game Storage", parameters: parameters);
+    }
+
     private void ClearLocalExecutablePath()
     {
         EditGame.LocalExecutablePath = null;
@@ -114,5 +137,10 @@ public partial class CreateGameModal
     private void ClearLocalGameSavePath()
     {
         EditGame.LocalGameSavePath = "";
+    }
+
+    private void ClearRemoteGameSavePath()
+    {
+        EditGame.RemoteGameSavePath = "";
     }
 }

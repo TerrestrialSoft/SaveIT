@@ -22,7 +22,7 @@
                         OnImageUploaded="ImageUploaded" />
                 </div>
                 <div>
-                    <LocalItemPicker
+                    <ItemPicker
                         Title="Local Game Executable"
                         Icon="IconName.FileTypeExe"
                         SelectedPath="@EditGame.LocalExecutablePath"
@@ -59,12 +59,18 @@
             </div>
             <div class="column">
                 <div class="m-1 p-1">
-                    <LocalItemPicker
-                        Title="Local Game Save Location"
+                    <ItemPicker Title="Local Game Save Location"
                         Icon="IconName.PcDisplayHorizontal"
                         SelectedPath="@EditGame.LocalGameSavePath"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"/>
+                </div>
+                <div class="m-1 p-1">
+                    <ItemPicker Title="Remote Game Save Location"
+                                Icon="IconName.Cloud"
+                                SelectedPath="@EditGame.RemoteGameSavePath"
+                                OnPickerClicked="ShowRemoteFolderPickerModal"
+                                OnPathCleared="ClearRemoteGameSavePath" />
                 </div>
             </div>
         </div>

@@ -2,7 +2,7 @@ using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 
 namespace SaveIt.App.UI.Components.Custom.General;
-public partial class LocalItemPicker
+public partial class ItemPicker
 {
     [Parameter]
     public EventCallback OnPickerClicked { get; set; }

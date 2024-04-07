@@ -1,3 +1,4 @@
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 
 namespace SaveIt.App.UI.Components.Custom.General;
@@ -14,6 +15,9 @@ public partial class LocalItemPicker
 
     [Parameter]
     public string Title { get; set; } = default!;
+
+    [Parameter]
+    public IconName Icon { get; set; } = default!;
 
     private async Task ShowModal()
     {

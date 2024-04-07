@@ -24,6 +24,7 @@
                 <div>
                     <LocalItemPicker
                         Title="Local Game Executable"
+                        Icon="IconName.FileTypeExe"
                         SelectedPath="@EditGame.LocalExecutablePath"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
                         OnPathCleared="ClearLocalExecutablePath"/>
@@ -60,6 +61,7 @@
                 <div class="m-1 p-1">
                     <LocalItemPicker
                         Title="Local Game Save Location"
+                        Icon="IconName.PcDisplayHorizontal"
                         SelectedPath="@EditGame.LocalGameSavePath"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"/>

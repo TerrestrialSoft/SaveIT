@@ -14,7 +14,7 @@ public partial class Games
     private List<Game> _filteredGames = [];
     private string _searchText = "";
     private Game? _selectedGame = new();
-    private NewGame _createGame = new();
+    private NewGameModel _createGame = new();
 
     protected override async Task OnInitializedAsync()
     {

@@ -22,7 +22,7 @@ public partial class CreateGameModal
     public Modal ModalCurrent { get; set; } = default!;
 
     [Parameter]
-    public NewGame EditGame { get; set; } = default!;
+    public NewGameModel EditGame { get; set; } = default!;
 
     private StorageAccount _selectedStorageAccount = new();
     private List<StorageAccount> _storageAccounts = [];
@@ -74,5 +74,10 @@ public partial class CreateGameModal
         };
 
         await ModalAuthorizeStorage.ShowAsync<StorageAuthorizationModal>("Authorize new Cloud Storage", parameters: parameters);
+    }
+
+    private void ImageUploaded(ImageModel image)
+    {
+        EditGame.Image = image;
     }
 }

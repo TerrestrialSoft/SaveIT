@@ -1,0 +1,11 @@
+﻿.column {
+    width: 46%;
+}
+
+label {
+    display: block;
+}
+
+.column div {
+    margin: 5px;
+}

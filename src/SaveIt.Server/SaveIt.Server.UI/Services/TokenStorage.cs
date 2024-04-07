@@ -28,7 +28,7 @@ public class TokenStorage(IMemoryCache _cache, IOptions<TokenCachingOptions> _to
     private static string GetCacheKey(Guid key)
         => string.Format(_cacheEntryTemplate, key);
 
-    public async Task<Result<OAuthTokenModel>> WaitForToken(Guid key, CancellationToken cancellationToken)
+    public async Task<Result<OAuthCompleteTokenResponseModel>> WaitForToken(Guid key, CancellationToken cancellationToken)
     {
         var maxTokenRetrieveTime = DateTime.UtcNow.Add(_maxTokenRetrieveTimeMinutes);
 

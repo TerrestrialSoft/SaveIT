@@ -18,7 +18,7 @@ public static class ApiEndpoints
             var serverUrl = GetServerUrl(context.Request);
             var authorization = authService.RegisterAuthorizationRequest(model.RequestId, serverUrl);
 
-            return Results.Ok(new AuthorizationUrlModel(authorization.Uri.ToString()));
+            return Results.Ok(new AuthorizationUrlResponseModel(authorization.Uri.ToString()));
         });
 
         apiGroup.MapGet("google/callback", async (string state, string? code, string? error, HttpContext context,
@@ -52,6 +52,16 @@ public static class ApiEndpoints
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : Results.NoContent();
+        });
+
+        apiGroup.MapPost("refresh", async (RefreshTokenRequestModel model, CancellationToken token,
+                       IGoogleAuthService authService) =>
+        {
+            var result = await authService.RefreshAccessTokenAsync(model.RefreshToken, token);
+
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : Results.BadRequest();
         });
     }
 

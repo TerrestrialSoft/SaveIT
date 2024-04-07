@@ -1,0 +1,58 @@
+﻿<EditForm Model="EditGame">
+    <div class="d-flex">
+        <div>
+            <div>
+                <label>
+                    Game Name
+                    <InputText @bind-Value="EditGame.Name" />
+                </label>
+            </div>
+            <div>
+                <label>
+                    Username
+                    <InputText @bind-Value="EditGame.Username" />
+                </label>
+            </div>
+        </div>
+        <div>
+            <div>
+                <ImagePicker />
+            </div>
+            <div>
+            </div>
+        </div>
+    </div>
+
+    <h3>Game Save Information</h3>
+
+    <div class="d-flex">
+        <div>
+            <div>
+                <label>
+                    Game Save Name
+                    <InputText @bind-Value="EditGame.GameSaveName" />
+                </label>
+            </div>
+            <div>
+                <label>
+                    Storage Account
+                    <InputSelect @bind-Value="_selectedStorageAccount">
+                        @foreach (var account in _storageAccounts)
+                        {
+                            <option value="@account">@account.Email (@account.Type.ToString())</option>
+                        }
+                    </InputSelect>
+                    <div>
+                        or <b @onclick="ShowAuthorizeStorageModal">create a new one</b>.
+                    </div>
+                </label>
+            </div>
+        </div>
+        <div>
+            <div>
+                <LocalFolderPicker Path="@EditGame.LocalGameSavePath" OnPickerClicked="ShowLocalFolderPickerModal" />
+            </div>
+        </div>
+    </div>
+    <Button Color="ButtonColor.Primary">Save changes</Button>
+</EditForm>

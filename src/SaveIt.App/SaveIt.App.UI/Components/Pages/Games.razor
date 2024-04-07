@@ -19,72 +19,7 @@
     }
 </div>
 
-<Modal @ref="_createNewGameModal" Title="Modal title" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true">
-    <BodyTemplate>
-        <EditForm Model="_selectedGame">
-            <div class="d-flex">
-                <div>
-                    <div>
-                        <label>
-                            Game Name
-                            <InputText @bind-Value="_selectedGame.Name" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            Username
-                            <InputText @bind-Value="_selectedGame.Name" />
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <div>
-                        <ImagePicker />
-                    </div>
-                    <div>
-                    
-                    </div>
-                </div>
-            </div>
-            
-            <h3>Game Save Information</h3>
-
-            <div class="d-flex">
-                <div>
-                    <div>
-                        <label>
-                            Game Save Name
-                            <InputText @bind-Value="_selectedGame.Name" />
-                        </label>
-                    </div>
-                    <div>
-                        <label>
-                            Storage Account
-                            <InputSelect @bind-Value="_selectedStorageAccount">
-                                @foreach(var account in _storageAccounts)
-                                {
-                                    <option value="@account">@account.Email (@account.Type.ToString())</option>
-                                }
-                            </InputSelect>
-                            <div>
-                                or <b @onclick="ShowAuthorizeStorageModal">create a new one</b>.
-                            </div>
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <div>
-                        <LocalFolderPicker Path="@_selectedLocalFolderPath" OnPickerClicked="ShowLocalFolderPickerModal" />
-                    </div>
-                </div>
-            </div>
-            
-        </EditForm>
-    </BodyTemplate>
-    <FooterTemplate>
-        <Button Color="ButtonColor.Primary">Save changes</Button>
-    </FooterTemplate>
-</Modal>
+<Modal @ref="_createNewGameModal" Title="Modal title" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
 
 <Modal @ref="_localFolderPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />

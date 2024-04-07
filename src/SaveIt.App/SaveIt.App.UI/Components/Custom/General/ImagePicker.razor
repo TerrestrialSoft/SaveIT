@@ -1,7 +1,13 @@
 ﻿<div>
     <div class="d-flex">
         <div class="p-2 w-50">
-            <Icon Name="IconName.Image" /> <label class="fs-5">Game Image</label>
+            <div class="d-flex align-content-center">
+                <div>
+                    <Icon Name="IconName.Image" Size="IconSize.x5" />
+                </div>
+                <div class="fs-5 ms-2">Game Image</div>
+            </div>
+            
             <div class="ms-4">
                 <label for="file-input" class="btn btn-outline-primary me-3">Select image</label>
                 <InputFile id="file-input" OnChange="LoadFile" accept="image/png,image/jpg,image/jpeg" class="d-none" />

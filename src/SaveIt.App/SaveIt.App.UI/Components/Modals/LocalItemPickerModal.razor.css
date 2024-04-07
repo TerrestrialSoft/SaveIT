@@ -1,19 +1,19 @@
-﻿.selected-directory {
+﻿.selected-item {
     background-color: #0987e8;
     border-radius: 5px;
 }
 
-.folder-item {
+.item {
     width: 6rem;
     height: 8rem;
 }
 
-.directory-img {
+.item-img {
     width: 6rem;
     height: 6rem;
 }
 
-.directory-name {
+.item-name {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

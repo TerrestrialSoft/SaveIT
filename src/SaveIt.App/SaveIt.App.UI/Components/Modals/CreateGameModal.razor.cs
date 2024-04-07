@@ -42,9 +42,11 @@ public partial class CreateGameModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(LocalFolderPickerModal.InitialPath), EditGame.LocalGameSavePath },
+            { nameof(LocalItemPickerModal.InitialPath), EditGame.LocalGameSavePath },
+            { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Folders },
+            { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Folders},
             {
-                nameof(LocalFolderPickerModal.OnDirectorySelected),
+                nameof(LocalItemPickerModal.OnItemSelected),
                 EventCallback.Factory.Create<string>(this, async (path) =>
                 {
                     EditGame.LocalGameSavePath = path;
@@ -54,7 +56,7 @@ public partial class CreateGameModal
             },
         };
 
-        await ModalLocalFolderPicker.ShowAsync<LocalFolderPickerModal>("Select Game Save Folder", parameters: parameters);
+        await ModalLocalFolderPicker.ShowAsync<LocalItemPickerModal>("Select Game Save Folder", parameters: parameters);
     }
 
     private async Task ShowAuthorizeStorageModal()
@@ -79,5 +81,38 @@ public partial class CreateGameModal
     private void ImageUploaded(ImageModel image)
     {
         EditGame.Image = image;
+    }
+
+    private async Task ShowLocalExecutablePickerModal()
+    {
+        await ModalCurrent.HideAsync();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(LocalItemPickerModal.InitialPath), EditGame.LocalExecutablePath! },
+            { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
+            { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
+            { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
+            {
+                nameof(LocalItemPickerModal.OnItemSelected),
+                EventCallback.Factory.Create<string>(this, async (path) =>
+                {
+                    EditGame.LocalExecutablePath = path;
+                    await ModalLocalFolderPicker.HideAsync();
+                    await ModalCurrent.ShowAsync();
+                })
+            },
+        };
+
+        await ModalLocalFolderPicker.ShowAsync<LocalItemPickerModal>("Select Game Executable", parameters: parameters);
+    }
+
+    private void ClearLocalExecutablePath()
+    {
+        EditGame.LocalExecutablePath = null;
+    }
+
+    private void ClearLocalGameSavePath()
+    {
+        EditGame.LocalGameSavePath = "";
     }
 }

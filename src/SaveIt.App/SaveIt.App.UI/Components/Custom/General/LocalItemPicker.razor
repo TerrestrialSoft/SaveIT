@@ -1,0 +1,26 @@
+﻿<div class="m-1">
+    <div class="d-flex align-content-center">
+        <div>
+            <Icon Name="IconName.PcDisplayHorizontal" Size="IconSize.x5" />
+        </div>
+        <div class="fs-5 ms-2">@Title</div>
+    </div>
+    <div>
+        <Button Color="ButtonColor.Primary"
+                Outline="true"
+                Class="ms-4 me-3"
+                @onclick="ShowModal">
+            Select Location
+        </Button>
+        
+        @if(!string.IsNullOrEmpty(SelectedPath))
+        {
+            <div class="d-flex align-items-center p-1">
+                <div class="text-muted me-2" style="word-break: break-all;">@SelectedPath</div>
+                <div @onclick="ClearPath"><Icon Name="IconName.Trash3Fill" Color="IconColor.Danger" Size="IconSize.x5" /></div>
+            </div>
+        }
+    </div>
+</div>
+
+

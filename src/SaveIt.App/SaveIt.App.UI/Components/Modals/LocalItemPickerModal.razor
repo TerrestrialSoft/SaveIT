@@ -1,0 +1,51 @@
+﻿<div class="m-3">
+    <div class="d-flex align-items-center mb-3">
+        <div class="me-4">
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory">
+                <Icon Name="IconName.ArrowLeft" />
+            </Button>
+        </div>
+        <div class="fs-5">@_currentPath</div>
+    </div>
+
+    @if (_error is not null)
+    {
+        <div>
+            <Alert Color="AlertColor.Warning">@_error</Alert>
+        </div>
+    }
+
+    <div class="d-flex flex-wrap">
+        @foreach (var item in _items)
+        {
+            @if (item.IsDirectory)
+            {
+                <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
+                     @ondblclick="() => MoveToDirectory(item)"
+                     @onclick="() => SelectItem(item)">
+                    <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
+                    <Tooltip Title="@item.Name" Placement="TooltipPlacement.Bottom">
+                        <p class="item-name">@item.Name</p>
+                    </Tooltip>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex flex-column align-items-center m-2 @(item.IsSelected ? "selected-item" : "") item"
+                     @onclick="() => SelectItem(item)"
+                     @ondblclick="() => SelectAndPickAsync(item)">
+                    <img src="img/icons/file-icon.svg" alt="File" class="item-img" />
+                    <Tooltip Title="@item.Name" Placement="TooltipPlacement.Bottom">
+                        <p class="item-name">@item.Name</p>
+                    </Tooltip>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="d-flex mt-3 justify-content-end">
+        <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
+    </div>
+</div>
+
+

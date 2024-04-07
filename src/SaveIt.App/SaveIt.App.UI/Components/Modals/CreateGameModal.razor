@@ -17,10 +17,16 @@
             </div>
             <div class="column">
                 <div class="m-1 p-1">
-                    <ImagePicker ImageSrc="@EditGame.Image" OnImageUploaded="ImageUploaded" />
+                    <ImagePicker
+                        ImageSrc="@EditGame.Image"
+                        OnImageUploaded="ImageUploaded" />
                 </div>
                 <div>
-
+                    <LocalItemPicker
+                        Title="Local Game Executable"
+                        SelectedPath="@EditGame.LocalExecutablePath"
+                        OnPickerClicked="ShowLocalExecutablePickerModal"
+                        OnPathCleared="ClearLocalExecutablePath"/>
                 </div>
             </div>
         </div>
@@ -52,7 +58,11 @@
             </div>
             <div class="column">
                 <div class="m-1 p-1">
-                    <LocalFolderPicker Path="@EditGame.LocalGameSavePath" OnPickerClicked="ShowLocalFolderPickerModal" />
+                    <LocalItemPicker
+                        Title="Local Game Save Location"
+                        SelectedPath="@EditGame.LocalGameSavePath"
+                        OnPickerClicked="ShowLocalFolderPickerModal"
+                        OnPathCleared="ClearLocalGameSavePath"/>
                 </div>
             </div>
         </div>

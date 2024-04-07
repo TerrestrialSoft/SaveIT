@@ -1,24 +1,27 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
 using SaveIt.App.Application.Extensions;
 using SaveIt.App.Domain.Auth;
 using SaveIt.App.Infrastructure.Api;
+using SaveIt.App.Infrastructure.Options;
 
 namespace SaveIt.App.Persistence.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         => services.AddApplication()
-            .AddTypedHttpClients(configuration);
+            .AddOptions(configuration)
+            .AddTypedHttpClients();
 
-    private static IServiceCollection AddTypedHttpClients(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddTypedHttpClients(this IServiceCollection services)
     {
-        services.AddHttpClient<ISaveItApiService, SaveItApiService>(client =>
+        services.AddHttpClient<ISaveItApiService, SaveItApiService>((serviceProvider, client) =>
         {
-            Uri uri = new Uri(configuration["SaveItApi:Url"]!);
-            client.BaseAddress = uri;
+            var apiOptions = serviceProvider.GetRequiredService<IOptions<SaveItApiOptions>>();
+            client.BaseAddress = new Uri(apiOptions.Value.Url);
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddPolicyHandler(_ => HttpPolicyExtensions
@@ -26,17 +29,20 @@ public static class ServiceCollectionExtensions
                 .OrResult(x => !x.IsSuccessStatusCode)
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
-        services.AddHttpClient<IExternalStorageService, GoogleApiService>(client =>
+        services.AddHttpClient<IExternalStorageService, GoogleApiService>((serviceProvider, client) =>
         {
-            Uri uri = new Uri(configuration["GoogleApi:Url"]!);
-            client.BaseAddress = uri;
+            var apiOptions = serviceProvider.GetRequiredService<IOptions<GoogleApiOptions>>();
+            client.BaseAddress = new Uri(apiOptions.Value.DriveUrl);
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddPolicyHandler(_ => HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .OrResult(x => x.StatusCode == System.Net.HttpStatusCode.NotFound)
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
         return services;
     }
+
+    private static IServiceCollection AddOptions(this IServiceCollection services, IConfiguration configuration)
+        => services.Configure<SaveItApiOptions>(configuration.GetSection(SaveItApiOptions.Path))
+            .Configure<GoogleApiOptions>(configuration.GetSection(GoogleApiOptions.Path));
 }

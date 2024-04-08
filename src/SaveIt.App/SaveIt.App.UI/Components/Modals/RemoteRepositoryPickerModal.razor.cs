@@ -29,10 +29,9 @@ public partial class RemoteRepositoryPickerModal
 
     protected override async Task OnInitializedAsync()
     {
-        if(SelectedItem is not null)
-        {
-            _selectedItem = new(SelectedItem);
-        }
+        _selectedItem = SelectedItem is not null
+            ? new(SelectedItem)
+            : new(new RemoteFileItemModel { Name = "root", IsDirectory = true, ParentId = "root", Id = "root" });
 
         try
         {
@@ -50,7 +49,7 @@ public partial class RemoteRepositoryPickerModal
         _items.Clear();
         try
         {
-            var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem?.Item?.ParentId);
+            var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId);
 
             if (itemsResult.IsFailed)
             {

@@ -13,11 +13,30 @@ internal class AccountSecretsService : IAccountSecretsService
     private static async Task SetValueAsync(string template, Guid accountId, string value)
         => await SecureStorage.Default.SetAsync(string.Format(template, accountId), value);
 
+    public void ClearAccount(Guid accountId)
+    {
+        SecureStorage.Default.Remove(string.Format(AccessTokenKey, accountId));
+        SecureStorage.Default.Remove(string.Format(RefreshToken, accountId));
+    }
+
     public Task<string?> GetAccessTokenAsync(Guid accountId)
         => GetValueAsync(AccessTokenKey, accountId);
 
     public Task<string?> GetRefreshTokenAsync(Guid accountId)
         => GetValueAsync(RefreshToken, accountId);
+
+    public async Task<Result> StoreAccessTokenAsync(Guid accountId, string accessToken)
+    {
+        try
+        {
+            await SetValueAsync(AccessTokenKey, accountId, accessToken);
+            return Result.Ok();
+        }
+        catch (Exception)
+        {
+            return Result.Fail("Failed to store data to storage");
+        }
+    }
 
     public async Task<Result> StoreTokensAsync(Guid accountId, string accessToken, string refreshToken)
     {

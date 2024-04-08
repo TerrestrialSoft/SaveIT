@@ -20,9 +20,29 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler) : IStorageAcc
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<StorageAccount>> GetAllStorageAccounts()
+    public async Task<IEnumerable<StorageAccount>> GetAllStorageAccounts(bool includeDeactivated = false)
     {
-        return await _db.Table<StorageAccount>()
-            .ToListAsync();
+        var table = _db.Table<StorageAccount>();
+
+        if(includeDeactivated)
+            table.Where(x => x.IsActive);
+
+        return await table.ToListAsync();
     }
+
+    public async Task DeactiveAccountAsync(Guid id)
+    {
+        var account = await _db.Table<StorageAccount>()
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (account is null)
+            return;
+
+        account.IsActive = false;
+
+        await _db.UpdateAsync(account);
+    }
+
+    public Task UpdateAccountAsync(StorageAccount account)
+        => _db.UpdateAsync(account);
 }

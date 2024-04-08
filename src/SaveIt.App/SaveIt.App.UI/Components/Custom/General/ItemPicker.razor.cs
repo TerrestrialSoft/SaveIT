@@ -1,8 +1,9 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
+using SaveIt.App.UI.Models;
 
 namespace SaveIt.App.UI.Components.Custom.General;
-public partial class ItemPicker
+public partial class ItemPicker<TItem> where TItem : NamedModel
 {
     [Parameter]
     public EventCallback OnPickerClicked { get; set; }
@@ -11,7 +12,7 @@ public partial class ItemPicker
     public EventCallback OnPathCleared { get; set; }
 
     [Parameter]
-    public string SelectedPath { get; set; } = "";
+    public TItem? SelectedFile { get; set; }
 
     [Parameter]
     public string Title { get; set; } = default!;
@@ -26,7 +27,7 @@ public partial class ItemPicker
 
     private Task ClearPath()
     {
-        SelectedPath = "";
+        SelectedFile = default;
         return OnPathCleared.InvokeAsync();
     }
 }

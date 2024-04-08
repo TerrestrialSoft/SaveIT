@@ -4,12 +4,11 @@ using SaveIt.App.UI.Models;
 namespace SaveIt.App.UI.Components.Modals;
 public partial class LocalItemPickerModal
 {
-    private string _currentPath = string.Empty;
-    private readonly List<LocalItemModel> _items = [];
+    private readonly List<SelectedItemViewModel<LocalFileItemModel>> _items = [];
     private string? _error;
 
     [Parameter]
-    public EventCallback<string> OnItemSelected { get; set; }
+    public EventCallback<LocalFileItemModel> OnItemSelected { get; set; }
 
     [Parameter]
     public LocalPickerMode PickerMode { get; set; } = LocalPickerMode.Both;
@@ -27,16 +26,40 @@ public partial class LocalItemPickerModal
         Both = 3
     }
 
+    private SelectedItemViewModel<LocalFileItemModel> _selectedFile = default!;
+
     [Parameter]
-    public string InitialPath { get; set; } = "";
+    public LocalFileItemModel? SelectedFile { get; set; }
 
     protected override void OnInitialized()
     {
+        if (SelectedFile is not null)
+        {
+            _selectedFile = new(SelectedFile);
+        }
+
         try
         {
-            _currentPath = string.IsNullOrEmpty(InitialPath)
-                ? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory)
-                : Path.GetDirectoryName(InitialPath)!;
+            if(_selectedFile is null)
+            {
+                var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+
+                _selectedFile = new(new LocalFileItemModel
+                {
+                    Name = Path.GetFileName(folder)!,
+                    Path = Directory.GetParent(folder)?.FullName ?? "",
+                    IsDirectory = true
+                });
+            }
+            else
+            {
+                _selectedFile = new(new LocalFileItemModel
+                {
+                    Name = Path.GetDirectoryName(_selectedFile.Item.Path)!,
+                    Path = Path.GetDirectoryName(_selectedFile.Item.Path)!,
+                    IsDirectory = true
+                });
+            }
 
             RedrawItems();
         }
@@ -54,27 +77,30 @@ public partial class LocalItemPickerModal
         {
             if (ShowMode == LocalPickerMode.Folders || ShowMode == LocalPickerMode.Both)
             {
-                var directories = Directory.GetDirectories(_currentPath);
+                var directories = Directory.GetDirectories(_selectedFile.Item.FullPath);
 
-                _items.AddRange(directories.Select(x => new LocalItemModel
+                _items.AddRange(directories.Select(x => new SelectedItemViewModel<LocalFileItemModel>(new()
                 {
                     Name = Path.GetFileName(x)!,
-                    Path = x,
+                    Path = _selectedFile.Item.FullPath,
                     IsDirectory = true
-                }));
+                })));
             }
 
             if (ShowMode == LocalPickerMode.Files || ShowMode == LocalPickerMode.Both)
             {
-                var files = Directory.GetFiles(_currentPath);
+                var files = Directory.GetFiles(_selectedFile.Item.FullPath);
+
+                var enableFiltering = AllowedExtensions.Any();
+
                 var filteredFiles = files
-                    .Where(x => AllowedExtensions.Any(y =>
+                    .Where(x => !enableFiltering || AllowedExtensions.Any(y =>
                         string.Equals(y, Path.GetExtension(x),StringComparison.InvariantCultureIgnoreCase)))
-                    .Select(x => new LocalItemModel
+                    .Select(x => new SelectedItemViewModel<LocalFileItemModel>(new()
                     {
                         Name = Path.GetFileName(x)!,
-                        Path = x
-                    });
+                        Path = _selectedFile.Item.FullPath
+                    }));
 
                 _items.AddRange(filteredFiles);
             }
@@ -86,31 +112,31 @@ public partial class LocalItemPickerModal
         }
     }
 
-    private void MoveToDirectory(LocalItemModel model)
+    private void MoveToDirectory(SelectedItemViewModel<LocalFileItemModel> model)
     {
-        if (!model.IsDirectory)
+        if (!model.Item.IsDirectory)
         {
             return;
         }
 
-        _currentPath = model.Path;
+        _selectedFile = model;
         RedrawItems();
     }
 
     private void ChangeToParentDirectory()
     {
-        var parent = Directory.GetParent(_currentPath);
+        var parent = Directory.GetParent(_selectedFile.Item.Path!);
 
         if (parent is null)
         {
             return;
         }
 
-        _currentPath = parent.FullName;
+        _selectedFile.Item.Name = parent.FullName;
         RedrawItems();
     }
 
-    private void SelectItem(LocalItemModel item)
+    private void SelectItem(SelectedItemViewModel<LocalFileItemModel> item)
     {
         var selectedItem = _items.Find(x => x.IsSelected);
 
@@ -128,7 +154,7 @@ public partial class LocalItemPickerModal
 
         if(selectedItem is null && (PickerMode == LocalPickerMode.Folders || PickerMode == LocalPickerMode.Both))
         {
-            await OnItemSelected.InvokeAsync(_currentPath);
+            await OnItemSelected.InvokeAsync(_selectedFile.Item);
             return;
         }
 
@@ -137,23 +163,18 @@ public partial class LocalItemPickerModal
             return;
         }
 
-        if(selectedItem.IsDirectory && PickerMode == LocalPickerMode.Files)
+        if(selectedItem.Item.IsDirectory && PickerMode == LocalPickerMode.Files)
         {
             MoveToDirectory(selectedItem);
             return;
         }
 
-        await OnItemSelected.InvokeAsync(selectedItem.Path);
+        await OnItemSelected.InvokeAsync(_selectedFile.Item);
     }
 
-    private Task SelectAndPickAsync(LocalItemModel item)
+    private Task SelectAndPickAsync(SelectedItemViewModel<LocalFileItemModel> item)
     {
         SelectItem(item);
         return PickItemAsync();
-    }
-
-    private void RemovePath()
-    {
-        _currentPath = "";
     }
 }

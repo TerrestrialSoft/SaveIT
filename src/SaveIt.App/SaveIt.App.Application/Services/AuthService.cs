@@ -4,7 +4,6 @@ using Polly;
 using FluentResults;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Domain.Enums;
-using SaveIt.App.Domain.Entities;
 
 namespace SaveIt.App.Application.Services;
 public class AuthService(ISaveItApiService _saveItClient, IStorageAccountRepository _accountRepository,
@@ -33,16 +32,6 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             return tokenResult.ToResult();
         }
 
-        Guid accountId = Guid.NewGuid();
-
-        var result = await _secretsService.StoreTokensAsync(accountId, tokenResult.Value.AccessToken,
-            tokenResult.Value.RefreshToken);
-
-        if(result.IsFailed)
-        {
-            return result;
-        }
-
         var emailResult = await GetUserEmailAsync(tokenResult.Value.AccessToken);
 
         if (emailResult.IsFailed)
@@ -51,17 +40,37 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         }
 
         var accounts = await _accountRepository.GetAccountsWithEmailAsync(emailResult.Value);
+        var account = accounts.FirstOrDefault(x => x.Type == StorageAccountType.Google);
 
-        if(accounts.Any(x => x.Type == StorageAccountType.Google))
+        Guid accountId = account is null
+            ? Guid.NewGuid()
+            : account.Id;
+
+        var result = await _secretsService.StoreTokensAsync(accountId, tokenResult.Value.AccessToken,
+             tokenResult.Value.RefreshToken);
+
+        if (result.IsFailed)
         {
-            return Result.Fail("Account already exists");
+            return result;
         }
 
-        StorageAccount account = new()
+        if(account is { IsActive: false})
+        {
+            account.IsActive = true;
+            await _accountRepository.UpdateAccountAsync(account);
+            return Result.Ok();
+        }
+        else if (account is not null)
+        {
+            return Result.Ok();
+        }
+
+        account = new()
         {
             Id = accountId,
             Email = emailResult.Value,
-            Type = StorageAccountType.Google
+            Type = StorageAccountType.Google,
+            IsActive = true,
         };
 
         await _accountRepository.AddAccountAsync(account);

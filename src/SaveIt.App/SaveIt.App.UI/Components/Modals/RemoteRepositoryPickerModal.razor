@@ -1,1 +1,31 @@
-﻿<h3>RemoteRepositoryPickerModal</h3>
+﻿<div class="m-3">
+    @if (_error is not null)
+    {
+        <div>
+            <Alert Color="AlertColor.Danger">@_error</Alert>
+        </div>
+    }
+    else
+    {
+        <div>
+            <div class="d-flex flex-wrap">
+                @foreach (var item in _items)
+                {
+                    <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
+                         @onclick="() => SelectItem(item)"
+                         @ondblclick="() => MoveToItem(item)">
+                        <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
+                        <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                            <p class="item-name">@item.Item.Name</p>
+                        </Tooltip>
+                    </div>
+                }
+            </div>
+
+            <div class="d-flex mt-3 justify-content-end">
+                <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
+            </div>
+        </div>
+    }
+    
+</div>

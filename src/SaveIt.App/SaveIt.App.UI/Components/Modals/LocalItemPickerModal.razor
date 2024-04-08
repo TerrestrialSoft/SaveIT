@@ -5,7 +5,7 @@
                 <Icon Name="IconName.ArrowLeft" />
             </Button>
         </div>
-        <div class="fs-5">@_currentPath</div>
+        <div class="fs-5">@SelectedFile?.Name</div>
     </div>
 
     @if (_error is not null)
@@ -18,14 +18,14 @@
     <div class="d-flex flex-wrap">
         @foreach (var item in _items)
         {
-            @if (item.IsDirectory)
+            @if (item.Item.IsDirectory)
             {
                 <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
                      @ondblclick="() => MoveToDirectory(item)"
                      @onclick="() => SelectItem(item)">
                     <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
-                    <Tooltip Title="@item.Name" Placement="TooltipPlacement.Bottom">
-                        <p class="item-name">@item.Name</p>
+                    <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                        <p class="item-name">@item.Item.Name</p>
                     </Tooltip>
                 </div>
             }
@@ -35,8 +35,8 @@
                      @onclick="() => SelectItem(item)"
                      @ondblclick="() => SelectAndPickAsync(item)">
                     <img src="img/icons/file-icon.svg" alt="File" class="item-img" />
-                    <Tooltip Title="@item.Name" Placement="TooltipPlacement.Bottom">
-                        <p class="item-name">@item.Name</p>
+                    <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                        <p class="item-name">@item.Item.Name</p>
                     </Tooltip>
                 </div>
             }
@@ -47,5 +47,3 @@
         <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
     </div>
 </div>
-
-

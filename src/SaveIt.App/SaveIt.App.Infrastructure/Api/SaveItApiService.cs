@@ -39,7 +39,7 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
     {
         var dictionary = new Dictionary<string, string>
         {
-            { "refresh_token", refreshToken }
+            { "RefreshToken", refreshToken }
         };
 
         var response = await _httpClient.PostAsJsonAsync(_refreshUrl, dictionary);

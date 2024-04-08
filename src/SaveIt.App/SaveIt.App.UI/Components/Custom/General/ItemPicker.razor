@@ -1,4 +1,6 @@
-﻿<div class="m-1 p-1">
+﻿@typeparam TItem where TItem : NamedModel
+
+<div class="m-1 p-1">
     <div class="d-flex align-content-center">
         <div>
             <Icon Name="@Icon" Size="IconSize.x5" />
@@ -13,10 +15,10 @@
             Select Location
         </Button>
 
-        @if (!string.IsNullOrEmpty(SelectedPath))
+        @if (SelectedFile is not null)
         {
-            <div class="d-flex align-items-center p-1">
-                <div class="text-muted me-2" style="word-break: break-all;">@SelectedPath</div>
+            <div class="d-flex align-items-center p-1 ms-4">
+                <div class="text-muted me-2" style="word-break: break-all;">@SelectedFile.FullPath</div>
                 <div @onclick="ClearPath"><Icon Name="IconName.Trash3Fill" Color="IconColor.Danger" Size="IconSize.x5" /></div>
             </div>
         }

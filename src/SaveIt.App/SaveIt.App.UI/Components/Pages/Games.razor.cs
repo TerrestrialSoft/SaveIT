@@ -7,7 +7,8 @@ namespace SaveIt.App.UI.Components.Pages;
 public partial class Games
 {
     private Modal _createNewGameModal = default!;
-    private Modal _localFolderPickerModal = default!;
+    private Modal _localItemPickerModal = default!;
+    private Modal _remoteItemPickerModal = default!;
     private Modal _authorizeStorageModal = default!;
 
     private List<Game> _allGames = [];
@@ -33,7 +34,8 @@ public partial class Games
         var parameters = new Dictionary<string, object>
         {
             { nameof(CreateGameModal.ModalCurrent), _createNewGameModal },
-            { nameof(CreateGameModal.ModalLocalFolderPicker), _localFolderPickerModal },
+            { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
+            { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
             { nameof(CreateGameModal.EditGame), _createGame }
         };

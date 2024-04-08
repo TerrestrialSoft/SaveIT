@@ -1,0 +1,21 @@
+﻿.selected-item {
+    background-color: #0987e8;
+    border-radius: 5px;
+}
+
+.item {
+    width: 6rem;
+    height: 8rem;
+}
+
+.item-img {
+    width: 6rem;
+    height: 6rem;
+}
+
+.item-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 6rem;
+}

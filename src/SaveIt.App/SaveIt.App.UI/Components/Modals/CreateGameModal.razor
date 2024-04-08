@@ -25,7 +25,7 @@
                     <ItemPicker
                         Title="Local Game Executable"
                         Icon="IconName.FileTypeExe"
-                        SelectedPath="@EditGame.LocalExecutablePath"
+                        SelectedFile="@EditGame.LocalExecutableFile"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
                         OnPathCleared="ClearLocalExecutablePath"/>
                 </div>
@@ -46,10 +46,10 @@
                     <label class="fs-5">
                         Storage Account
                     </label>
-                    <InputSelect @bind-Value="_selectedStorageAccount" class="p-1 w-75">
+                    <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-1 w-75">
                         @foreach (var account in _storageAccounts)
                         {
-                            <option value="@account">@account.Email (@account.Type.ToString())</option>
+                            <option value="@account.Id">@account.Email (@account.Type.ToString())</option>
                         }
                     </InputSelect>
                     <div>
@@ -61,16 +61,16 @@
                 <div class="m-1 p-1">
                     <ItemPicker Title="Local Game Save Location"
                         Icon="IconName.PcDisplayHorizontal"
-                        SelectedPath="@EditGame.LocalGameSavePath"
+                        SelectedFile="@EditGame.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"/>
                 </div>
                 <div class="m-1 p-1">
                     <ItemPicker Title="Remote Game Save Location"
-                                Icon="IconName.Cloud"
-                                SelectedPath="@EditGame.RemoteGameSavePath"
-                                OnPickerClicked="ShowRemoteFolderPickerModal"
-                                OnPathCleared="ClearRemoteGameSavePath" />
+                        Icon="IconName.Cloud"
+                        SelectedFile="@EditGame.RemoteGameSaveFile"
+                        OnPickerClicked="ShowRemoteFolderPickerModal"
+                        OnPathCleared="ClearRemoteGameSavePath" />
                 </div>
             </div>
         </div>

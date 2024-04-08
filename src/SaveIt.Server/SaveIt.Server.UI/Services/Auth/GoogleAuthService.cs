@@ -1,9 +1,9 @@
 ﻿using FluentResults;
 using Flurl;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using SaveIt.Server.UI.Models;
 using SaveIt.Server.UI.Options;
+using System.Text.Json;
 using System.Web;
 
 namespace SaveIt.Server.UI.Services.Auth;
@@ -30,7 +30,7 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
         
         var builder = new UriBuilder(_clientConfig.OAuthUrl);
         var redirectUri = string.Format(_clientConfig.LocalRedirectUrl, serverUrl);
-        var encodedState = HttpUtility.UrlEncode(JsonConvert.SerializeObject(state));
+        var encodedState = HttpUtility.UrlEncode(JsonSerializer.Serialize(state));
 
         builder.Query = builder.Query.SetQueryParams(new Dictionary<string, string>()
         {
@@ -49,7 +49,8 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
         CancellationToken cancellationToken)
     {
         var decodedState = HttpUtility.UrlDecode(urlEncodedState);
-        var state = JsonConvert.DeserializeObject<StateModel>(decodedState);
+        var state = JsonSerializer.Deserialize<StateModel>(decodedState);
+        
 
         if (state is null || state.RequestId == Guid.Empty)
         {

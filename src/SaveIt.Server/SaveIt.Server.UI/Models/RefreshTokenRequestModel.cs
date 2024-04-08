@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SaveIt.Server.UI.Models;
 
-public record RefreshTokenRequestModel([BindRequired]string RefreshToken);
+public record RefreshTokenRequestModel([Required]string RefreshToken);

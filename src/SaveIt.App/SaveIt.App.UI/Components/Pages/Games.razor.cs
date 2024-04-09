@@ -29,6 +29,12 @@ public partial class Games
     private void GameCardClicked(Game g)
         => _selectedGame = g;
 
+    private Task ShowNewCreateNewGameModal()
+    {
+        _createGame = new();
+        return ShowCreateNewGameModal();
+    }
+
     private async Task ShowCreateNewGameModal()
     {
         var parameters = new Dictionary<string, object>

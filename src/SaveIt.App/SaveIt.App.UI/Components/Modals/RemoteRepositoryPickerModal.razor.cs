@@ -9,6 +9,7 @@ public partial class RemoteRepositoryPickerModal
 {
     private readonly List<SelectedItemViewModel<RemoteFileItemModel>> _items = [];
     private string? _error;
+    private bool _isLoading = true;
 
     [Inject]
     private IExternalStorageService StorageService { get; set; } = default!;
@@ -33,20 +34,24 @@ public partial class RemoteRepositoryPickerModal
             ? new(SelectedItem)
             : new(new RemoteFileItemModel { Name = "root", IsDirectory = true, ParentId = "root", Id = "root" });
 
+        string? error = null;
+
         try
         {
             await RedrawItemsAsync();
         }
         catch (Exception)
         {
-            _error = "Application has no permission to view the contents of this folder.";
+            error = "Application has no permission to view the contents of this folder.";
         }
+        FinishLoadingWithResult(error);
     }
 
     private async Task RedrawItemsAsync()
     {
         _error = null;
         _items.Clear();
+        string? error = null;
         try
         {
             var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId);
@@ -56,13 +61,11 @@ public partial class RemoteRepositoryPickerModal
                 if(itemsResult.HasError<AuthError>())
                 {
                     await StorageAccountRepository.DeactiveAccountAsync(SelectedStorageAccountId);
-                    _error = "Unable to refresh token. Storage account was deactivated";
-                    _items.Clear();
+                    FinishLoadingWithResult("Unable to refresh token. Storage account was deactivated");
                     return;
                 }
 
-                _error = itemsResult.Errors[0].Message;
-                _items.Clear();
+                FinishLoadingWithResult(itemsResult.Errors[0].Message);
                 return;
             }
 
@@ -76,8 +79,20 @@ public partial class RemoteRepositoryPickerModal
         }
         catch (Exception)
         {
+            error = "There was a problem during retrieving data from the cloud storage.";
+        }
+
+        FinishLoadingWithResult(error);
+    }
+
+    private void FinishLoadingWithResult(string? error = null)
+    {
+        _isLoading = false;
+
+        if(error is not null)
+        {
+            _error = error;
             _items.Clear();
-            _error = "There was a problem during retrieving data from the cloud storage.";
         }
     }
 

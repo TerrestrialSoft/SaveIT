@@ -51,15 +51,6 @@ public partial class LocalItemPickerModal
                     IsDirectory = true
                 });
             }
-            else
-            {
-                _selectedFile = new(new LocalFileItemModel
-                {
-                    Name = Path.GetDirectoryName(_selectedFile.Item.Path)!,
-                    Path = Path.GetDirectoryName(_selectedFile.Item.Path)!,
-                    IsDirectory = true
-                });
-            }
 
             RedrawItems();
         }
@@ -79,12 +70,7 @@ public partial class LocalItemPickerModal
             {
                 var directories = Directory.GetDirectories(_selectedFile.Item.FullPath);
 
-                _items.AddRange(directories.Select(x => new SelectedItemViewModel<LocalFileItemModel>(new()
-                {
-                    Name = Path.GetFileName(x)!,
-                    Path = _selectedFile.Item.FullPath,
-                    IsDirectory = true
-                })));
+                _items.AddRange(directories.Select(x => GetFileItem(x, _selectedFile.Item.FullPath, true)));
             }
 
             if (ShowMode == LocalPickerMode.Files || ShowMode == LocalPickerMode.Both)
@@ -96,11 +82,7 @@ public partial class LocalItemPickerModal
                 var filteredFiles = files
                     .Where(x => !enableFiltering || AllowedExtensions.Any(y =>
                         string.Equals(y, Path.GetExtension(x),StringComparison.InvariantCultureIgnoreCase)))
-                    .Select(x => new SelectedItemViewModel<LocalFileItemModel>(new()
-                    {
-                        Name = Path.GetFileName(x)!,
-                        Path = _selectedFile.Item.FullPath
-                    }));
+                    .Select(x => GetFileItem(x, _selectedFile.Item.FullPath));
 
                 _items.AddRange(filteredFiles);
             }
@@ -111,6 +93,14 @@ public partial class LocalItemPickerModal
             _error = "Application has no permission to view the contents of this folder.";
         }
     }
+
+    private static SelectedItemViewModel<LocalFileItemModel> GetFileItem(string filePath, string parentPath, bool isDirectory = false)
+        => new(new LocalFileItemModel()
+        {
+            Name = Path.GetFileName(filePath)!,
+            Path = parentPath,
+            IsDirectory = isDirectory
+        });
 
     private void MoveToDirectory(SelectedItemViewModel<LocalFileItemModel> model)
     {
@@ -125,14 +115,24 @@ public partial class LocalItemPickerModal
 
     private void ChangeToParentDirectory()
     {
-        var parent = Directory.GetParent(_selectedFile.Item.Path!);
+        var parent = _selectedFile.Item.Path;
 
-        if (parent is null)
+        if (string.IsNullOrEmpty(parent))
         {
             return;
         }
 
-        _selectedFile.Item.Name = parent.FullName;
+        string parentPath;
+        try
+        {
+            parentPath = Path.GetDirectoryName(parent)!;
+        }
+        catch (Exception)
+        {
+            return;
+        }
+
+        _selectedFile = GetFileItem(parent, parentPath, true);
         RedrawItems();
     }
 
@@ -169,7 +169,7 @@ public partial class LocalItemPickerModal
             return;
         }
 
-        await OnItemSelected.InvokeAsync(_selectedFile.Item);
+        await OnItemSelected.InvokeAsync(selectedItem.Item);
     }
 
     private Task SelectAndPickAsync(SelectedItemViewModel<LocalFileItemModel> item)

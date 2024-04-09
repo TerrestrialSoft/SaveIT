@@ -94,7 +94,8 @@ public partial class LocalItemPickerModal
         }
     }
 
-    private static SelectedItemViewModel<LocalFileItemModel> GetFileItem(string filePath, string parentPath, bool isDirectory = false)
+    private static SelectedItemViewModel<LocalFileItemModel> GetFileItem(string filePath, string parentPath,
+        bool isDirectory = false)
         => new(new LocalFileItemModel()
         {
             Name = Path.GetFileName(filePath)!,

@@ -1,4 +1,5 @@
 ﻿<div class="m-3">
+
     @if (_error is not null)
     {
         <div>
@@ -7,6 +8,18 @@
     }
     else
     {
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-4">
+                <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory">
+                    <Icon Name="IconName.ArrowLeft" />
+                </Button>
+            </div>
+            @if(_selectedItem is not null)
+            {
+                <div class="fs-5">@_selectedItem.Item.FullPath</div>
+            }
+        </div>
+
         <div>
             @if(_isLoading)
             {

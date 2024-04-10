@@ -51,10 +51,7 @@ public partial class Games
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
             { nameof(CreateGameModal.EditGame), _createGame },
             { nameof(CreateGameModal.OnGameCreated),
-                EventCallback.Factory.Create(this, async () =>
-                {
-                    await RefreshGames();
-                })
+                EventCallback.Factory.Create(this, RefreshGames)
             },
         };
 

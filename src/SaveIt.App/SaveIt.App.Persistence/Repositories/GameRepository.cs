@@ -9,19 +9,13 @@ internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
     private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
 
     public async Task<Game?> GetGame(Guid id)
-    {
-        return await _db.Table<Game>()
-            .FirstOrDefaultAsync(g => g.Id == id);
-    }
+        => await _db.Table<Game>()
+            .FirstOrDefaultAsync(g => g.Id == id)!;
 
-    public async Task SaveGameAsync(Game game)
-    {
-        await _db.InsertAsync(game);
-    }
+    public async Task CreateGameAsync(Game game)
+        => await _db.InsertAsync(game);
 
     public async Task<IEnumerable<Game>> GetAllGamesAsync()
-    {
-        return await _db.Table<Game>()
+        => await _db.Table<Game>()
             .ToListAsync();
-    }
 }

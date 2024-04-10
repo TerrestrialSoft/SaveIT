@@ -1,9 +1,11 @@
 ﻿using SaveIt.App.Domain.Enums;
+using SQLite;
 
 namespace SaveIt.App.Domain.Entities;
-public class StorageAccount
+
+[Table("StorageAccounts")]
+public class StorageAccount : BaseEntity
 {
-    public Guid Id { get; init; }
     public string Email { get; init; } = default!;
     public StorageAccountType Type { get; init; }
     public bool IsActive { get; set; }

@@ -16,17 +16,17 @@ public class NewGameModel
 
     [Required]
     [DisplayName("Local Game Save File")]
-    public LocalFileItemModel LocalGameSaveFile { get; set; } = default!;
+    public LocalFileItemModel? LocalGameSaveFile { get; set; } = default!;
 
     [Required]
     [DisplayName("Remote Game Save File")]
-    public RemoteFileItemModel RemoteGameSaveFile { get; set; } = default!;
+    public RemoteFileItemModel? RemoteGameSaveFile { get; set; } = default!;
 
-    public LocalFileItemModel? LocalExecutableFile { get; set; }
+    public LocalFileItemModel? GameExecutableFile { get; set; }
 
     [Required]
     [DisplayName("Storage Account")]
-    public Guid StorageAccountId { get; set; }
+    public Guid? StorageAccountId { get; set; }
 
     public ImageModel? Image { get; set; }
 }

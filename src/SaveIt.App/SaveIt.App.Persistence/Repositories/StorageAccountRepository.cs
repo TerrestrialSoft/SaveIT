@@ -8,17 +8,13 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler) : IStorageAcc
 {
     private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
 
-    public async Task AddAccountAsync(StorageAccount account)
-    {
-        await _db.InsertAsync(account);
-    }
+    public async Task CreateAccountAsync(StorageAccount account)
+        => await _db.InsertAsync(account);
 
     public async Task<IEnumerable<StorageAccount>> GetAccountsWithEmailAsync(string email)
-    {
-        return await _db.Table<StorageAccount>()
+        => await _db.Table<StorageAccount>()
             .Where(x => x.Email == email)
             .ToListAsync();
-    }
 
     public async Task<IEnumerable<StorageAccount>> GetAllStorageAccounts(bool includeDeactivated = false)
     {
@@ -43,6 +39,6 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler) : IStorageAcc
         await _db.UpdateAsync(account);
     }
 
-    public Task UpdateAccountAsync(StorageAccount account)
-        => _db.UpdateAsync(account);
+    public async Task UpdateAccountAsync(StorageAccount account)
+        => await _db.UpdateAsync(account);
 }

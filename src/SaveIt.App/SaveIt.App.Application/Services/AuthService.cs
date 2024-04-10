@@ -72,7 +72,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             IsActive = true,
         };
 
-        await _accountRepository.AddAccountAsync(account);
+        await _accountRepository.CreateAccountAsync(account);
 
         return Result.Ok();
     }
@@ -88,9 +88,9 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         var retryPipeline = new ResiliencePipelineBuilder<OAuthCompleteTokenModel?>()
         .AddRetry(new()
         {
-            MaxRetryAttempts = 40,
+            MaxRetryAttempts = 3,
             BackoffType = DelayBackoffType.Constant,
-            Delay = TimeSpan.FromSeconds(15),
+            Delay = TimeSpan.FromSeconds(300),
             ShouldHandle = new PredicateBuilder<OAuthCompleteTokenModel?>()
                 .Handle<HttpRequestException>(),
         })

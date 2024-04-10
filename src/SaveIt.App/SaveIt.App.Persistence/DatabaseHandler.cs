@@ -20,6 +20,7 @@ public class DatabaseHandler : IDatabaseHandler
 
     private static void CreateTables(SQLiteConnection db)
     {
+        db.CreateTable<ImageEntity>();
         db.CreateTable<Game>();
         db.CreateTable<GameSave>();
         db.CreateTable<StorageAccount>();

@@ -10,5 +10,6 @@ public static class ServiceCollectionExtensions
         => services.AddScoped<IGameRepository, GameRepository>()
             .AddScoped<IGameSaveRepository, GameSaveRepository>()
             .AddScoped<IStorageAccountRepository, StorageAccountRepository>()
+            .AddScoped<IImageRepository, ImageRepository>()
             .AddSingleton<IDatabaseHandler, DatabaseHandler>();
 }

@@ -22,9 +22,9 @@
                 </div>
                 <div>
                     <ItemPicker
-                        Title="Local Game Executable"
+                        Title="Game Executable Location"
                         Icon="IconName.FileTypeExe"
-                        SelectedFile="@EditGame.LocalExecutableFile"
+                        SelectedFile="@EditGame.GameExecutableFile"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
                         OnPathCleared="ClearLocalExecutablePath"/>
                 </div>
@@ -59,13 +59,15 @@
                     {
                         <Button
                             Color="ButtonColor.Primary"
-                            Size="Size.Large"
+                            Class="ms-4 mt-1 me-3"
                             Outline=true
                             @onclick="ShowAuthorizeStorageModal">
                             Authorize new account
                         </Button>
                     }
-                    <ValidationMessage For="() => EditGame.StorageAccountId" />
+                    <div class="ms-2">
+                        <ValidationMessage For="() => EditGame.StorageAccountId" />
+                    </div>
                 </div>
             </div>
             <div class="column">
@@ -76,18 +78,21 @@
                         SelectedFile="@EditGame.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"/>
-
-                    <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
+                    <div class="ms-4">
+                        <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
+                    </div>
                 </div>
                 <div class="m-1 p-1">
                     <ItemPicker Title="Remote Game Save Location"
                         Icon="IconName.Cloud"
                         IsRequired="true"
+                                IsDisabled="@(EditGame.StorageAccountId is null)"
                         SelectedFile="@EditGame.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
                         OnPathCleared="ClearRemoteGameSavePath" />
-
-                    <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
+                    <div class="ms-4">
+                        <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
+                    </div>
                 </div>
             </div>
         </div>

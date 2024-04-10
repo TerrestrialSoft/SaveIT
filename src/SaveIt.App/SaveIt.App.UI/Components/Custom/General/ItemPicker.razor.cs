@@ -18,6 +18,9 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     public bool IsRequired { get; set; }
 
     [Parameter]
+    public bool IsDisabled { get; set; }
+
+    [Parameter]
     public string Title { get; set; } = default!;
 
     [Parameter]

@@ -2,16 +2,19 @@
 using SQLiteNetExtensions.Attributes;
 
 namespace SaveIt.App.Domain.Entities;
-public class Game
-{
-    [PrimaryKey]
-    public Guid Id { get; init; }
 
-    public string Name { get; set; } = default!;
-    public string Username { get; set; } = default!;
+[Table("Games")]
+public class Game : BaseEntity
+{
+    public string Name { get; init; } = default!;
+    public string Username { get; init; } = default!;
+    public string? GameExecutablePath { get; set; }
+
+    [ForeignKey(typeof(ImageEntity))]
     public Guid? ImageId { get; set; }
-    public string? ApplicationExecutablePath { get; set; }
-    public bool IsFavourite { get; set; }
+
+    [OneToOne]
+    public ImageEntity? Image { get; set; }
 
     [OneToMany]
     public ICollection<GameSave> GameSaves { get; set; } = [];

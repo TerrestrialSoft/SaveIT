@@ -1,4 +1,5 @@
 using BlazorBootstrap;
+using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Models;
@@ -19,8 +20,13 @@ public partial class Games
 
     protected override async Task OnInitializedAsync()
     {
+        await RefreshGames();
+    }
+
+    private async Task RefreshGames()
+    {
         _allGames = (await gameRepository.GetAllGamesAsync()).ToList();
-        _filteredGames = _allGames.ToList();
+        UpdateGames(_searchText);
     }
 
     private void UpdateGames(string searchText)
@@ -43,7 +49,13 @@ public partial class Games
             { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
-            { nameof(CreateGameModal.EditGame), _createGame }
+            { nameof(CreateGameModal.EditGame), _createGame },
+            { nameof(CreateGameModal.OnGameCreated),
+                EventCallback.Factory.Create(this, async () =>
+                {
+                    await RefreshGames();
+                })
+            },
         };
 
         await _createNewGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);

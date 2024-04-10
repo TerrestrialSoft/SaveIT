@@ -13,9 +13,18 @@
 </div>
 
 <div class="d-flex flex-wrap">
-    @foreach (var game in _filteredGames)
+    @if (_filteredGames.Count == 0)
     {
-        <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" />
+        <div class="d-flex justify-content-center w-100 mt-4">
+            <Alert Color="AlertColor.Secondary" Class="w-100"> No games found </Alert>
+        </div>
+    }
+    else
+    {
+        @foreach (var game in _filteredGames)
+        {
+            <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" />
+        }
     }
 </div>
 

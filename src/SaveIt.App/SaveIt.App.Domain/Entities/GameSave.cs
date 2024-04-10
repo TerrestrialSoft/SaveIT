@@ -3,20 +3,23 @@ using SQLiteNetExtensions.Attributes;
 
 namespace SaveIt.App.Domain.Entities;
 
-public class GameSave
+[Table("GameSaves")]
+public class GameSave : BaseEntity
 {
-    [PrimaryKey]
-    public Guid Id { get; init; }
+    public string Name { get; init; } = default!;
+    public string LocalGameSavePath { get; init; } = default!;
+    public string RemoteLocationId { get; init; } = default!;
+    
+    [ForeignKey(typeof(ImageEntity))]
+    public Guid StorageAccountId { get; init; }
 
     [ForeignKey(typeof(Game))]
-    public Guid GameId { get; set; }
-
-    public string Name { get; set; } = default!;
-    public string LocalGameSavePath { get; set; } = default!;
-    public string RemoteGameSavePath { get; set; } = default!;
-    public Guid StorageAccountId { get; set; }
+    public Guid GameId { get; init; }
 
     [ManyToOne]
     public Game Game { get; set; } = default!;
+
+    [ManyToOne]
+    public StorageAccount StorageAccount { get; set; } = default!;
 
 }

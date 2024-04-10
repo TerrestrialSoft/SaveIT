@@ -10,7 +10,19 @@ public partial class CreateGameModal
     public const string Title = "Create New Game";
 
     [Inject]
+    protected ToastService ToastService { get; set; } = default!;
+
+    [Inject]
     private IStorageAccountRepository StorageAccountRepository { get; set; } = default!;
+
+    [Inject]
+    private IGameRepository GameRepository { get; set; } = default!;
+
+    [Inject]
+    private IImageRepository ImageRepository { get; set; } = default!;
+
+    [Inject]
+    private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
     [Parameter]
     public Modal ModalLocalItemPicker { get; set; } = default!;
@@ -27,17 +39,24 @@ public partial class CreateGameModal
     [Parameter]
     public NewGameModel EditGame { get; set; } = default!;
 
+    [Parameter]
+    public EventCallback OnGameCreated { get; set; } = default!;
+
     private List<StorageAccount> _storageAccounts = [];
 
     protected override async Task OnInitializedAsync()
     {
         await RefreshStorageAccountsAsync();
+        TrySetStorageAccount();
     }
 
     private async Task RefreshStorageAccountsAsync()
     {
         _storageAccounts = (await StorageAccountRepository.GetAllStorageAccounts()).ToList();
-        
+    }
+
+    private void TrySetStorageAccount()
+    {
         if (_storageAccounts.Count != 0)
         {
             EditGame.StorageAccountId = _storageAccounts[0].Id;
@@ -74,7 +93,7 @@ public partial class CreateGameModal
                 {
                     await RefreshStorageAccountsAsync();
                     await ModalAuthorizeStorage.HideAsync();
-                    await ModalLocalItemPicker.ShowAsync();
+                    await ModalCurrent.ShowAsync();
                 })
             }
         };
@@ -92,14 +111,14 @@ public partial class CreateGameModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(LocalItemPickerModal.SelectedFile), EditGame.LocalExecutableFile! },
+            { nameof(LocalItemPickerModal.SelectedFile), EditGame.GameExecutableFile! },
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
             { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
             { nameof(LocalItemPickerModal.OnItemSelected),
                 EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
                 {
-                    EditGame.LocalExecutableFile = file;
+                    EditGame.GameExecutableFile = file;
                     await ModalLocalItemPicker.HideAsync();
                     await ModalCurrent.ShowAsync();
                 })
@@ -131,7 +150,7 @@ public partial class CreateGameModal
 
     private void ClearLocalExecutablePath()
     {
-        EditGame.LocalExecutableFile = null;
+        EditGame.GameExecutableFile = null;
     }
 
     private void ClearLocalGameSavePath()
@@ -146,6 +165,44 @@ public partial class CreateGameModal
 
     private async Task Submit()
     {
+        var game = new Game()
+        {
+            Id = Guid.NewGuid(),
+            Name = EditGame.Name,
+            Username = EditGame.Username,
+            GameExecutablePath = EditGame.GameExecutableFile?.FullPath,
+        };
 
+        if(EditGame.Image is ImageModel img)
+        {
+            var image = new ImageEntity()
+            {
+                Id = Guid.NewGuid(),
+                Name = img.Name,
+                Content = img.ImageBase64
+            };
+
+            game.ImageId = image.Id;
+            await ImageRepository.CreateImageAsync(image);
+        }
+
+        var gameSave = new GameSave()
+        {
+            Id = Guid.NewGuid(),
+            GameId = game.Id,
+            StorageAccountId = EditGame.StorageAccountId!.Value,
+            RemoteLocationId = EditGame.RemoteGameSaveFile!.ParentId!,
+            LocalGameSavePath = EditGame.LocalGameSaveFile!.Path!,
+        };
+        
+        await GameRepository.CreateGameAsync(game);
+        await GameSaveRepository.CreateGameSaveAsync(gameSave);
+        
+        ToastService.Notify(new(ToastType.Success, "Game created successfully"));
+
+        EditGame = new();
+        TrySetStorageAccount();
+        await ModalCurrent.HideAsync();
+        await OnGameCreated.InvokeAsync();
     }
 }

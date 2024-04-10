@@ -29,19 +29,16 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         var response = await _httpClient.GetAsync(_profileUrl);
         
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
             return Result.Fail("Error ocurred during communication with external server");
         }
 
         var content = await response.Content.ReadFromJsonAsync<GoogleProfile>();
-        
-        if (content is null)
-        {
-            return Result.Fail("Error ocurred during communication with external server");
-        }
-        
-        return content.User.Email;
+
+        return content is not null
+            ? content.User.Email
+            : Result.Fail("Error ocurred during communication with external server");
     }
 
     public Task<Result<IEnumerable<FileItem>>> GetFoldersAsync(Guid storageAccountId, string parentId)

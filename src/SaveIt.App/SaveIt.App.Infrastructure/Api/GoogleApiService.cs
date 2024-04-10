@@ -24,14 +24,22 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
     private const string _fileDetailUrl = _baseFileDetailUrl + "?fields=" + _fileQueryfields;
     private const string _fileUploadMultipartUrl = _baseFilesUrl + "?uploadType=multipart";
 
-    public async Task<string> GetProfileEmailAsync(string accessToken)
+    public async Task<Result<string>> GetProfileEmailAsync(string accessToken)
     {
-        // TODO FIX THIS
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         var response = await _httpClient.GetAsync(_profileUrl);
-        response.EnsureSuccessStatusCode();
+        
+        if (response.IsSuccessStatusCode)
+        {
+            return Result.Fail("Error ocurred during communication with external server");
+        }
+
         var content = await response.Content.ReadFromJsonAsync<GoogleProfile>();
-        ArgumentNullException.ThrowIfNull(content);
+        
+        if (content is null)
+        {
+            return Result.Fail("Error ocurred during communication with external server");
+        }
         
         return content.User.Email;
     }
@@ -77,9 +85,9 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
     public async Task<Result> DeleteFileAsync(Guid storageAccountId, string id)
     {
         var filter = string.Format(_baseFileDetailUrl, id);
-        var message = new HttpRequestMessage(HttpMethod.Delete, filter);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Delete, filter));
 
-        var result = await ExecuteRequestAsync(storageAccountId, message);
+        var result = await ExecuteRequestAsync(storageAccountId, messageFactory);
 
         return result;
     }
@@ -95,29 +103,30 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
                 : null,
         };
 
-        var message = new HttpRequestMessage(HttpMethod.Post, _fileUploadMultipartUrl)
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Post, _fileUploadMultipartUrl)
         {
             Content = new StringContent(JsonSerializer.Serialize(folderMetadata))
-        };
+        });
 
-        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, message);
+
+        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory);
 
         return result;
     }
 
     private Task<Result<T>> GetAsync<T>(Guid storageAccountId, string url)
     { 
-        var message = new HttpRequestMessage(HttpMethod.Get, url);
-        return ExecuteRequestAsync<T>(storageAccountId, message);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, url));
+        return ExecuteRequestAsync<T>(storageAccountId, messageFactory);
     }
 
-    private async Task<Result> ExecuteRequestAsync(Guid storageAccountId, HttpRequestMessage requestMessage)
+    private async Task<Result> ExecuteRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestMessage)
     {
         var responseResult = await GetSuccessResponseMessage(storageAccountId, requestMessage);
         return responseResult.ToResult();
     }
 
-    private async Task<Result<T>> ExecuteRequestAsync<T>(Guid storageAccountId, HttpRequestMessage requestMessage)
+    private async Task<Result<T>> ExecuteRequestAsync<T>(Guid storageAccountId, Func<HttpRequestMessage> requestMessage)
     {
         var responseResult = await GetSuccessResponseMessage(storageAccountId, requestMessage);
 
@@ -127,18 +136,19 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
         }
 
         var content = await responseResult.Value.Content.ReadFromJsonAsync<T>();
-        ArgumentNullException.ThrowIfNull(content);
 
-        return content;
+        return content is not null
+            ? content
+            : Result.Fail("Error ocurred during communication with external server");
     }
 
     private async Task<Result<HttpResponseMessage>> GetSuccessResponseMessage(Guid storageAccountId,
-        HttpRequestMessage requestMessage)
+        Func<HttpRequestMessage> requestMessage)
     {
         var token = await _accountSecretsRepo.GetAccessTokenAsync(storageAccountId);
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await _httpClient.SendAsync(requestMessage);
+        var response = await _httpClient.SendAsync(requestMessage());
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
@@ -152,25 +162,23 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
             response = result.Value;
         }
 
-        if(!response.IsSuccessStatusCode)
-        {
-            return Result.Fail("Error ocurred during communication with external server");
-        }
-
-        return response;
+        return response.IsSuccessStatusCode
+            ? response
+            : Result.Fail("Error ocurred during communication with external server");
     }
 
-    private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId, HttpRequestMessage requestMessage)
+    private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestMessage)
     {
         var refreshResult = await TryRefreshTokenAsync(storageAccountId);
 
         if (refreshResult.IsFailed)
         {
-            return Result.Fail(refreshResult.Errors);
+            return refreshResult.ToResult();
         }
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value);
-        var result = await _httpClient.SendAsync(requestMessage);
+
+        var result = await _httpClient.SendAsync(requestMessage());
 
         return Result.Ok(result);
     }
@@ -198,6 +206,6 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
 
         return storeResult.IsSuccess
             ? Result.Ok(accessToken)
-            : Result.Fail(storeResult.Errors);
+            : storeResult;
     }
 }

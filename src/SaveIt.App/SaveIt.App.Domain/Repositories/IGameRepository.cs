@@ -6,4 +6,5 @@ public interface IGameRepository
     Task CreateGameAsync(Game game);
     Task<Game?> GetGame(Guid id);
     Task<IEnumerable<Game>> GetAllGamesAsync();
+    Task<IEnumerable<Game>> GetAllGamesWithChildrenAsync();
 }

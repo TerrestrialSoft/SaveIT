@@ -7,7 +7,7 @@
             <div>
                 Profile:
                 <InputSelect @bind-Value="SelectedSave">
-                    @foreach(var save in Game.GameSaves)
+                    @foreach(var save in Game.GameSaves!)
                     {
                         <option value="@save">@save.Name</option>
                     }
@@ -17,7 +17,7 @@
     }
     else
     {
-        <img src="img/icons/image-placeholder-icon.svg" class="card-img-top" alt="@Game.Name">
+        <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")" class="card-img-top image" alt="@Game.Name Image">
         <div class="card-body">
             <h5 class="card-title">@Game.Name</h5>
         </div>

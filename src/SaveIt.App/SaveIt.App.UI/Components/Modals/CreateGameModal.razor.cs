@@ -189,6 +189,7 @@ public partial class CreateGameModal
         var gameSave = new GameSave()
         {
             Id = Guid.NewGuid(),
+            Name = EditGame.GameSaveName,
             GameId = game.Id,
             StorageAccountId = EditGame.StorageAccountId!.Value,
             RemoteLocationId = EditGame.RemoteGameSaveFile!.ParentId!,

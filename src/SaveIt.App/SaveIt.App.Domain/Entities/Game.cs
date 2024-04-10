@@ -17,5 +17,5 @@ public class Game : BaseEntity
     public ImageEntity? Image { get; set; }
 
     [OneToMany]
-    public ICollection<GameSave> GameSaves { get; set; } = [];
+    public List<GameSave>? GameSaves { get; set; }
 }

@@ -25,7 +25,7 @@ public partial class Games
 
     private async Task RefreshGames()
     {
-        _allGames = (await gameRepository.GetAllGamesAsync()).ToList();
+        _allGames = (await gameRepository.GetAllGamesWithChildrenAsync()).ToList();
         UpdateGames(_searchText);
     }
 

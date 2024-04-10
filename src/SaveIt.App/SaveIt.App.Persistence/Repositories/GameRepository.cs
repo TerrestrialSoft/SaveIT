@@ -2,6 +2,7 @@
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SQLite;
+using SQLiteNetExtensionsAsync.Extensions;
 
 namespace SaveIt.App.Persistence.Repositories;
 internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
@@ -10,7 +11,22 @@ internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
 
     public async Task<Game?> GetGame(Guid id)
         => await _db.Table<Game>()
-            .FirstOrDefaultAsync(g => g.Id == id)!;
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+    public async Task<IEnumerable<Game>> GetAllGamesWithChildrenAsync()
+    {
+        var results = await _db.Table<Game>()
+            .ToListAsync();
+        List<Game> games = [];
+
+        foreach (var game in results)
+        {
+            await _db.GetChildrenAsync(game);
+            games.Add(game);
+        }
+
+        return games;
+    }
 
     public async Task CreateGameAsync(Game game)
         => await _db.InsertAsync(game);

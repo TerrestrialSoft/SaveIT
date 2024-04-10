@@ -89,7 +89,7 @@ public partial class RemoteRepositoryPickerModal
 
             _items.AddRange(itemsResult.Value.Select(GetSelectRemoteFile));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             error = "There was a problem during retrieving data from the cloud storage.";
         }

@@ -167,7 +167,8 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
             : Result.Fail("Error ocurred during communication with external server");
     }
 
-    private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestMessage)
+    private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId,
+        Func<HttpRequestMessage> requestMessage)
     {
         var refreshResult = await TryRefreshTokenAsync(storageAccountId);
 

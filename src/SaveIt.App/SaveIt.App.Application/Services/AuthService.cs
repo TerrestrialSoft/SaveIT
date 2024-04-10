@@ -9,7 +9,6 @@ namespace SaveIt.App.Application.Services;
 public class AuthService(ISaveItApiService _saveItClient, IStorageAccountRepository _accountRepository,
     IAccountSecretsService _secretsService, IExternalStorageService _externalStorage) : IAuthService
 {
-
     public async Task<Result<Uri>> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken)
     {
         try
@@ -80,15 +79,8 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
 
     private async Task<Result<string>> GetUserEmailAsync(string accessToken)
     {
-        try
-        {
-            var email = await _externalStorage.GetProfileEmailAsync(accessToken);
-            return Result.Ok(email);
-        }
-        catch (Exception)
-        {
-            return Result.Fail("Error occured during communication with the external server");
-        }
+        var result = await _externalStorage.GetProfileEmailAsync(accessToken);
+        return result;
     }
 
     private async Task<Result<OAuthCompleteTokenModel>> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)

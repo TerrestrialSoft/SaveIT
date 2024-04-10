@@ -55,11 +55,6 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
     {
         var token = await _accountSecretsRepo.GetAccessTokenAsync(storageAccountId);
 
-        if (token is null)
-        {
-            return Result.Fail("Token not found");
-        }
-
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var response = await _httpClient.GetAsync(url);
 
@@ -73,7 +68,7 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
             }
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value);
-            response = await _httpClient.GetAsync(_filesWithSpecificParentUrl);
+            response = await _httpClient.GetAsync(url);
         }
 
         response.EnsureSuccessStatusCode();

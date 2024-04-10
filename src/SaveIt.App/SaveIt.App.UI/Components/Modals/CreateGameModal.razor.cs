@@ -37,7 +37,11 @@ public partial class CreateGameModal
     private async Task RefreshStorageAccountsAsync()
     {
         _storageAccounts = (await StorageAccountRepository.GetAllStorageAccounts()).ToList();
-        EditGame.StorageAccountId ??= _storageAccounts.FirstOrDefault()?.Id;
+        
+        if (_storageAccounts.Count != 0)
+        {
+            EditGame.StorageAccountId = _storageAccounts[0].Id;
+        }
     }
 
     private async Task ShowLocalFolderPickerModal()
@@ -48,7 +52,8 @@ public partial class CreateGameModal
             { nameof(LocalItemPickerModal.SelectedFile), EditGame.LocalGameSaveFile! },
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Folders },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Folders},
-            { nameof(LocalItemPickerModal.OnItemSelected), EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
+            { nameof(LocalItemPickerModal.OnItemSelected),
+                EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
                 {
                     EditGame.LocalGameSaveFile = file;
                     await ModalLocalItemPicker.HideAsync();
@@ -91,7 +96,8 @@ public partial class CreateGameModal
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
             { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
-            { nameof(LocalItemPickerModal.OnItemSelected), EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
+            { nameof(LocalItemPickerModal.OnItemSelected),
+                EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
                 {
                     EditGame.LocalExecutableFile = file;
                     await ModalLocalItemPicker.HideAsync();
@@ -110,7 +116,8 @@ public partial class CreateGameModal
         {
             { nameof(RemoteRepositoryPickerModal.SelectedItem), EditGame.RemoteGameSaveFile! },
             { nameof(RemoteRepositoryPickerModal.SelectedStorageAccountId), EditGame.StorageAccountId! },
-            { nameof(RemoteRepositoryPickerModal.OnItemSelected), EventCallback.Factory.Create<RemoteFileItemModel>(this, async (file) =>
+            { nameof(RemoteRepositoryPickerModal.OnItemSelected),
+                EventCallback.Factory.Create<RemoteFileItemModel>(this, async (file) =>
                 {
                     EditGame.RemoteGameSaveFile = file;
                     await ModalRemoteItemPicker.HideAsync();
@@ -135,5 +142,10 @@ public partial class CreateGameModal
     private void ClearRemoteGameSavePath()
     {
         EditGame.RemoteGameSaveFile = null;
+    }
+
+    private async Task Submit()
+    {
+
     }
 }

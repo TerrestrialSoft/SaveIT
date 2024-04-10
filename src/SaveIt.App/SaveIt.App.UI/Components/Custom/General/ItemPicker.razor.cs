@@ -15,6 +15,9 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     public TItem? SelectedFile { get; set; }
 
     [Parameter]
+    public bool IsRequired { get; set; }
+
+    [Parameter]
     public string Title { get; set; } = default!;
 
     [Parameter]

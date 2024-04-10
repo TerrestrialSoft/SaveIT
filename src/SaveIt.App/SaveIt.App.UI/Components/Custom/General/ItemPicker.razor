@@ -5,7 +5,12 @@
         <div>
             <Icon Name="@Icon" Size="IconSize.x5" />
         </div>
-        <div class="fs-5 ms-2">@Title</div>
+        <div class="fs-5 ms-2">@Title
+            @if(IsRequired)
+            {
+                <RequiredMark/>
+            }
+        </div>
     </div>
     <div>
         <Button Color="ButtonColor.Primary"

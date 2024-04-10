@@ -1,18 +1,17 @@
-﻿<EditForm Model="EditGame">
+﻿<EditForm Model="EditGame" OnValidSubmit=Submit autocomplete="off">
+    <DataAnnotationsValidator />
     <div>
         <div class="d-flex justify-content-around p-2">
             <div class="column">
                 <div class="m-1 p-1">
-                    <label class="fs-5">
-                        Game Name
-                    </label>
-                    <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75" />
+                    <label class="fs-5">Game Name<RequiredMark/></label>
+                    <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75 form-control" />
+                    <ValidationMessage For="() => EditGame.Name" />
                 </div>
                 <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">
-                        Username
-                    </label>
-                    <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75" />
+                    <label class="fs-5">Username<RequiredMark/></label>
+                    <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75 form-control" />
+                    <ValidationMessage For="() => EditGame.Username" />
                 </div>
             </div>
             <div class="column">
@@ -37,45 +36,63 @@
         <div class="d-flex justify-content-around p-2">
             <div class="column">
                 <div class="m-1 p-1">
-                    <label class="fs-5">
-                        Game Save Name
-                    </label>
-                    <InputText @bind-Value="EditGame.GameSaveName" placeholder="Game Save Name"  class="w-75" />
+                    <label class="fs-5">Game Save Name<RequiredMark/></label>
+                    <InputText @bind-Value="EditGame.GameSaveName" placeholder="Game Save Name" class="form-control w-75" />
+                    <ValidationMessage For="() => EditGame.GameSaveName" />
+
                 </div>
                 <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">
-                        Storage Account
-                    </label>
-                    <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-1 w-75">
-                        @foreach (var account in _storageAccounts)
-                        {
-                            <option value="@account.Id">@account.Email (@account.Type.ToString())</option>
-                        }
-                    </InputSelect>
-                    <div>
-                        or <b @onclick="ShowAuthorizeStorageModal">create a new one</b>.
-                    </div>
+                    <label class="fs-5">Storage Account<RequiredMark/></label>
+                    @if (_storageAccounts.Any())
+                    {
+                        <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-2 w-75 form-control">
+                            @foreach (var account in _storageAccounts)
+                            {
+                                <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>
+                            }
+                        </InputSelect>
+                        <div>
+                            or <b @onclick="ShowAuthorizeStorageModal">authorize a new one</b>.
+                        </div>
+                    }
+                    else
+                    {
+                        <Button
+                            Color="ButtonColor.Primary"
+                            Size="Size.Large"
+                            Outline=true
+                            @onclick="ShowAuthorizeStorageModal">
+                            Authorize new account
+                        </Button>
+                    }
+                    <ValidationMessage For="() => EditGame.StorageAccountId" />
                 </div>
             </div>
             <div class="column">
                 <div class="m-1 p-1">
                     <ItemPicker Title="Local Game Save Location"
                         Icon="IconName.PcDisplayHorizontal"
+                        IsRequired="true"
                         SelectedFile="@EditGame.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"/>
+
+                    <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
                 </div>
                 <div class="m-1 p-1">
                     <ItemPicker Title="Remote Game Save Location"
                         Icon="IconName.Cloud"
+                        IsRequired="true"
                         SelectedFile="@EditGame.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
                         OnPathCleared="ClearRemoteGameSavePath" />
+
+                    <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
                 </div>
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <Button Color="ButtonColor.Primary" Size="Size.Large" >Save changes</Button>
+            <Button Color="ButtonColor.Primary" Size="Size.Large" Type="ButtonType.Submit">Save changes</Button>
         </div>
     </div>
 </EditForm>

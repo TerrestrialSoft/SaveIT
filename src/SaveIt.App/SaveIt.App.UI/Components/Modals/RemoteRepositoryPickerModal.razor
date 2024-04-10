@@ -43,7 +43,16 @@
             </div>
 
             <div class="d-flex mt-3 justify-content-end">
-                <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
+                <Button
+                    Color="ButtonColor.Danger"
+                    @onclick="DeleteFileAsync"
+                    Outline=true
+                    Disabled="_selectedItem!.Item.ParentId == RemoteFileItemModel.DefaultId"
+                    Class="fs-5 p-2 pe-3 ps-3 m-2">
+                    Delete
+                </Button>
+                <Button Color="ButtonColor.Secondary" @onclick="CreateRepositoryAsync" Class="fs-5 p-2 pe-3 ps-3 m-2">Create repository</Button>
+                <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3 m-2">Select</Button>
             </div>
         }
     }

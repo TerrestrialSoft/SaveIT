@@ -41,18 +41,29 @@ public partial class RemoteRepositoryPickerModal
     protected override async Task OnInitializedAsync()
     {
         string? error = null;
+        FileItem folder;
 
-        var defaultFolderId = RemoteFileItemModel.DefaultId;
-        var folderResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, defaultFolderId);
-
-        if(folderResult.IsFailed)
+        try
         {
-            error = folderResult.Errors[0].Message;
+            var folderResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, RemoteFileItemModel.DefaultId);
+
+            if (folderResult.IsFailed)
+            {
+                error = folderResult.Errors[0].Message;
+                FinishLoadingWithResult(error);
+                return;
+            }
+
+            folder = folderResult.Value;
+        }
+        catch (Exception)
+        {
+            error = "There was a problem during retrieving data from the cloud storage.";
             FinishLoadingWithResult(error);
             return;
         }
 
-        _selectedItem = GetSelectRemoteFile(folderResult.Value);
+        _selectedItem = GetSelectRemoteFile(folder);
 
         try
         {
@@ -60,7 +71,7 @@ public partial class RemoteRepositoryPickerModal
         }
         catch (Exception)
         {
-            error = "Application has no permission to view the contents of this folder.";
+            error = "There was a problem during retrieving data from the cloud storage.";
         }
         FinishLoadingWithResult(error);
     }
@@ -89,7 +100,7 @@ public partial class RemoteRepositoryPickerModal
 
             _items.AddRange(itemsResult.Value.Select(GetSelectRemoteFile));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             error = "There was a problem during retrieving data from the cloud storage.";
         }
@@ -158,6 +169,39 @@ public partial class RemoteRepositoryPickerModal
         }
 
         _selectedItem = GetSelectRemoteFile(fileResult.Value);
+        await RedrawItemsAsync();
+    }
+
+    private async Task CreateRepositoryAsync()
+    {
+        StartLoading();
+        var result = await StorageService.CreateRepositoryAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+
+        if (result.IsFailed)
+        {
+            FinishLoadingWithResult(result.Errors[0].Message);
+            return;
+        }
+
+        await RedrawItemsAsync();
+    }
+
+    private async Task DeleteFileAsync()
+    {
+        if(_selectedItem.Item.ParentId == RemoteFileItemModel.DefaultId)
+        {
+            return;
+        }
+
+        StartLoading();
+        var result = await StorageService.DeleteFileAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+
+        if (result.IsFailed)
+        {
+            FinishLoadingWithResult(result.Errors[0].Message);
+            return;
+        }
+
         await RedrawItemsAsync();
     }
 }

@@ -8,19 +8,25 @@ using SaveIt.App.Infrastructure.Models;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItService,
     IAccountSecretsService _accountSecretsRepo) : IExternalStorageService
 {
     private const string _profileUrl = "about?fields=user";
-    private const string _baseFileUrl = "files?fields=files(id, name, parents, kind, mimeType)&q=trashed=false and " +
-        "mimeType='application/vnd.google-apps.folder'";
-    private const string _filesWithSpecificParentUrl = _baseFileUrl + "and '{0}' in parents";
-    private const string _fileDetailUrl = "files/{0}?fields=id, name, parents, kind, mimeType";
+    private const string _baseFilesUrl = "files";
+    private const string _baseFileDetailUrl = _baseFilesUrl + "/{0}";
+    private const string _fileQueryfields = "id, name, parents, kind, mimeType";
+    private const string _baseFileQueryUrl = _baseFilesUrl + "?fields=files("+ _fileQueryfields + ")" +
+        "&q=trashed=false and mimeType='application/vnd.google-apps.folder'";
+    private const string _filesWithSpecificParentUrl = _baseFileQueryUrl + "and '{0}' in parents";
+    private const string _fileDetailUrl = _baseFileDetailUrl + "?fields=" + _fileQueryfields;
+    private const string _fileUploadMultipartUrl = _baseFilesUrl + "?uploadType=multipart";
 
     public async Task<string> GetProfileEmailAsync(string accessToken)
     {
+        // TODO FIX THIS
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         var response = await _httpClient.GetAsync(_profileUrl);
         response.EnsureSuccessStatusCode();
@@ -39,11 +45,11 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
 
     private async Task<Result<IEnumerable<FileItem>>> GetFilesWithFilter(Guid storageAccountId, string filter)
     {
-        var contentResult = await GetResponseAsync<GoogleFileListModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
 
         if(contentResult.IsFailed)
         {
-            return Result.Fail(contentResult.Errors);
+            return contentResult.ToResult();
         }
 
         var files = contentResult.Value.Files.Select(x => x.ToFileItem());
@@ -51,31 +57,122 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
         return Result.Ok(files);
     }
 
-    private async Task<Result<T>> GetResponseAsync<T>(Guid storageAccountId, string url)
+    public async Task<Result<FileItem>> GetFolderAsync(Guid storageAccountId, string fileId)
+    {
+        var filter = string.Format(_fileDetailUrl, fileId);
+        var contentResult = await GetAsync<GoogleFileModel>(storageAccountId, filter);
+
+        return contentResult.IsSuccess
+            ? Result.Ok(contentResult.Value.ToFileItem())
+            : Result.Fail(contentResult.Errors);
+    }
+
+    public async Task<Result> CreateRepositoryAsync(Guid storageAccountId, string? parentId = null)
+    {
+        var result = await CreateFolderAsync(storageAccountId, "SaveIt", parentId);
+
+        return result.ToResult();
+    }
+
+    public async Task<Result> DeleteFileAsync(Guid storageAccountId, string id)
+    {
+        var filter = string.Format(_baseFileDetailUrl, id);
+        var message = new HttpRequestMessage(HttpMethod.Delete, filter);
+
+        var result = await ExecuteRequestAsync(storageAccountId, message);
+
+        return result;
+    }
+
+    private async Task<Result<GoogleFileModel>> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null)
+    {
+        var folderMetadata = new
+        {
+            name,
+            mimeType = "application/vnd.google-apps.folder",
+            parents = parentId is not null 
+                ? new[] { parentId }
+                : null,
+        };
+
+        var message = new HttpRequestMessage(HttpMethod.Post, _fileUploadMultipartUrl)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(folderMetadata))
+        };
+
+        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, message);
+
+        return result;
+    }
+
+    private Task<Result<T>> GetAsync<T>(Guid storageAccountId, string url)
+    { 
+        var message = new HttpRequestMessage(HttpMethod.Get, url);
+        return ExecuteRequestAsync<T>(storageAccountId, message);
+    }
+
+    private async Task<Result> ExecuteRequestAsync(Guid storageAccountId, HttpRequestMessage requestMessage)
+    {
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestMessage);
+        return responseResult.ToResult();
+    }
+
+    private async Task<Result<T>> ExecuteRequestAsync<T>(Guid storageAccountId, HttpRequestMessage requestMessage)
+    {
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestMessage);
+
+        if (responseResult.IsFailed)
+        {
+            return responseResult.ToResult();
+        }
+
+        var content = await responseResult.Value.Content.ReadFromJsonAsync<T>();
+        ArgumentNullException.ThrowIfNull(content);
+
+        return content;
+    }
+
+    private async Task<Result<HttpResponseMessage>> GetSuccessResponseMessage(Guid storageAccountId,
+        HttpRequestMessage requestMessage)
     {
         var token = await _accountSecretsRepo.GetAccessTokenAsync(storageAccountId);
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var response = await _httpClient.GetAsync(url);
+        var response = await _httpClient.SendAsync(requestMessage);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
-            var refreshResult = await TryRefreshTokenAsync(storageAccountId);
+            var result = await RetryRequestAsync(storageAccountId, requestMessage);
 
-            if (refreshResult.IsFailed)
+            if (result.IsFailed)
             {
-                return Result.Fail(refreshResult.Errors);
+                return Result.Fail(result.Errors);
             }
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value);
-            response = await _httpClient.GetAsync(url);
+            response = result.Value;
         }
 
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadFromJsonAsync<T>();
-        ArgumentNullException.ThrowIfNull(content);
+        if(!response.IsSuccessStatusCode)
+        {
+            return Result.Fail("Error ocurred during communication with external server");
+        }
 
-        return content;
+        return response;
+    }
+
+    private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId, HttpRequestMessage requestMessage)
+    {
+        var refreshResult = await TryRefreshTokenAsync(storageAccountId);
+
+        if (refreshResult.IsFailed)
+        {
+            return Result.Fail(refreshResult.Errors);
+        }
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value);
+        var result = await _httpClient.SendAsync(requestMessage);
+
+        return Result.Ok(result);
     }
 
     private async Task<Result<string>> TryRefreshTokenAsync(Guid storageAccountId)
@@ -92,7 +189,7 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
         {
             accessToken = await _saveItService.RefreshAccessTokenAsync(refreshToken);
         }
-        catch(Exception)
+        catch (Exception)
         {
             return Result.Fail(new AuthError("Unable to refresh access token"));
         }
@@ -102,15 +199,5 @@ public class GoogleApiService(HttpClient _httpClient, ISaveItApiService _saveItS
         return storeResult.IsSuccess
             ? Result.Ok(accessToken)
             : Result.Fail(storeResult.Errors);
-    }
-
-    public async Task<Result<FileItem>> GetFolderAsync(Guid storageAccountId, string fileId)
-    {
-        var filter = string.Format(_fileDetailUrl, fileId);
-        var contentResult = await GetResponseAsync<GoogleFileModel>(storageAccountId, filter);
-
-        return contentResult.IsSuccess
-            ? Result.Ok(contentResult.Value.ToFileItem())
-            : Result.Fail(contentResult.Errors);
     }
 }

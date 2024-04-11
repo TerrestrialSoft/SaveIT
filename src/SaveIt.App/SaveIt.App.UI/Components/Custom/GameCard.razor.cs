@@ -13,12 +13,25 @@ public partial class GameCard
     [Parameter]
     public bool ShowDetail { get; set; } = false;
 
-    private GameSave? SelectedSave { get; set; }
+    private Guid? SelectedSaveId { get; set; }
 
+    protected override void OnInitialized()
+    {
+        if (Game.GameSaves is [] && Game.GameSaves.Count != 0)
+            SelectedSaveId = Game.GameSaves[0].Id;
+    }
 
     private async Task ToggleDetailShowing()
     {
-        ShowDetail = !ShowDetail;
-        await OnCardClicked.InvokeAsync(Game);
+        if(!ShowDetail)
+        {
+            ShowDetail = true;
+            await OnCardClicked.InvokeAsync(Game);
+        }
+    }
+
+    private void PlayGame()
+    {
+
     }
 }

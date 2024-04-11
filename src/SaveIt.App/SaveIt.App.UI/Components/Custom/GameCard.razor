@@ -1,24 +1,32 @@
-﻿<div class="card m-1 prevent-select" style="width: 18rem; height:18rem;" @onclick="ToggleDetailShowing">
+﻿<div class="card m-2 prevent-select" style="width: 18rem; height:18rem;" @onclick="ToggleDetailShowing">
     
     @if (ShowDetail)
     {
         <div class="card-body">
             <h5 class="card-title">@Game.Name</h5>
             <div>
-                Profile:
-                <InputSelect @bind-Value="SelectedSave">
+                <label class="fs-6">Profile</label>
+                <InputSelect @bind-Value="SelectedSaveId" class="p-2 w-100 form-control">
                     @foreach(var save in Game.GameSaves!)
                     {
-                        <option value="@save">@save.Name</option>
+                        <option value="@save.Id" class="p-1">@save.Name</option>
                     }
                 </InputSelect>
+            </div>
+            <div>
+                <Button Color="ButtonColor.Primary"
+                        Class="ms-4 me-3"
+                        @onclick="PlayGame">
+                        <Icon Name="IconName.Play" />
+                    Play
+                </Button>
             </div>
         </div>
     }
     else
     {
         <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")" class="card-img-top image" alt="@Game.Name Image">
-        <div class="card-body">
+        <div class="card-body divider">
             <h5 class="card-title">@Game.Name</h5>
         </div>
     }

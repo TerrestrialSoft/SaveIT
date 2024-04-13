@@ -9,4 +9,6 @@ public interface IExternalStorageService
     Task<Result<string>> GetProfileEmailAsync(string accessToken);
     Task<Result> CreateRepositoryAsync(Guid storageAccountId, string? parentId = null);
     Task<Result> DeleteFileAsync(Guid storageAccountId, string id);
+    Task<Result<IEnumerable<FileItem>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId, string name);
+    Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, string? parentId = null);
 }

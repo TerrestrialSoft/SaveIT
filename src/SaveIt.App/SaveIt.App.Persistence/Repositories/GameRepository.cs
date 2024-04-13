@@ -9,7 +9,7 @@ internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
 {
     private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
 
-    public async Task<Game?> GetGame(Guid id)
+    public async Task<Game?> GetGameAsync(Guid id)
         => await _db.Table<Game>()
             .FirstOrDefaultAsync(g => g.Id == id);
 

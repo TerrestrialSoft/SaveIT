@@ -39,6 +39,16 @@ public static class ServiceCollectionExtensions
                 .HandleTransientHttpError()
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
+        services.AddHttpClient<GoogleApiUploadService>((serviceProvider, client) =>
+        {
+            var apiOptions = serviceProvider.GetRequiredService<IOptions<GoogleApiOptions>>();
+            client.BaseAddress = new Uri(apiOptions.Value.DriveUploadUrl);
+        })
+       .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+       .AddPolicyHandler(_ => HttpPolicyExtensions
+               .HandleTransientHttpError()
+               .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
+
         return services;
     }
 

@@ -9,7 +9,9 @@ internal class GameSaveRepository(IDatabaseHandler _dbHandler) : IGameSaveReposi
     private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
 
     public async Task CreateGameSaveAsync(GameSave gameSave)
-    {
-        await _db.InsertAsync(gameSave);
-    }
+        => await _db.InsertAsync(gameSave);
+
+    public async Task<GameSave?> GetGameSaveAsync(Guid gameSaveId)
+        => await _db.Table<GameSave>()
+            .FirstOrDefaultAsync(x => x.Id == gameSaveId);
 }

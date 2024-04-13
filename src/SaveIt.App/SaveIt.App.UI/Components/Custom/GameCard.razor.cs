@@ -1,5 +1,6 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
+using SaveIt.App.Domain;
 using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
@@ -12,6 +13,9 @@ public partial class GameCard
 
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
+
+    [Inject]
+    private IGameService GameService { get; set; } = default!;
 
     [Inject]
     private ToastService ToastService { get; set; } = default!;
@@ -34,7 +38,7 @@ public partial class GameCard
 
     protected override void OnInitialized()
     {
-        if (Game.GameSaves is [] && Game.GameSaves.Count != 0)
+        if (Game.GameSaves is not null && Game.GameSaves.Count > 0)
             SelectedSaveId = Game.GameSaves[0].Id;
     }
 
@@ -49,6 +53,8 @@ public partial class GameCard
 
     private void StartGame()
     {
+        GameService.LockRepositoryAsync(SelectedSaveId!.Value);
+        return;
         if (Game.GameExecutablePath is null)
         {
             return;

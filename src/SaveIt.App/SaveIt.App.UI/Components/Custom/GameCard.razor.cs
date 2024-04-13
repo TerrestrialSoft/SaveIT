@@ -13,6 +13,9 @@ public partial class GameCard
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
 
+    [Inject]
+    private ToastService ToastService { get; set; } = default!;
+
     [Parameter]
     public required Game Game { get; set; }
 
@@ -80,7 +83,7 @@ public partial class GameCard
         }
 
         await GameRepository.DeleteGameAsync(Game.Id);
+        ToastService.Notify(new(ToastType.Success, $"Game deleted successfully."));
         await OnCardUpdated.InvokeAsync(Game);
-        // Add ToastService
     }
 }

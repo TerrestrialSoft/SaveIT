@@ -5,12 +5,12 @@
             <div class="column">
                 <div class="m-1 p-1">
                     <label class="fs-5">Game Name<RequiredMark/></label>
-                    <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75 form-control" />
+                    <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75 form-control" tabindex="0" />
                     <ValidationMessage For="() => EditGame.Name" />
                 </div>
                 <div class="m-1 mt-2 p-1">
                     <label class="fs-5">Username<RequiredMark/></label>
-                    <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75 form-control" />
+                    <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75 form-control" tabindex="1" />
                     <ValidationMessage For="() => EditGame.Username" />
                 </div>
             </div>
@@ -18,7 +18,8 @@
                 <div class="m-1 p-1">
                     <ImagePicker
                         ImageSrc="@EditGame.Image"
-                        OnImageUploaded="ImageUploaded" />
+                        OnImageUploaded="ImageUploaded"
+                        TabIndex="2"/>
                 </div>
                 <div>
                     <ItemPicker
@@ -26,7 +27,8 @@
                         Icon="IconName.FileTypeExe"
                         SelectedFile="@EditGame.GameExecutableFile"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
-                        OnPathCleared="ClearLocalExecutablePath"/>
+                        OnPathCleared="ClearLocalExecutablePath"
+                        TabIndex="3"/>
                 </div>
             </div>
         </div>
@@ -37,14 +39,19 @@
             <div class="column">
                 <div class="m-1 p-1">
                     <label class="fs-5">Game Save Name<RequiredMark/></label>
-                    <InputText @bind-Value="EditGame.GameSaveName" placeholder="Game Save Name" class="form-control w-75" />
+                    <InputText @bind-Value="EditGame.GameSaveName"
+                        placeholder="Game Save Name"
+                        class="form-control w-75"
+                        tabindex="4"/>
                     <ValidationMessage For="() => EditGame.GameSaveName" />
                 </div>
                 <div class="m-1 mt-2 p-1">
                     <label class="fs-5">Storage Account<RequiredMark/></label>
                     @if (_storageAccounts.Any())
                     {
-                        <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-2 w-75 form-control form-select">
+                        <InputSelect @bind-Value="EditGame.StorageAccountId"
+                            class="p-2 w-75 form-control form-select"
+                            tabindex="5">
                             @foreach (var account in _storageAccounts)
                             {
                                 <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>
@@ -60,7 +67,8 @@
                             Color="ButtonColor.Primary"
                             Class="ms-4 mt-1 me-3"
                             Outline=true
-                            @onclick="ShowAuthorizeStorageModal">
+                            @onclick="ShowAuthorizeStorageModal"
+                            TabIndex="5">
                             Authorize new account
                         </Button>
                     }
@@ -76,19 +84,21 @@
                         IsRequired="true"
                         SelectedFile="@EditGame.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
-                        OnPathCleared="ClearLocalGameSavePath"/>
+                        OnPathCleared="ClearLocalGameSavePath"
+                        TabIndex="6"/>
                     <div class="ms-4">
                         <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
                     </div>
                 </div>
-                <div class="m-1 p-1">
+                <div class="m-1 p-1" tabindex="8">
                     <ItemPicker Title="Remote Game Save Location"
                         Icon="IconName.Cloud"
                         IsRequired="true"
-                                IsDisabled="@(EditGame.StorageAccountId is null)"
+                        IsDisabled="@(EditGame.StorageAccountId is null)"
                         SelectedFile="@EditGame.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
-                        OnPathCleared="ClearRemoteGameSavePath" />
+                        OnPathCleared="ClearRemoteGameSavePath"
+                        TabIndex="7"/>
                     <div class="ms-4">
                         <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
                     </div>
@@ -96,7 +106,12 @@
             </div>
         </div>
         <div class="d-flex justify-content-end">
-            <Button Color="ButtonColor.Primary" Size="Size.Large" Type="ButtonType.Submit">Save changes</Button>
+            <Button Color="ButtonColor.Primary"
+                Size="Size.Large"
+                Type="ButtonType.Submit"
+                TabIndex="8">
+                Save changes
+            </Button>
         </div>
     </div>
 </EditForm>

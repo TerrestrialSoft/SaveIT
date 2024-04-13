@@ -24,6 +24,9 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     public string Title { get; set; } = default!;
 
     [Parameter]
+    public int TabIndex { get; set; }
+
+    [Parameter]
     public IconName Icon { get; set; } = default!;
 
     private async Task ShowModal()

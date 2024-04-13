@@ -14,7 +14,6 @@ public class ProcessService : IProcessService
 		catch (Exception)
 		{
 			return Result.Fail("Unable to start process");
-
         }
 
         return Result.Ok();

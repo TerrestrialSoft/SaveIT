@@ -55,7 +55,12 @@ public partial class GameCard
         }
 
         var result = ProcessService.StartProcess(Game.GameExecutablePath);
-        // Add ToastService
+        
+        var message = result.IsSuccess
+            ? new ToastMessage(ToastType.Success, $"Game started successfully.")
+            : new ToastMessage(ToastType.Danger, "Failed to start the game.");
+
+        ToastService.Notify(message);
     }
 
     private async Task DeleteGame()

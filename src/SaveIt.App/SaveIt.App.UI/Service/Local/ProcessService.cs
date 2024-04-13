@@ -5,7 +5,7 @@ using System.Diagnostics;
 namespace SaveIt.App.UI.Service.Local;
 public class ProcessService : IProcessService
 {
-    public Task<Result> StartProcess(string path)
+    public Result StartProcess(string path)
     {
 		try
 		{
@@ -13,10 +13,10 @@ public class ProcessService : IProcessService
 		}
 		catch (Exception)
 		{
-			return Task.FromResult(Result.Ok());
+			return Result.Fail("Unable to start process");
 
         }
 
-        return Task.FromResult(Result.Ok());
+        return Result.Ok();
     }
 }

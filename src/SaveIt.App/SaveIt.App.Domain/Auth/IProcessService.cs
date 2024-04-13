@@ -3,5 +3,5 @@
 namespace SaveIt.App.Domain.Auth;
 public interface IProcessService
 {
-    Task<Result> StartProcess(string path);
+    Result StartProcess(string path);
 }

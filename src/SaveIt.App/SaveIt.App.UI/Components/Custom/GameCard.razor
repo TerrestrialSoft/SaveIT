@@ -6,18 +6,30 @@
             <h5 class="card-title">@Game.Name</h5>
             <div>
                 <label class="fs-6">Profile</label>
-                <InputSelect @bind-Value="SelectedSaveId" class="p-2 w-100 form-control">
+                <InputSelect @bind-Value="SelectedSaveId" class="p-2 w-100 form-control form-select">
                     @foreach(var save in Game.GameSaves!)
                     {
                         <option value="@save.Id" class="p-1">@save.Name</option>
                     }
                 </InputSelect>
             </div>
-            <div>
+        </div>
+
+        <div class="card-footer">
+            <div class="d-flex justify-content-between">
+                <Button Color="ButtonColor.Danger"
+                        Size="Size.Large"
+                        Outline="true"
+                        @onclick="DeleteGame">
+                    <Icon Name="IconName.Trash3" />
+                    Delete
+                </Button>
+
                 <Button Color="ButtonColor.Primary"
-                        Class="ms-4 me-3"
-                        @onclick="PlayGame">
-                        <Icon Name="IconName.Play" />
+                        Disabled="@(Game.GameExecutablePath == null)"
+                        Size="Size.Large"
+                        @onclick="StartGame">
+                    <Icon Name="IconName.Play" />
                     Play
                 </Button>
             </div>
@@ -25,10 +37,14 @@
     }
     else
     {
-        <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")" class="card-img-top image" alt="@Game.Name Image">
+        <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")"
+            class="card-img-top image"
+            alt="@Game.Name Image">
         <div class="card-body divider">
             <h5 class="card-title">@Game.Name</h5>
         </div>
     }
     
+    <ConfirmDialog @ref="confirmDialog" />
+
 </div>

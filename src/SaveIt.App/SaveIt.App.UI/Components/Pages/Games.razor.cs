@@ -57,4 +57,9 @@ public partial class Games
 
         await _createNewGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
     }
+
+    private Task GameCardUpdatedAsync()
+    {
+        return RefreshGames();
+    }
 }

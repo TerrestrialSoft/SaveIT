@@ -23,7 +23,7 @@
     {
         @foreach (var game in _filteredGames)
         {
-            <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" />
+            <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" OnCardUpdated="GameCardUpdatedAsync" />
         }
     }
 </div>

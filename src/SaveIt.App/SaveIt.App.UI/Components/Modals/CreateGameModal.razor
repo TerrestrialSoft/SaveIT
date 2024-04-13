@@ -44,7 +44,7 @@
                     <label class="fs-5">Storage Account<RequiredMark/></label>
                     @if (_storageAccounts.Any())
                     {
-                        <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-2 w-75 form-control">
+                        <InputSelect @bind-Value="EditGame.StorageAccountId" class="p-2 w-75 form-control form-select">
                             @foreach (var account in _storageAccounts)
                             {
                                 <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>

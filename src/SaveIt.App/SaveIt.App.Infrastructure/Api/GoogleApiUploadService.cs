@@ -15,7 +15,7 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsServi
     private const string _baseFilesUrl = "files";
     private const string _fileUploadMultipartUrl = $"{_baseFilesUrl}?uploadType=multipart";
 
-    public async Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, string? parentId = null)
+    public async Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null)
     {
         var fileMetadata = new GoogleFileCreateModel
         {
@@ -28,7 +28,7 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsServi
         var metadataContent = new StringContent(metadataJson, Encoding.UTF8,
             new MediaTypeHeaderValue("application/json"));
 
-        var mediaJson = "{\"Prop\":\"a\"}";
+        var mediaJson = JsonSerializer.Serialize(fileContent);
         var mediaContent = new StringContent(mediaJson, Encoding.UTF8,
             new MediaTypeHeaderValue("application/json"));
 

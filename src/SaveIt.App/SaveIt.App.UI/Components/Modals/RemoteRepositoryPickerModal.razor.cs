@@ -41,7 +41,7 @@ public partial class RemoteRepositoryPickerModal
     protected override async Task OnInitializedAsync()
     {
         string? error = null;
-        FileItem folder;
+        FileItemModel folder;
 
         try
         {
@@ -108,7 +108,7 @@ public partial class RemoteRepositoryPickerModal
         FinishLoadingWithResult(error);
     }
 
-    private static SelectedItemViewModel<RemoteFileItemModel> GetSelectRemoteFile(FileItem item)
+    private static SelectedItemViewModel<RemoteFileItemModel> GetSelectRemoteFile(FileItemModel item)
         => new(item.ToRemoteFileItemModel());
 
     private void StartLoading()

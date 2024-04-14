@@ -4,11 +4,12 @@ using SaveIt.App.Domain.Models;
 namespace SaveIt.App.Domain.Auth;
 public interface IExternalStorageService
 {
-    Task<Result<FileItem>> GetFolderAsync(Guid storageAccountId, string fileId);
-    Task<Result<IEnumerable<FileItem>>> GetFoldersAsync(Guid storageAccountId, string parentId);
+    Task<Result<FileItemModel>> GetFolderAsync(Guid storageAccountId, string fileId);
+    Task<Result<IEnumerable<FileItemModel>>> GetFoldersAsync(Guid storageAccountId, string parentId);
     Task<Result<string>> GetProfileEmailAsync(string accessToken);
     Task<Result> CreateRepositoryAsync(Guid storageAccountId, string? parentId = null);
     Task<Result> DeleteFileAsync(Guid storageAccountId, string id);
-    Task<Result<IEnumerable<FileItem>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId, string name);
-    Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, string? parentId = null);
+    Task<Result<IEnumerable<FileItemModel>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId, string name);
+    Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null);
+    Task<Result<T?>> DownloadFileAsync<T>(Guid storageAccountId, string fileId);
 }

@@ -4,7 +4,7 @@ using SaveIt.App.UI.Models;
 namespace SaveIt.App.UI.Extensions;
 public static class ModelExtensions
 {
-    public static RemoteFileItemModel ToRemoteFileItemModel(this FileItem item)
+    public static RemoteFileItemModel ToRemoteFileItemModel(this FileItemModel item)
     {
         ArgumentNullException.ThrowIfNull(item.Id);
 

@@ -10,7 +10,8 @@ using System.Text.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 public class GoogleApiService(HttpClient httpClient, IAccountSecretsService accountSecretsRepo, ISaveItApiService saveItService,
-    GoogleApiUploadService _googleApiUploadService) : BaseApiService(httpClient, accountSecretsRepo, saveItService), IExternalStorageService
+    GoogleApiUploadService _googleApiUploadService)
+    : BaseApiService(httpClient, accountSecretsRepo, saveItService), IExternalStorageService
 {
     private const string _profileUrl = "about?fields=user";
     private const string _baseFilesUrl = "files";
@@ -23,6 +24,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
     private const string _fileDetailUrl = $"{_baseFileDetailUrl}?fields=" + _fileQueryfields;
     private const string _findFileWithNameAndParentUrl = _baseFileQueryUrl + " and name='{1}' and '{0}' in parents";
     private const string _mimeTypeFolder = "application/vnd.google-apps.folder";
+    private const string _fileDownloadUrl = $"{_baseFileDetailUrl}?alt=media";
 
     public async Task<Result<string>> GetProfileEmailAsync(string accessToken)
     {
@@ -41,14 +43,14 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
             : Result.Fail("Error ocurred during communication with external server");
     }
 
-    public Task<Result<IEnumerable<FileItem>>> GetFoldersAsync(Guid storageAccountId, string parentId)
+    public Task<Result<IEnumerable<FileItemModel>>> GetFoldersAsync(Guid storageAccountId, string parentId)
     {
         var filter = string.Format(_filesFolderWithSpecificParentUrl, parentId);
 
         return GetFilesWithFilter(storageAccountId, filter);
     }
 
-    private async Task<Result<IEnumerable<FileItem>>> GetFilesWithFilter(Guid storageAccountId, string filter)
+    private async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithFilter(Guid storageAccountId, string filter)
     {
         var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
 
@@ -62,7 +64,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         return Result.Ok(files);
     }
 
-    public async Task<Result<FileItem>> GetFolderAsync(Guid storageAccountId, string fileId)
+    public async Task<Result<FileItemModel>> GetFolderAsync(Guid storageAccountId, string fileId)
     {
         var filter = string.Format(_fileDetailUrl, fileId);
         var contentResult = await GetAsync<GoogleFileModel>(storageAccountId, filter);
@@ -101,7 +103,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         return result;
     }
 
-    public async Task<Result<IEnumerable<FileItem>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId,
+    public async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId,
         string name)
     {
         var filter = string.Format(_findFileWithNameAndParentUrl, remoteLocationId, name);
@@ -112,6 +114,23 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
             : contentResult.ToResult();
     }
 
-    public Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, string? parentId = null)
-        => _googleApiUploadService.CreateFileAsync(storageAccountId, fileName, parentId);
+    public async Task<Result<T?>> DownloadFileAsync<T>(Guid storageAccountId, string fileId)
+    {
+        var filter = string.Format(_fileDownloadUrl, fileId);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
+
+        var result = await DownloadContentAsStringAsync(storageAccountId, messageFactory);
+
+        if (result.IsFailed)
+        {
+            return result.ToResult();
+        }
+
+        var content = JsonSerializer.Deserialize<T>(result.Value);
+
+        return Result.Ok(content);
+    }
+
+    public Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null)
+        => _googleApiUploadService.CreateFileAsync(storageAccountId, fileName, fileContent, parentId);
 }

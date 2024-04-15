@@ -1,9 +1,6 @@
 ﻿using FluentResults;
 
 namespace SaveIt.App.Domain.Errors;
-public class AuthError : Error
+public class AuthError(string message) : Error(message)
 {
-    public AuthError(string message) : base(message)
-    {
-    }
 }

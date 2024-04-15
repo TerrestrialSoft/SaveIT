@@ -5,8 +5,8 @@ namespace SaveIt.App.Domain.Errors;
 public abstract class GameErrors(string message) : Error(message)
 {
     public static GameSaveInUseError GameSaveInUse (LockFileModel lockFile) => new(lockFile);
-    public static GameSaveInUseError CurrentUserLockedGameSave (LockFileModel lockFile) => new(lockFile);
-    public static GameSaveInUseError GameLockedByAnotherUser (LockFileModel lockFile) => new(lockFile);
+    public static GameSaveAlreadyLocked CurrentUserLockedGameSave (LockFileModel lockFile) => new(lockFile);
+    public static GameLockedByDifferentUser GameLockedByAnotherUser (LockFileModel lockFile) => new(lockFile);
 
     public class GameSaveInUseError(LockFileModel lockFile) : GameErrors("Game save is already in use.")
     {

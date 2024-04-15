@@ -26,6 +26,16 @@ csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = true:error
 csharp_style_throw_expression = true:suggestion
 csharp_prefer_braces_for_control_blocks = true:warning
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_prefer_simple_default_expression = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_style_prefer_range_operator = true:suggestion
+
+# S2094: Classes should not be empty
+dotnet_diagnostic.S2094.severity = none
+
 [*.{cs,vb}]
 #### Naming styles ####
 
@@ -92,3 +102,4 @@ dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
 dotnet_style_prefer_compound_assignment = true:error
 dotnet_style_prefer_simplified_interpolation = true:suggestion
 dotnet_style_namespace_match_folder = true:suggestion
+dotnet_style_prefer_collection_expression = when_types_loosely_match:suggestion

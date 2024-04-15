@@ -35,9 +35,11 @@ public partial class StartGameModal
     private StartGameScreenState _screenState = StartGameScreenState.Loading;
     private LockFileModel? _lockFile;
     private string? _errorMessage;
+    private bool _loading = false;
 
     protected override async Task OnInitializedAsync()
     {
+        _loading = false;
         _errorMessage = null;
         _lockFile = null;
         _screenState = StartGameScreenState.Loading;
@@ -50,26 +52,29 @@ public partial class StartGameModal
     {
         var result = await GameService.LockRepositoryAsync(SaveId);
 
-        if (result.IsFailed)
+        if (result.IsSuccess)
         {
-            if (result.HasError<GameErrors.GameSaveInUseError>(out var errors))
-            {
-                var error = errors.First();
-                _lockFile = error.LockFile;
-                _screenState = StartGameScreenState.SaveInUse;
-
-                return;
-            }
-
-            if(result.HasError<GameErrors.GameSaveAlreadyLocked>())
-            {
-                await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
-                return;
-            }
-
-            _screenState = StartGameScreenState.Error;
-            _errorMessage = result.Errors[0].Message;
+            await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
+            return;
         }
+
+        if (result.HasError<GameErrors.GameSaveInUseError>(out var errors))
+        {
+            var error = errors.First();
+            _lockFile = error.LockFile;
+            _screenState = StartGameScreenState.SaveInUse;
+
+            return;
+        }
+
+        if (result.HasError<GameErrors.GameSaveAlreadyLocked>())
+        {
+            await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
+            return;
+        }
+
+        _screenState = StartGameScreenState.Error;
+        _errorMessage = result.Errors[0].Message;
     }
 
     private async Task StartGameAndContinueWithAsync(StartGameScreenState state)
@@ -107,6 +112,8 @@ public partial class StartGameModal
 
     private async Task DiscardProgress()
     {
+        _loading = true;
+
         var result = await GameService.UnlockRepositoryAsync(SaveId);
         if (result.IsFailed)
         {
@@ -121,12 +128,14 @@ public partial class StartGameModal
             ToastService.Notify(new ToastMessage(ToastType.Danger, errorMessage));
         }
 
+        _loading = false;
         await CloseAsync();
     }
 
     private async Task UploadSaveAsync()
     {
         var result = await GameService.UploadSaveAsync(SaveId);
+        // TODO: This can fail
     }
 
     private static string GetStateColorClass(StartGameScreenState state)

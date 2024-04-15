@@ -136,4 +136,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
 
     public Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent)
         => _googleApiUploadService.UpdateFileSimpleAsync(storageAccountId, id, fileContent);
+
+    public Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value)
+        => _googleApiUploadService.UploadFileAsync(storageAccountId, parentId, fileName, value);
 }

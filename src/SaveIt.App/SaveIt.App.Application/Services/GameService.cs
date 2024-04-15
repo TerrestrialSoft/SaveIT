@@ -6,7 +6,7 @@ using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Domain.Services;
 
 namespace SaveIt.App.Application.Services;
-public class GameService(IProcessService _processService, IGameSaveRepository _gameSaveRepository,
+public class GameService(IProcessService _processService, IGameSaveRepository _gameSaveRepository, IFileService _fileService,
     IExternalStorageService _externalStorageService, IGameRepository _gameRepository) : IGameService
 {
     private const string _lockFileName = ".lockfile";
@@ -158,8 +158,33 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : updateResult;
     }
 
-    public Task<Result> UploadSaveAsync(Guid saveId)
+    public async Task<Result> UploadSaveAsync(Guid gameSaveId)
     {
-        throw new NotImplementedException();
+        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var fileResult = _fileService.GetCompressedFileAsync(gameSave.LocalGameSavePath);
+
+        if (fileResult.IsFailed)
+        {
+            return fileResult.ToResult();
+        }
+
+        string fileName = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
+
+        var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            fileName, fileResult.Value);
+        
+        if(uploadResult.IsFailed)
+        {
+            return uploadResult;
+        }
+
+        var unlockResult = await UnlockRepositoryAsync(gameSaveId);
+
+        return unlockResult;
     }
 }

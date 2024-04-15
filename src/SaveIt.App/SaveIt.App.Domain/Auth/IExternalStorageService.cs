@@ -13,4 +13,5 @@ public interface IExternalStorageService
     Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null);
     Task<Result<T?>> DownloadFileAsync<T>(Guid storageAccountId, string fileId);
     Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent);
+    Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value);
 }

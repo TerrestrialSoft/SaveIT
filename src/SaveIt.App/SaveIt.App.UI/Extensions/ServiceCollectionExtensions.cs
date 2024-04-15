@@ -2,6 +2,7 @@
 using SaveIt.App.Domain;
 using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Repositories;
+using SaveIt.App.Domain.Services;
 using SaveIt.App.Persistence.Extensions;
 using SaveIt.App.UI.Service.Local;
 using System.Reflection;
@@ -17,7 +18,8 @@ internal static class ServiceCollectionExtensions
     private static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddScoped<IApplicationContext, ApplicationContext>()
             .AddScoped<IAccountSecretsService, AccountSecretsService>()
-            .AddScoped<IProcessService, ProcessService>();
+            .AddScoped<IProcessService, ProcessService>()
+            .AddScoped<IFileService, FileService>();
 
     internal static void AddAppJsonConfiguration(this IConfigurationManager configurationManager)
     {

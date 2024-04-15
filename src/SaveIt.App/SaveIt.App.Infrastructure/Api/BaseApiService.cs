@@ -52,6 +52,72 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsService accoun
             : Result.Fail("Error ocurred during communication with external server");
     }
 
+    protected async Task<Result<string>> ExecuteRequestForHeaderAsync(Guid storageAccountId, string headerName,
+        Func<HttpRequestMessage> requestFactory)
+    {
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+
+        if (responseResult.IsFailed)
+        {
+            return responseResult.ToResult();
+        }
+
+        if (!responseResult.Value.Headers.TryGetValues(headerName, out var values))
+        {
+            return Result.Fail("Requested header not found.");
+        }
+        var headerValue = values.First();
+
+        return !string.IsNullOrWhiteSpace(headerValue)
+            ? Result.Ok(headerValue)
+            : Result.Fail("Requested header is empty.");
+    }
+
+    protected async Task<Result> ExecuteResumableRequest(Guid storageAccountId, HttpMethod method, string url, Stream content)
+    {
+        bool continueUpload = true;
+        int processedBytes = 0;
+
+        while (continueUpload)
+        {
+            content.Seek(processedBytes, SeekOrigin.Begin);
+            var requestFactory = GetStreamMessage(content);
+
+            var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+            
+            if (responseResult.IsFailed)
+            {
+                if (responseResult.HasError<ApiErrors.IncompleteUploadError>())
+                {
+                    if(responseResult.Value.Headers.TryGetValues("Range", out var rangeValues))
+                    {
+                        var rangeSplit = rangeValues.FirstOrDefault()?.Split('-');
+                        var rangeStr = rangeSplit?[^1];
+                        if (int.TryParse(rangeStr, out var range))
+                            processedBytes = range;
+                    }
+                    continue;
+                }
+
+                if (responseResult.HasError<ApiErrors.NotFoundError>())
+                {
+                    Result.Fail("There was a problem during upload. Please try again.");
+                }
+
+                return responseResult.ToResult();
+            }
+            continueUpload = false;
+        }
+
+        return Result.Ok();
+
+        Func<HttpRequestMessage> GetStreamMessage(Stream stream)
+            => new(() => new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = new StreamContent(stream),
+            });
+    }
+
     private async Task<Result<HttpResponseMessage>> GetSuccessResponseMessage(Guid storageAccountId,
         Func<HttpRequestMessage> requestFactory)
     {
@@ -71,6 +137,16 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsService accoun
             }
 
             response = result.Value;
+        }
+
+        if(response.StatusCode == HttpStatusCode.NotFound)
+        {
+            return Result.Fail(ApiErrors.NotFound());
+        }
+
+        if(response.StatusCode == HttpStatusCode.PermanentRedirect)
+        {
+            return Result.Fail(ApiErrors.IncompleteUpload());
         }
 
         return response.IsSuccessStatusCode

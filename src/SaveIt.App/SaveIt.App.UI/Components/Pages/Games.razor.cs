@@ -11,6 +11,7 @@ public partial class Games
     private Modal _localItemPickerModal = default!;
     private Modal _remoteItemPickerModal = default!;
     private Modal _authorizeStorageModal = default!;
+    private Modal _startGameModal = default!;
 
     private List<Game> _allGames = [];
     private List<Game> _filteredGames = [];

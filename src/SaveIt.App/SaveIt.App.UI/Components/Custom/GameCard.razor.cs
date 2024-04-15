@@ -1,36 +1,32 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
-using SaveIt.App.Domain;
-using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
+using SaveIt.App.UI.Components.Modals;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class GameCard
 {
     [Inject]
-    private IProcessService ProcessService { get; set; } = default!;
-
-    [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
-
-    [Inject]
-    private IGameService GameService { get; set; } = default!;
 
     [Inject]
     private ToastService ToastService { get; set; } = default!;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public required Game Game { get; set; }
 
-    [Parameter]
-    public EventCallback<Game> OnCardClicked { get; set; }
+    [Parameter, EditorRequired]
+    public required EventCallback<Game> OnCardClicked { get; set; }
 
-    [Parameter]
-    public EventCallback<Game> OnCardUpdated { get; set; }
+    [Parameter, EditorRequired]
+    public required EventCallback<Game> OnCardUpdated { get; set; }
 
     [Parameter]
     public bool ShowDetail { get; set; } = false;
+
+    [Parameter, EditorRequired]
+    public required Modal ModalStartGame { get; set; }
 
     private ConfirmDialog confirmDialog = default!;
 
@@ -51,22 +47,16 @@ public partial class GameCard
         }
     }
 
-    private void StartGame()
+    private async Task StartGame()
     {
-        GameService.LockRepositoryAsync(SelectedSaveId!.Value);
-        return;
-        if (Game.GameExecutablePath is null)
+        var parameters = new Dictionary<string, object>
         {
-            return;
-        }
+            { nameof(StartGameModal.SaveId), SelectedSaveId!.Value },
+            { nameof(StartGameModal.DefaultGameName), Game.Name },
+            { nameof(StartGameModal.OnClose), EventCallback.Factory.Create(this, ModalStartGame.HideAsync) }
+        };
 
-        var result = ProcessService.StartProcess(Game.GameExecutablePath);
-        
-        var message = result.IsSuccess
-            ? new ToastMessage(ToastType.Success, $"Game started successfully.")
-            : new ToastMessage(ToastType.Danger, "Failed to start the game.");
-
-        ToastService.Notify(message);
+        await ModalStartGame.ShowAsync<StartGameModal>(StartGameModal.Title, parameters: parameters);
     }
 
     private async Task DeleteGame()

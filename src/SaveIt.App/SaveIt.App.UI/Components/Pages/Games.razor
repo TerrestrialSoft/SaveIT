@@ -23,7 +23,11 @@
     {
         @foreach (var game in _filteredGames)
         {
-            <GameCard Game="game" ShowDetail="game == _selectedGame" OnCardClicked="GameCardClicked" OnCardUpdated="GameCardUpdatedAsync" />
+            <GameCard Game="game"
+                ShowDetail="game == _selectedGame"
+                ModalStartGame="_startGameModal"
+                OnCardClicked="GameCardClicked"
+                OnCardUpdated="GameCardUpdatedAsync" />
         }
     }
 </div>
@@ -32,3 +36,4 @@
 <Modal @ref="_localItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_remoteItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
+<Modal @ref="_startGameModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />

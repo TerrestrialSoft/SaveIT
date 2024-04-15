@@ -1,0 +1,87 @@
+﻿<div class="d-flex flex-column align-content-center text-center mt-2 custom-modal">
+    <h1>@(_gameSave?.Game?.Name ?? DefaultGameName)</h1>
+    <div class="fs-4 m-2 p-2">State: <b class="@GetStateColorClass(_screenState)">@_screenState.GetName()</b></div>
+    <div class="m-4 p-4 d-flex flex-column justify-content-between flex-grow-1">
+        @switch(_screenState)
+        {
+            case StartGameScreenState.Loading:
+            case StartGameScreenState.DownloadingSave:
+            case StartGameScreenState.StartingGame:
+                <div class="text-center mt-4">
+                    <Spinner Type="SpinnerType.Border" Size="SpinnerSize.ExtraLarge" Style="width: 6rem; height: 6rem;" />
+                </div>
+                break;
+            case StartGameScreenState.SaveInUse:
+                <div class="fs-5">
+                    Game save is already in use by <b>@_lockFile?.LockDetails?.LockedBy</b> who locked it at
+                    <b>@_lockFile?.LockDetails?.LockedAt.ToLocalTime().ToString("g")</b>.
+                    <br/>
+                    You have the option to either wait for the user to finish or you can try to join them.
+                </div>
+
+                @if(_gameSave?.Game?.GameExecutablePath is not null)
+                {
+                    <div class="text-center mt-5">
+                        <Button Color="ButtonColor.Primary"
+                            Size="Size.Large"
+                            Class="w-50 p-3 mt-2"
+                            @onclick="() => StartGameAndContinueWithAsync(StartGameScreenState.PlayingGame)">
+                            Start game
+                        </Button>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center mt-5">
+                        <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                    </div>
+                }
+                break;
+            case StartGameScreenState.Error:
+                <div class="fs-5">
+                    An error occurred while trying to start the game.
+                    <br/>
+                    <b>@_errorMessage</b>
+                </div>
+                <div class="text-center mt-5">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                </div>
+                break;
+            case StartGameScreenState.PlayingGame:
+                <div class="fs-5">
+                    Game is now running.
+                    <br/>
+                    You can now close this window and start playing.
+                </div>
+
+                @if(_errorMessage is not null)
+                {
+                    <Alert Color="AlertColor.Primary"> @_errorMessage </Alert>
+                }
+
+                <div class="text-center mt-5">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                </div>
+                break;
+            case StartGameScreenState.HostingGame:
+                <div class="fs-5">
+                    You are hosting the game.
+                    <br/>
+                    After finishing the game, synchronize your game save with the cloud storage by clicking the "Upload & Close" button.
+                    This will unlock the possibility to download the save by other members with the access.
+                </div>
+
+                @if(_errorMessage is not null)
+                {
+                    <Alert Color="AlertColor.Primary"> @_errorMessage </Alert>
+                }
+
+                <div class="d-flex flex-column justify-content-between mt-5">
+                    <Button Color="ButtonColor.Danger" Outline="true" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="DiscardProgress"> Discard </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="UploadSaveAsync"> Upload Save </Button>
+                </div>
+                break;
+
+        }
+    </div>
+</div>

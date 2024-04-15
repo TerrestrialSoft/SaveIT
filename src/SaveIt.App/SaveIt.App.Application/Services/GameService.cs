@@ -27,48 +27,56 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return lockFilesResult.ToResult();
         }
 
-        var newLockFile = new LockFileModel()
+        LockFileModel? lockFile;
+
+        if (!lockFilesResult.Value.Any())
+        {
+            lockFile = GetLockFile(gameSave.Game.Username);
+
+            var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _lockFileName, lockFile,
+                gameSave.RemoteLocationId);
+
+            return result;
+        }
+
+        var lockFileModel = lockFilesResult.Value.First();
+        var lockfileResult = await _externalStorageService
+            .DownloadFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
+
+        if (lockfileResult.IsFailed)
+        {
+            return lockfileResult.ToResult();
+        }
+
+        lockFile = lockfileResult.Value;
+
+        if (lockFile is null)
+        {
+            return Result.Fail("Invalid lockfile content structure");
+        }
+
+        if (lockFile.Status == LockFileStatus.Locked)
+        {
+            return Result.Fail(GameError.GameSaveInUse(lockFile));
+        }
+
+        lockFile = GetLockFile(gameSave.Game.Username);
+
+        var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
+            lockFile);
+
+        return (updateResult.IsSuccess ? Result.Ok(lockFile)! : updateResult)!;
+
+        static LockFileModel GetLockFile(string username) => new()
         {
             Status = LockFileStatus.Locked,
             LockDetails = new LockDetailsModel()
             {
                 LockedAt = DateTime.UtcNow,
-                LockedBy = gameSave.Game.Username
+                LockedBy = username
             }
         };
 
-        if (lockFilesResult.Value.Any())
-        {
-            var lockFileModel = lockFilesResult.Value.First();
-            var lockfileResult = await _externalStorageService
-                .DownloadFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
-
-            if (lockfileResult.IsFailed)
-            {
-                return lockfileResult.ToResult();
-            }
-
-            var lockFile = lockfileResult.Value;
-
-            if (lockFile is null)
-            {
-                return Result.Fail("Invalid lockfile content structure");
-            }
-
-            if (lockFile.Status == LockFileStatus.Locked)
-            {
-                return Result.Fail(GameError.GameSaveInUse(lockFile));
-            }
-
-            // TODO: Lockfile is unlocked, lock it – Update lockfile with new lock details.
-
-            return Result.Ok(newLockFile);
-        }
-
-        var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _lockFileName, newLockFile,
-            gameSave.RemoteLocationId);
-
-        return result;
     }
 
     //public async Task<Result> StartGameXX()

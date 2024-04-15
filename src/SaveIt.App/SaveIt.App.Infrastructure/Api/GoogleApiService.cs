@@ -74,11 +74,11 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
             : Result.Fail(contentResult.Errors);
     }
 
-    public async Task<Result> CreateRepositoryAsync(Guid storageAccountId, string? parentId = null)
+    public async Task<Result> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null)
     {
         var folderMetadata = new GoogleFileCreateModel
         {
-            Name = "SaveIt",
+            Name = name,
             MimeType = _mimeTypeFolder,
             Parents = parentId is not null ? new[] { parentId } : null
         };
@@ -132,5 +132,8 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
     }
 
     public Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null)
-        => _googleApiUploadService.CreateFileAsync(storageAccountId, fileName, fileContent, parentId);
+        => _googleApiUploadService.CreateFileSimpleAsync(storageAccountId, fileName, fileContent, parentId);
+
+    public Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent)
+        => _googleApiUploadService.UpdateFileSimpleAsync(storageAccountId, id, fileContent);
 }

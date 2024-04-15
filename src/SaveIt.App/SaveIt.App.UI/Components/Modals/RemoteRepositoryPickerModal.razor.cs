@@ -175,7 +175,7 @@ public partial class RemoteRepositoryPickerModal
     private async Task CreateRepositoryAsync()
     {
         StartLoading();
-        var result = await StorageService.CreateRepositoryAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+        var result = await StorageService.CreateFolderAsync(SelectedStorageAccountId, "SaveIt", _selectedItem.Item.Id);
 
         if (result.IsFailed)
         {

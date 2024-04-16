@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
+using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -80,6 +81,22 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
                 LockedBy = username
             }
         };
+    }
+
+    public async Task<Result> PrepareGameSaveAsync(Guid gameSaveId)
+    {
+        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        // TODO: Implement
+        // Download the save file from the remote storage
+        // Extract the save file
+        // Update the local save
+
+        return Result.Ok();
     }
 
     public async Task<Result> StartGameAsync(Guid gameId)

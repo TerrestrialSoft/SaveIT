@@ -192,8 +192,8 @@ public partial class CreateGameModal
             Name = EditGame.GameSaveName,
             GameId = game.Id,
             StorageAccountId = EditGame.StorageAccountId!.Value,
-            RemoteLocationId = EditGame.RemoteGameSaveFile!.ParentId!,
-            LocalGameSavePath = EditGame.LocalGameSaveFile!.Path!,
+            RemoteLocationId = EditGame.RemoteGameSaveFile!.Id,
+            LocalGameSavePath = EditGame.LocalGameSaveFile!.FullPath,
         };
         
         await GameRepository.CreateGameAsync(game);

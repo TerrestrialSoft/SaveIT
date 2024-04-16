@@ -69,12 +69,17 @@ public partial class StartGameModal
 
         if (result.HasError<GameErrors.GameSaveAlreadyLocked>())
         {
-            await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
+            await PrepareSaveAsync();
             return;
         }
 
         _screenState = StartGameScreenState.Error;
         _errorMessage = result.Errors[0].Message;
+    }
+
+    private async Task PrepareSaveAsync()
+    {
+        await GameService.PrepareGameSaveAsync(SaveId);
     }
 
     private async Task StartGameAndContinueWithAsync(StartGameScreenState state)
@@ -105,10 +110,8 @@ public partial class StartGameModal
         return result;
     }
 
-    private async Task CloseAsync()
-    {
-        await OnClose.InvokeAsync();
-    }
+    private Task CloseAsync()
+        => OnClose.InvokeAsync();
 
     private async Task DiscardProgressAndCloseAsync()
     {
@@ -140,6 +143,7 @@ public partial class StartGameModal
         if (result.IsSuccess)
         {
             _loading = false;
+            ToastService.Notify(new ToastMessage(ToastType.Success, "Game Save successfully uploaded"));
             await CloseAsync();
             return;
         }

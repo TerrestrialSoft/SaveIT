@@ -8,5 +8,6 @@ public record GoogleFileCreateModel
 
     public required string MimeType { get; init; }
 
+    [JsonPropertyName("parents")]
     public required IEnumerable<string>? Parents { get; init; }
 }

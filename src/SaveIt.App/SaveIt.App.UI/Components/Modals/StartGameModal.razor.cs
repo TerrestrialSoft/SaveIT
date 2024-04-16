@@ -110,7 +110,7 @@ public partial class StartGameModal
         await OnClose.InvokeAsync();
     }
 
-    private async Task DiscardProgress()
+    private async Task DiscardProgressAndCloseAsync()
     {
         _loading = true;
 
@@ -132,17 +132,28 @@ public partial class StartGameModal
         await CloseAsync();
     }
 
-    private async Task UploadSaveAsync()
+    private async Task UploadSaveAndCloseAsync()
     {
+        _loading = true;
         var result = await GameService.UploadSaveAsync(SaveId);
-        // TODO: This can fail
+        
+        if (result.IsSuccess)
+        {
+            _loading = false;
+            await CloseAsync();
+            return;
+        }
+
+        _loading = false;
+        _errorMessage = result.Errors[0].Message;
+        _screenState = StartGameScreenState.UploadFailed;
     }
 
     private static string GetStateColorClass(StartGameScreenState state)
         => state switch
         {
             StartGameScreenState.SaveInUse => "text-warning",
-            StartGameScreenState.Error => "text-danger",
+            var v when (v == StartGameScreenState.Error || v == StartGameScreenState.UploadFailed) => "text-danger",
             var v when (v == StartGameScreenState.PlayingGame || v == StartGameScreenState.HostingGame) => "text-success",
             StartGameScreenState.HostingGame => "text-success",
             _ => ""
@@ -150,7 +161,7 @@ public partial class StartGameModal
 
     private enum StartGameScreenState
     {
-        [Name("Loading...")]
+        [Name("Locking the Cloud Storage...")]
         Loading = 1,
 
         [Name("Downloading Save...")]
@@ -170,5 +181,8 @@ public partial class StartGameModal
 
         [Name("Error")]
         Error = 7,
+
+        [Name("Upload Failed")]
+        UploadFailed = 8,
     }
 }

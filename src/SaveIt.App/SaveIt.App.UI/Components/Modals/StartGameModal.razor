@@ -84,11 +84,22 @@
                 }
 
                 <div class="d-flex justify-content-between mt-5">
-                    <Button Color="ButtonColor.Danger" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="DiscardProgress"> Discard </Button>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAsync"> Upload & Close </Button>
+                    <Button Color="ButtonColor.Danger" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="DiscardProgressAndCloseAsync"> Discard </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAndCloseAsync"> Upload & Close </Button>
                 </div>
                 break;
+            case StartGameScreenState.UploadFailed:
+                <div class="fs-5">
+                    An error occurred while trying to upload the game save. The game save downloading is still locked for the other users. Try it again.
+                    <br/>
+                    <b>@_errorMessage</b>
+                </div>
 
+                <div class="d-flex justify-content-between mt-5">
+                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAndCloseAsync"> Retry </Button>
+                </div>
+                break;
         }
     </div>
 </div>

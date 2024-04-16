@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
-using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -11,6 +10,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
     IExternalStorageService _externalStorageService, IGameRepository _gameRepository) : IGameService
 {
     private const string _lockFileName = ".lockfile";
+    private const string _savePrefix = "save_";
 
     public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId)
     {
@@ -42,7 +42,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         var lockFileModel = lockFilesResult.Value.First();
         var lockfileResult = await _externalStorageService
-            .DownloadFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
+            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
 
         if (lockfileResult.IsFailed)
         {
@@ -91,12 +91,25 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        // TODO: Implement
-        // Download the save file from the remote storage
-        // Extract the save file
-        // Update the local save
+        var fileDownloadResult = await _externalStorageService.GetNewestFileWithSubstringInNameAsync(gameSave.StorageAccountId,
+            gameSave.RemoteLocationId, _savePrefix);
 
-        return Result.Ok();
+        if (fileDownloadResult.IsFailed)
+        {
+            return fileDownloadResult.ToResult();
+        }
+
+        if (fileDownloadResult.Value is null)
+        {
+            return Result.Fail("No save file found");
+        }
+
+        var downloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId,
+            fileDownloadResult.Value.Id!);
+
+        return downloadResult.IsSuccess
+            ? _fileService.DecompressFile(gameSave.LocalGameSavePath, downloadResult.Value)
+            : downloadResult.ToResult();
     }
 
     public async Task<Result> StartGameAsync(Guid gameId)
@@ -138,7 +151,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         var lockFileModel = lockFilesResult.Value.First();
         var lockfileResult = await _externalStorageService
-            .DownloadFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
+            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
 
         if (lockfileResult.IsFailed)
         {
@@ -183,17 +196,18 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var fileResult = _fileService.GetCompressedFileAsync(gameSave.LocalGameSavePath);
+        var fileResult = _fileService.GetCompressedFile(gameSave.LocalGameSavePath);
 
         if (fileResult.IsFailed)
         {
             return fileResult.ToResult();
         }
 
-        string fileName = DateTime.UtcNow.ToString("yyyy-MM-dd_HH-mm-ss") + ".zip";
+        using var stream = fileResult.Value;
+        string fileName = $"{_savePrefix}{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss}.zip";
 
         var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
-            fileName, fileResult.Value);
+            fileName, stream);
         
         if(uploadResult.IsFailed)
         {

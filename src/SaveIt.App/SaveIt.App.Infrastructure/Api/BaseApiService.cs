@@ -52,6 +52,23 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsService accoun
             : Result.Fail("Error ocurred during communication with external server");
     }
 
+    protected async Task<Result<Stream>> DownloadContentAsStreamAsync(Guid storageAccountId,
+        Func<HttpRequestMessage> requestFactory)
+    {
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+
+        if (responseResult.IsFailed)
+        {
+            return responseResult.ToResult();
+        }
+
+        var content = await responseResult.Value.Content.ReadAsStreamAsync();
+
+        return content is not null
+            ? content
+            : Result.Fail("Error ocurred during communication with external server");
+    }
+
     protected async Task<Result<string>> ExecuteRequestForHeaderAsync(Guid storageAccountId, string headerName,
         Func<HttpRequestMessage> requestFactory)
     {

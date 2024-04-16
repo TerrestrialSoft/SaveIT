@@ -17,12 +17,15 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
     private const string _baseFilesUrl = "files";
     private const string _baseFileDetailUrl = _baseFilesUrl + "/{0}";
     private const string _fileQueryfields = "id, name, parents, kind, mimeType";
-    private const string _baseFileQueryUrl = $"{_baseFilesUrl}?fields=files({_fileQueryfields})" +
-        $"&q=trashed=false";
-    private const string _filesFolderWithSpecificParentUrl = $"{_baseFileQueryUrl} and mimeType='{_mimeTypeFolder}'" +
+    private const string _baseFileQueryUrl = $"{_baseFilesUrl}?{_fieldsParameter}";
+    private const string _baseFileQueryUntrashedUrl = $"{_baseFileQueryUrl}&q=trashed=false";
+    private const string _fieldsParameter = $"fields=files({_fileQueryfields})";
+    private const string _filesFolderWithSpecificParentUrl = $"{_baseFileQueryUntrashedUrl} and mimeType='{_mimeTypeFolder}'" +
         "and '{0}' in parents";
     private const string _fileDetailUrl = $"{_baseFileDetailUrl}?fields=" + _fileQueryfields;
-    private const string _findFileWithNameAndParentUrl = _baseFileQueryUrl + " and name='{1}' and '{0}' in parents";
+    private const string _findFileWithNameAndParentUrl = _baseFileQueryUntrashedUrl + " and name='{1}' and '{0}' in parents";
+    private const string _findLastModifiedFileWithNameAndParentUrl
+        = _baseFileQueryUrl + "&orderBy=modifiedTime desc&q=trashed=false and name contains '{1}' and '{0}' in parents";
     private const string _mimeTypeFolder = "application/vnd.google-apps.folder";
     private const string _fileDownloadUrl = $"{_baseFileDetailUrl}?alt=media";
 
@@ -114,7 +117,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
             : contentResult.ToResult();
     }
 
-    public async Task<Result<T?>> DownloadFileAsync<T>(Guid storageAccountId, string fileId)
+    public async Task<Result<T?>> DownloadJsonFileAsync<T>(Guid storageAccountId, string fileId)
     {
         var filter = string.Format(_fileDownloadUrl, fileId);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
@@ -139,4 +142,30 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
 
     public Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value)
         => _googleApiUploadService.UploadFileAsync(storageAccountId, parentId, fileName, value);
+
+    public async Task<Result<FileItemModel?>> GetNewestFileWithSubstringInNameAsync(Guid storageAccountId, string remoteLocationId,
+        string substring)
+    {
+        var filter = string.Format(_findLastModifiedFileWithNameAndParentUrl, remoteLocationId, substring);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+
+        if (contentResult.IsFailed)
+        {
+            return contentResult.ToResult();
+        }
+
+        var file = contentResult.Value.Files
+            .FirstOrDefault()?
+            .ToFileItem();
+
+        return Result.Ok(file);
+    }
+
+    public async Task<Result<Stream>> DownloadFileAsync(Guid storageAccountId, string fileId)
+    {
+        var filter = string.Format(_fileDownloadUrl, fileId);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
+
+        return await DownloadContentAsStreamAsync(storageAccountId, messageFactory);
+    }
 }

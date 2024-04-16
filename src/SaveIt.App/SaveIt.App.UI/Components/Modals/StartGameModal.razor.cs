@@ -54,7 +54,7 @@ public partial class StartGameModal
 
         if (result.IsSuccess)
         {
-            await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
+            await PrepareSaveAsync();
             return;
         }
 
@@ -69,7 +69,7 @@ public partial class StartGameModal
 
         if (result.HasError<GameErrors.GameSaveAlreadyLocked>())
         {
-            await PrepareSaveAsync();
+            await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
             return;
         }
 
@@ -79,7 +79,11 @@ public partial class StartGameModal
 
     private async Task PrepareSaveAsync()
     {
+        _screenState = StartGameScreenState.DownloadingSave;
+        StateHasChanged();
         await GameService.PrepareGameSaveAsync(SaveId);
+        _screenState = StartGameScreenState.HostingGame;
+        await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
     }
 
     private async Task StartGameAndContinueWithAsync(StartGameScreenState state)
@@ -168,7 +172,7 @@ public partial class StartGameModal
         [Name("Locking the Cloud Storage...")]
         Loading = 1,
 
-        [Name("Downloading Save...")]
+        [Name("Downloading the Game Save...")]
         DownloadingSave = 2,
 
         [Name("Game Save in Use")]

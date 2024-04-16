@@ -3,5 +3,6 @@
 namespace SaveIt.App.Domain.Services;
 public interface IFileService
 {
-    Result<MemoryStream> GetCompressedFileAsync(string localGameSavePath);
+    Result DecompressFile(string localGameSavePath, Stream value);
+    Result<MemoryStream> GetCompressedFile(string localGameSavePath);
 }

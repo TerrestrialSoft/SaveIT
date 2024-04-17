@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Components;
 namespace SaveIt.App.UI.Components.Modals;
 public partial class StorageAuthorizationModal
 {
-    [Parameter]
-    public EventCallback OnClose { get; set; }
+    [Parameter, EditorRequired]
+    public required EventCallback OnClose { get; set; }
 
     private AuthorizationScreenState _authState = AuthorizationScreenState.SelectProvider;
 

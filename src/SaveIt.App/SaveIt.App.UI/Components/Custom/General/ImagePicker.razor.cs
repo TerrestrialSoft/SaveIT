@@ -8,8 +8,8 @@ public partial class ImagePicker
     private const long _maxFileSize = 5 * 1024 * 1024;
     private string? _error = null;
 
-    [Parameter]
-    public EventCallback<ImageModel> OnImageUploaded { get; set; }
+    [Parameter, EditorRequired]
+    public required EventCallback<ImageModel> OnImageUploaded { get; set; }
 
     [Parameter]
     public ImageModel? ImageSrc { get; set; }

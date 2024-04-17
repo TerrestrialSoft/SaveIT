@@ -24,23 +24,23 @@ public partial class CreateGameModal
     [Inject]
     private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
-    [Parameter]
-    public Modal ModalLocalItemPicker { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required Modal ModalLocalItemPicker { get; set; }
 
-    [Parameter]
-    public Modal ModalRemoteItemPicker { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required Modal ModalRemoteItemPicker { get; set; }
 
-    [Parameter]
-    public Modal ModalAuthorizeStorage { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required Modal ModalAuthorizeStorage { get; set; }
 
-    [Parameter]
-    public Modal ModalCurrent { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required Modal ModalCurrent { get; set; }
 
-    [Parameter]
-    public NewGameModel EditGame { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required NewGameModel EditGame { get; set; }
 
-    [Parameter]
-    public EventCallback OnGameCreated { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public EventCallback OnGameCreated { get; set; }
 
     private List<StorageAccount> _storageAccounts = [];
 
@@ -68,7 +68,7 @@ public partial class CreateGameModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(LocalItemPickerModal.SelectedFile), EditGame.LocalGameSaveFile! },
+            { nameof(LocalItemPickerModal.InitialSelectedFile), EditGame.LocalGameSaveFile! },
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Folders },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Folders},
             { nameof(LocalItemPickerModal.OnItemSelected),
@@ -111,7 +111,7 @@ public partial class CreateGameModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(LocalItemPickerModal.SelectedFile), EditGame.GameExecutableFile! },
+            { nameof(LocalItemPickerModal.InitialSelectedFile), EditGame.GameExecutableFile! },
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
             { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
@@ -133,7 +133,7 @@ public partial class CreateGameModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(RemoteRepositoryPickerModal.SelectedItem), EditGame.RemoteGameSaveFile! },
+            { nameof(RemoteRepositoryPickerModal.InitialSelectedItem), EditGame.RemoteGameSaveFile! },
             { nameof(RemoteRepositoryPickerModal.SelectedStorageAccountId), EditGame.StorageAccountId! },
             { nameof(RemoteRepositoryPickerModal.OnItemSelected),
                 EventCallback.Factory.Create<RemoteFileItemModel>(this, async (file) =>

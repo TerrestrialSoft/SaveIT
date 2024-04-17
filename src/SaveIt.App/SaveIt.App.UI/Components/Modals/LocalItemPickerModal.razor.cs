@@ -7,8 +7,8 @@ public partial class LocalItemPickerModal
     private readonly List<SelectedItemViewModel<LocalFileItemModel>> _items = [];
     private string? _error;
 
-    [Parameter]
-    public EventCallback<LocalFileItemModel> OnItemSelected { get; set; }
+    [Parameter, EditorRequired]
+    public required EventCallback<LocalFileItemModel> OnItemSelected { get; set; }
 
     [Parameter]
     public LocalPickerMode PickerMode { get; set; } = LocalPickerMode.Both;
@@ -19,23 +19,16 @@ public partial class LocalItemPickerModal
     [Parameter]
     public IEnumerable<string> AllowedExtensions { get; set; } = [];
 
-    public enum LocalPickerMode
-    {
-        Files = 1,
-        Folders = 2,
-        Both = 3
-    }
-
     private SelectedItemViewModel<LocalFileItemModel> _selectedFile = default!;
 
     [Parameter]
-    public LocalFileItemModel? SelectedFile { get; set; }
+    public LocalFileItemModel? InitialSelectedFile { get; set; }
 
     protected override void OnInitialized()
     {
-        if (SelectedFile is not null)
+        if (InitialSelectedFile is not null)
         {
-            _selectedFile = new(SelectedFile);
+            _selectedFile = new(InitialSelectedFile);
         }
 
         try
@@ -177,5 +170,12 @@ public partial class LocalItemPickerModal
     {
         SelectItem(item);
         return PickItemAsync();
+    }
+
+    public enum LocalPickerMode
+    {
+        Files = 1,
+        Folders = 2,
+        Both = 3
     }
 }

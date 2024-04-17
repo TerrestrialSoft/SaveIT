@@ -6,10 +6,16 @@ namespace SaveIt.App.UI.Components.Custom.General;
 public partial class ItemPicker<TItem> where TItem : NamedModel
 {
     [Parameter]
-    public EventCallback OnPickerClicked { get; set; }
+    public required string Title { get; set; }
 
-    [Parameter]
-    public EventCallback OnPathCleared { get; set; }
+    [Parameter, EditorRequired]
+    public required IconName Icon { get; set; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback OnPickerClicked { get; set; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback OnPathCleared { get; set; }
 
     [Parameter]
     public TItem? SelectedFile { get; set; }
@@ -21,13 +27,7 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     public bool IsDisabled { get; set; }
 
     [Parameter]
-    public string Title { get; set; } = default!;
-
-    [Parameter]
     public int TabIndex { get; set; }
-
-    [Parameter]
-    public IconName Icon { get; set; } = default!;
 
     private async Task ShowModal()
     {

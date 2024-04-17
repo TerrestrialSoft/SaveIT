@@ -19,22 +19,22 @@ public partial class RemoteRepositoryPickerModal
     [Inject]
     private IStorageAccountRepository StorageAccountRepository { get; set; } = default!;
 
-    [Parameter]
-    public Guid SelectedStorageAccountId { get; set; }
+    [Parameter, EditorRequired]
+    public required Guid SelectedStorageAccountId { get; set; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback<RemoteFileItemModel> OnItemSelected { get; set; }
 
     [Parameter]
-    public EventCallback<RemoteFileItemModel> OnItemSelected { get; set; }
-
-    [Parameter]
-    public RemoteFileItemModel? SelectedItem { get; set; }
+    public RemoteFileItemModel? InitialSelectedItem { get; set; }
 
     private SelectedItemViewModel<RemoteFileItemModel> _selectedItem = default!;
 
     public RemoteRepositoryPickerModal()
     {
-        if (SelectedItem is not null)
+        if (InitialSelectedItem is not null)
         {
-            _selectedItem = new(SelectedItem);
+            _selectedItem = new(InitialSelectedItem);
         }
     }
 

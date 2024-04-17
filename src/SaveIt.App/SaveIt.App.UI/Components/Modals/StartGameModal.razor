@@ -37,14 +37,15 @@
                     </div>
                 }
                 break;
-            case StartGameScreenState.Error:
+            case StartGameScreenState.LockFailed:
                 <div class="fs-5">
-                    An error occurred while trying to start the game.
+                    An error occurred while trying to lock the repository.
                     <br/>
                     <b>@_errorMessage</b>
                 </div>
-                <div class="text-center mt-5">
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                <div class="d-flex justify-content-between mt-5">
+                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="LockRepositoryAsync"> Retry </Button>
                 </div>
                 break;
             case StartGameScreenState.PlayingGame:
@@ -98,6 +99,18 @@
                 <div class="d-flex justify-content-between mt-5">
                     <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
                     <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAndCloseAsync"> Retry </Button>
+                </div>
+                break;
+            case StartGameScreenState.DownloadFailed:
+                <div class="fs-5">
+                    An error occurred while trying to download the game save. Try it again.
+                    <br/>
+                    <b>@_errorMessage</b>
+                </div>
+
+                <div class="d-flex justify-content-between mt-5">
+                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="PrepareSaveAsync"> Retry </Button>
                 </div>
                 break;
         }

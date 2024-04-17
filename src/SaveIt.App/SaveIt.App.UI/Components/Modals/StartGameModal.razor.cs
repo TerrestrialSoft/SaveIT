@@ -73,7 +73,7 @@ public partial class StartGameModal
             return;
         }
 
-        _screenState = StartGameScreenState.Error;
+        _screenState = StartGameScreenState.LockFailed;
         _errorMessage = result.Errors[0].Message;
     }
 
@@ -81,7 +81,15 @@ public partial class StartGameModal
     {
         _screenState = StartGameScreenState.DownloadingSave;
         StateHasChanged();
-        await GameService.PrepareGameSaveAsync(SaveId);
+        var result = await GameService.PrepareGameSaveAsync(SaveId);
+
+        if (result.IsFailed)
+        {
+            _screenState = StartGameScreenState.DownloadFailed;
+            _errorMessage = result.Errors[0].Message;
+            return;
+        }
+
         _screenState = StartGameScreenState.HostingGame;
         await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
     }
@@ -161,7 +169,8 @@ public partial class StartGameModal
         => state switch
         {
             StartGameScreenState.SaveInUse => "text-warning",
-            var v when (v == StartGameScreenState.Error || v == StartGameScreenState.UploadFailed) => "text-danger",
+            var v when (v == StartGameScreenState.LockFailed || v == StartGameScreenState.UploadFailed
+                || v == StartGameScreenState.DownloadFailed) => "text-danger",
             var v when (v == StartGameScreenState.PlayingGame || v == StartGameScreenState.HostingGame) => "text-success",
             StartGameScreenState.HostingGame => "text-success",
             _ => ""
@@ -188,9 +197,12 @@ public partial class StartGameModal
         HostingGame = 6,
 
         [Name("Error")]
-        Error = 7,
+        LockFailed = 7,
 
         [Name("Upload Failed")]
         UploadFailed = 8,
+
+        [Name("Download Failed")]
+        DownloadFailed = 9
     }
 }

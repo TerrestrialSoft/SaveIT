@@ -29,6 +29,9 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     [Parameter]
     public int TabIndex { get; set; }
 
+    [Parameter]
+    public string? HelpText { get; set; }
+
     private async Task ShowModal()
     {
         await OnPickerClicked.InvokeAsync();

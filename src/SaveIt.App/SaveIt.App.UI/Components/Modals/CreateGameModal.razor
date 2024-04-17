@@ -4,12 +4,20 @@
         <div class="d-flex justify-content-around p-2">
             <div class="column">
                 <div class="m-1 p-1">
-                    <label class="fs-5">Game Name<RequiredMark/></label>
+                    <label class="fs-5">
+                        Game Name
+                        <RequiredMark />
+                        <Help Text="Enter the name of the game you want to create a profile for." />
+                    </label>
                     <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75 form-control" tabindex="0" />
                     <ValidationMessage For="() => EditGame.Name" />
                 </div>
                 <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">Username<RequiredMark/></label>
+                    <label class="fs-5">
+                        Username
+                        <RequiredMark/>
+                        <Help Text="Enter your username under which you want to appear within this application when saving game progress for this particular game." />
+                    </label>
                     <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75 form-control" tabindex="1" />
                     <ValidationMessage For="() => EditGame.Username" />
                 </div>
@@ -19,7 +27,8 @@
                     <ImagePicker
                         ImageSrc="@EditGame.Image"
                         OnImageUploaded="ImageUploaded"
-                        TabIndex="2"/>
+                        TabIndex="2"
+                        HelpText="Select the image that will be displayed for this game." />
                 </div>
                 <div>
                     <ItemPicker
@@ -28,7 +37,8 @@
                         SelectedFile="@EditGame.GameExecutableFile"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
                         OnPathCleared="ClearLocalExecutablePath"
-                        TabIndex="3"/>
+                        TabIndex="3"
+                        HelpText="Select the location of the game exe file used to run the game." />
                 </div>
             </div>
         </div>
@@ -38,15 +48,24 @@
         <div class="d-flex justify-content-around p-2">
             <div class="column">
                 <div class="m-1 p-1">
-                    <label class="fs-5">Game Save Name<RequiredMark/></label>
+                    <label class="fs-5">
+                        Game Save Name
+                        <RequiredMark/>
+                        <Help Text="Enter the name of your game save." />
+                    </label>
                     <InputText @bind-Value="EditGame.GameSaveName"
                         placeholder="Game Save Name"
                         class="form-control w-75"
                         tabindex="4"/>
+
                     <ValidationMessage For="() => EditGame.GameSaveName" />
                 </div>
                 <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">Storage Account<RequiredMark/></label>
+                    <label class="fs-5">
+                        Storage Account
+                        <RequiredMark/>
+                        <Help Text="Select an authorised account to access cloud storage or authorise a new one." />
+                    </label>
                     @if (_storageAccounts.Any())
                     {
                         <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
@@ -87,7 +106,8 @@
                         SelectedFile="@EditGame.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"
-                        TabIndex="6"/>
+                        TabIndex="6"
+                        HelpText="Select the game save folder that is saved on your local device." />
                     <div class="ms-4">
                         <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
                     </div>
@@ -100,7 +120,8 @@
                         SelectedFile="@EditGame.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
                         OnPathCleared="ClearRemoteGameSavePath"
-                        TabIndex="7"/>
+                        TabIndex="7"
+                        HelpText="Select a folder on your cloud storage where your game save and other application work files will be saved." />
                     <div class="ms-4">
                         <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
                     </div>

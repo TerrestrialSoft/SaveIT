@@ -15,6 +15,9 @@ public partial class ImagePicker
     public ImageModel? ImageSrc { get; set; }
 
     [Parameter]
+    public string? HelpText { get; set; }
+
+    [Parameter]
     public int TabIndex { get; set; }
 
     private async Task LoadFile(InputFileChangeEventArgs e)

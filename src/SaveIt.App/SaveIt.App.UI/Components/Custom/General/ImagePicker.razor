@@ -5,7 +5,13 @@
                 <div>
                     <Icon Name="IconName.Image" Size="IconSize.x5" />
                 </div>
-                <div class="fs-5 ms-2">Game Image</div>
+                <div class="fs-5 ms-2">
+                    Game Image
+                    @if(HelpText is not null)
+                    {
+                        <Help Text="@HelpText" />
+                    }
+                </div>
             </div>
             
             <div class="ms-4">

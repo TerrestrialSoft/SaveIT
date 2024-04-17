@@ -14,9 +14,6 @@ public partial class CreateGameModal
     protected ToastService ToastService { get; set; } = default!;
 
     [Inject]
-    private IStorageAccountRepository StorageAccountRepository { get; set; } = default!;
-
-    [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
 
     [Inject]

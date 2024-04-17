@@ -1,0 +1,27 @@
+﻿<div>
+    <EditForm Model="Model" OnValidSubmit="ValidSubmitAsync" autocomplete="off">
+        <FluentValidationValidator />
+
+        <div>
+            <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="Model"/>
+
+            <div class="d-flex justify-content-end">
+                <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Outline="false"
+                        Type="ButtonType.Submit"
+                        TabIndex="8"
+                        @onclick="CancelUpdateAsync">
+                    Cancel
+                </Button>
+                
+                <Button Color="ButtonColor.Primary"
+                    Size="Size.Large"
+                    Type="ButtonType.Submit"
+                    TabIndex="8">
+                    Update
+                </Button>
+            </div>
+        </div>
+    </EditForm>
+</div>

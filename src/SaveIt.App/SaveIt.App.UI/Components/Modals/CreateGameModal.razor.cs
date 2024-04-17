@@ -40,7 +40,7 @@ public partial class CreateGameModal
     [Parameter, EditorRequired]
     public EventCallback OnGameCreated { get; set; }
 
-    private async Task Submit()
+    private async Task ValidSubmit()
     {
         var game = new Game()
         {

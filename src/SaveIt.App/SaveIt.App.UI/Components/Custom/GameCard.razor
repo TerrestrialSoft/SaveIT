@@ -10,7 +10,7 @@
                         Outline="true" Size="Size.Small"
                         @onclick="DeleteGame"
                         TooltipTitle="Delete">
-                            <Icon Name="IconName.Trash3" />
+                            <Icon Name="IconName.Trash3Fill" />
                     </Button>
                 </div>
             </div>
@@ -35,11 +35,10 @@
                     Edit
                 </Button>
                 <Button Color="ButtonColor.Primary"
-                        Disabled="@(Game.GameExecutablePath == null)"
                         Size="Size.Large"
                         @onclick="StartGame">
                     <Icon Name="IconName.Play" />
-                    Play
+                    Start
                 </Button>
             </div>
         </div>

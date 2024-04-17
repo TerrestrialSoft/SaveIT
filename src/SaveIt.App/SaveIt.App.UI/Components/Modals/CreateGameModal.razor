@@ -1,133 +1,17 @@
-﻿<EditForm Model="EditGame" OnValidSubmit=Submit autocomplete="off">
-    <DataAnnotationsValidator />
+﻿<EditForm Model="CreateNewCompleteGame" OnValidSubmit=Submit autocomplete="off">
+    <FluentValidationValidator />
     <div>
-        <div class="d-flex justify-content-around p-2">
-            <div class="column">
-                <div class="m-1 p-1">
-                    <label class="fs-5">
-                        Game Name
-                        <RequiredMark />
-                        <Help Text="Enter the name of the game you want to create a profile for." />
-                    </label>
-                    <InputText @bind-Value="EditGame.Name" placeholder="Game Name" class="w-75 form-control" tabindex="0" />
-                    <ValidationMessage For="() => EditGame.Name" />
-                </div>
-                <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">
-                        Username
-                        <RequiredMark/>
-                        <Help Text="Enter your username under which you want to appear within this application when saving game progress for this particular game." />
-                    </label>
-                    <InputText @bind-Value="EditGame.Username" placeholder="Username" class="w-75 form-control" tabindex="1" />
-                    <ValidationMessage For="() => EditGame.Username" />
-                </div>
-            </div>
-            <div class="column">
-                <div class="m-1 p-1">
-                    <ImagePicker
-                        ImageSrc="@EditGame.Image"
-                        OnImageUploaded="ImageUploaded"
-                        TabIndex="2"
-                        HelpText="Select the image that will be displayed for this game." />
-                </div>
-                <div>
-                    <ItemPicker
-                        Title="Game Executable Location"
-                        Icon="IconName.FileTypeExe"
-                        SelectedFile="@EditGame.GameExecutableFile"
-                        OnPickerClicked="ShowLocalExecutablePickerModal"
-                        OnPathCleared="ClearLocalExecutablePath"
-                        TabIndex="3"
-                        HelpText="Select the location of the game exe file used to run the game." />
-                </div>
-            </div>
-        </div>
+        <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="CreateNewCompleteGame.Game"/>
 
         <h3 class="p-2">Game Save Information</h3>
 
-        <div class="d-flex justify-content-around p-2">
-            <div class="column">
-                <div class="m-1 p-1">
-                    <label class="fs-5">
-                        Game Save Name
-                        <RequiredMark/>
-                        <Help Text="Enter the name of your game save." />
-                    </label>
-                    <InputText @bind-Value="EditGame.GameSaveName"
-                        placeholder="Game Save Name"
-                        class="form-control w-75"
-                        tabindex="4"/>
+        <EditGameSave
+            ModalLocalItemPicker="ModalLocalItemPicker"
+            ModalRemoteItemPicker="ModalRemoteItemPicker"
+            ModalAuthorizeStorage="ModalAuthorizeStorage"
+            ModalCurrent="ModalCurrent"
+            Model="CreateNewCompleteGame.GameSave"/>
 
-                    <ValidationMessage For="() => EditGame.GameSaveName" />
-                </div>
-                <div class="m-1 mt-2 p-1">
-                    <label class="fs-5">
-                        Storage Account
-                        <RequiredMark/>
-                        <Help Text="Select an authorised account to access cloud storage or authorise a new one." />
-                    </label>
-                    @if (_storageAccounts.Any())
-                    {
-                        <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
-                            Value="@EditGame.StorageAccountId"
-                            ValueExpression="@(() => @EditGame.StorageAccountId)"
-                            class="p-2 w-75 form-control form-select"
-                            tabindex="5">
-                            @foreach (var account in _storageAccounts)
-                            {
-                                <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>
-                            }
-                        </InputSelect>
-                        <div>
-                            or <b @onclick="ShowAuthorizeStorageModal" class="btn-authorize-new">authorize a new one</b>.
-                        </div>
-                    }
-                    else
-                    {
-                        <Button
-                            Color="ButtonColor.Primary"
-                            Class="ms-4 mt-1 me-3"
-                            Outline=true
-                            @onclick="ShowAuthorizeStorageModal"
-                            TabIndex="5">
-                            Authorize new account
-                        </Button>
-                    }
-                    <div class="ms-2">
-                        <ValidationMessage For="() => EditGame.StorageAccountId" />
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="m-1 p-1">
-                    <ItemPicker Title="Local Game Save Location"
-                        Icon="IconName.PcDisplayHorizontal"
-                        IsRequired="true"
-                        SelectedFile="@EditGame.LocalGameSaveFile"
-                        OnPickerClicked="ShowLocalFolderPickerModal"
-                        OnPathCleared="ClearLocalGameSavePath"
-                        TabIndex="6"
-                        HelpText="Select the game save folder that is saved on your local device." />
-                    <div class="ms-4">
-                        <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
-                    </div>
-                </div>
-                <div class="m-1 p-1">
-                    <ItemPicker Title="Remote Game Save Location"
-                        Icon="IconName.Cloud"
-                        IsRequired="true"
-                        IsDisabled="@(EditGame.StorageAccountId is null)"
-                        SelectedFile="@EditGame.RemoteGameSaveFile"
-                        OnPickerClicked="ShowRemoteFolderPickerModal"
-                        OnPathCleared="ClearRemoteGameSavePath"
-                        TabIndex="7"
-                        HelpText="Select a folder on your cloud storage where your game save and other application work files will be saved." />
-                    <div class="ms-4">
-                        <ValidationMessage For="() => EditGame.RemoteGameSaveFile" />
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="d-flex justify-content-end">
             <Button Color="ButtonColor.Primary"
                 Size="Size.Large"
@@ -137,5 +21,4 @@
             </Button>
         </div>
     </div>
-    <ConfirmDialog @ref="confirmDialog" />
 </EditForm>

@@ -1,0 +1,83 @@
+﻿<div class="d-flex justify-content-around p-2">
+    <div class="column">
+        <div class="m-1 p-1">
+            <label class="fs-5">
+                Game Save Name
+                <RequiredMark />
+                <Help Text="Enter the name of your game save." />
+            </label>
+            <InputText @bind-Value="Model.Name"
+                       placeholder="Game Save Name"
+                       class="form-control w-75"
+                       tabindex="4" />
+
+            <ValidationMessage For="() => Model.Name" />
+        </div>
+        <div class="m-1 mt-2 p-1">
+            <label class="fs-5">
+                Storage Account
+                <RequiredMark />
+                <Help Text="Select an authorised account to access cloud storage or authorise a new one." />
+            </label>
+            @if (_storageAccounts.Any())
+            {
+                <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
+                             Value="@Model.StorageAccountId"
+                             ValueExpression="@(() => Model.StorageAccountId)"
+                             class="p-2 w-75 form-control form-select"
+                             tabindex="5">
+                    @foreach (var account in _storageAccounts)
+                    {
+                        <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>
+                    }
+                </InputSelect>
+                <div>
+                    or <b @onclick="ShowAuthorizeStorageModal" class="btn-authorize-new">authorize a new one</b>.
+                </div>
+            }
+            else
+            {
+                <Button Color="ButtonColor.Primary"
+                        Class="ms-4 mt-1 me-3"
+                        Outline=true
+                        @onclick="ShowAuthorizeStorageModal"
+                        TabIndex="5">
+                    Authorize new account
+                </Button>
+            }
+            <div class="ms-2">
+                <ValidationMessage For="() => Model.StorageAccountId" />
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="m-1 p-1">
+            <ItemPicker Title="Local Game Save Location"
+                        Icon="IconName.PcDisplayHorizontal"
+                        IsRequired="true"
+                        SelectedFile="@Model.LocalGameSaveFile"
+                        OnPickerClicked="ShowLocalFolderPickerModal"
+                        OnPathCleared="ClearLocalGameSavePath"
+                        TabIndex="6"
+                        HelpText="Select the game save folder that is saved on your local device." />
+            <div class="ms-4">
+                <ValidationMessage For="() => Model.LocalGameSaveFile" />
+            </div>
+        </div>
+        <div class="m-1 p-1">
+            <ItemPicker Title="Remote Game Save Location"
+                        Icon="IconName.Cloud"
+                        IsRequired="true"
+                        IsDisabled="@(Model.StorageAccountId is null)"
+                        SelectedFile="@Model.RemoteGameSaveFile"
+                        OnPickerClicked="ShowRemoteFolderPickerModal"
+                        OnPathCleared="ClearRemoteGameSavePath"
+                        TabIndex="7"
+                        HelpText="Select a folder on your cloud storage where your game save and other application work files will be saved." />
+            <div class="ms-4">
+                <ValidationMessage For="() => Model.RemoteGameSaveFile" />
+            </div>
+        </div>
+    </div>
+    <ConfirmDialog @ref="confirmDialog" />
+</div>

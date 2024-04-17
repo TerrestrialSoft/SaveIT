@@ -3,7 +3,17 @@
     @if (ShowDetail)
     {
         <div class="card-body">
-            <h5 class="card-title">@Game.Name</h5>
+            <div class="d-flex flex-row justify-content-between">
+                <h5 class="card-title">@Game.Name</h5>
+                <div>
+                    <Button Color="ButtonColor.Danger"
+                        Outline="true" Size="Size.Small"
+                        @onclick="DeleteGame"
+                        TooltipTitle="Delete">
+                            <Icon Name="IconName.Trash3" />
+                    </Button>
+                </div>
+            </div>
             <div>
                 <label class="fs-6">Profile</label>
                 <InputSelect @bind-Value="SelectedSaveId" class="p-2 w-100 form-control form-select">
@@ -17,14 +27,13 @@
 
         <div class="card-footer">
             <div class="d-flex justify-content-between">
-                <Button Color="ButtonColor.Danger"
+                <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Outline="true"
-                        @onclick="DeleteGame">
-                    <Icon Name="IconName.Trash3" />
-                    Delete
+                        @onclick="ShowEditGameModal">
+                    <Icon Name="IconName.Pencil" />
+                    Edit
                 </Button>
-
                 <Button Color="ButtonColor.Primary"
                         Disabled="@(Game.GameExecutablePath == null)"
                         Size="Size.Large"
@@ -44,7 +53,4 @@
             <h5 class="card-title">@Game.Name</h5>
         </div>
     }
-    
-    <ConfirmDialog @ref="confirmDialog" />
-
 </div>

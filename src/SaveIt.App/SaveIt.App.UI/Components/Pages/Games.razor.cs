@@ -2,7 +2,7 @@ using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.UI.Components.Modals;
-using SaveIt.App.UI.Models;
+using SaveIt.App.UI.Models.Game;
 
 namespace SaveIt.App.UI.Components.Pages;
 public partial class Games
@@ -15,7 +15,7 @@ public partial class Games
 
     private List<Game> _allGames = [];
     private List<Game> _filteredGames = [];
-    private string _searchText = "";
+    private readonly string _searchText = "";
     private Game? _selectedGame = new();
     private NewGameModel _createGame = new();
 
@@ -50,7 +50,7 @@ public partial class Games
             { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
-            { nameof(CreateGameModal.EditGame), _createGame },
+            { nameof(CreateGameModal.CreateNewCompleteGame), _createGame },
             { nameof(CreateGameModal.OnGameCreated),
                 EventCallback.Factory.Create(this, RefreshGames)
             },

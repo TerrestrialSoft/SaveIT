@@ -87,4 +87,9 @@ public partial class GameCard
         ToastService.Notify(new(ToastType.Success, $"Game deleted successfully."));
         await OnCardUpdated.InvokeAsync(Game);
     }
+
+    private void ShowEditGameModal()
+    {
+
+    }
 }

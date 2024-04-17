@@ -42,6 +42,8 @@ public partial class CreateGameModal
     [Parameter, EditorRequired]
     public EventCallback OnGameCreated { get; set; }
 
+    private ConfirmDialog confirmDialog = default!;
+
     private List<StorageAccount> _storageAccounts = [];
 
     protected override async Task OnInitializedAsync()
@@ -205,5 +207,37 @@ public partial class CreateGameModal
         TrySetStorageAccount();
         await ModalCurrent.HideAsync();
         await OnGameCreated.InvokeAsync();
+    }
+
+    private async Task StorageAccountChanged(Guid? id)
+    {
+        if (EditGame.RemoteGameSaveFile is not null)
+        {
+            var options = new ConfirmDialogOptions
+            {
+                YesButtonText = "Cancel",
+                YesButtonColor = ButtonColor.Primary,
+                NoButtonText = "Delete",
+                NoButtonColor = ButtonColor.Secondary,
+                Size = DialogSize.Large,
+                IsVerticallyCentered = true,
+                DialogCssClass = "fs-5"
+            };
+
+            var wasCancelled = await confirmDialog.ShowAsync(
+                title: $"Change storage provider",
+                message1: $"You have already selected Remote File." +
+                $"Changing Storage Provider will remove previously selected Remote File.",
+                message2: "Do you wish to continue?",
+                options);
+
+            if (wasCancelled)
+            {
+                return;
+            }
+        }
+
+        EditGame.StorageAccountId = id;
+        EditGame.RemoteGameSaveFile = null;
     }
 }

@@ -49,7 +49,9 @@
                     <label class="fs-5">Storage Account<RequiredMark/></label>
                     @if (_storageAccounts.Any())
                     {
-                        <InputSelect @bind-Value="EditGame.StorageAccountId"
+                        <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
+                            Value="@EditGame.StorageAccountId"
+                            ValueExpression="@(() => @EditGame.StorageAccountId)"
                             class="p-2 w-75 form-control form-select"
                             tabindex="5">
                             @foreach (var account in _storageAccounts)
@@ -90,7 +92,7 @@
                         <ValidationMessage For="() => EditGame.LocalGameSaveFile" />
                     </div>
                 </div>
-                <div class="m-1 p-1" tabindex="8">
+                <div class="m-1 p-1">
                     <ItemPicker Title="Remote Game Save Location"
                         Icon="IconName.Cloud"
                         IsRequired="true"
@@ -114,4 +116,5 @@
             </Button>
         </div>
     </div>
+    <ConfirmDialog @ref="confirmDialog" />
 </EditForm>

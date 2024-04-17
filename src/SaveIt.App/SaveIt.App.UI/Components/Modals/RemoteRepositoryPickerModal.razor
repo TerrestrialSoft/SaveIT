@@ -1,4 +1,4 @@
-﻿<div class="m-3">
+﻿<div class="m-2 min-size-content d-flex flex-column">
 
     @if (_error is not null)
     {
@@ -11,7 +11,7 @@
         @if (_isLoading)
         {
             <div class="d-flex justify-content-center">
-                <Spinner Size="SpinnerSize.Large" />
+                <Spinner Size="SpinnerSize.Large" Style=" width: 6rem; height: 6rem;" />
             </div>
         }
         else
@@ -28,7 +28,7 @@
                 }
             </div>
 
-            <div class="d-flex flex-wrap">
+            <div class="d-flex flex-wrap flex-grow-1">
                 @foreach (var item in _items)
                 {
                     <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"

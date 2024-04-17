@@ -45,7 +45,8 @@ public partial class RemoteRepositoryPickerModal
 
         try
         {
-            var folderResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, RemoteFileItemModel.DefaultId);
+            var fileId = InitialSelectedItem?.Id ?? RemoteFileItemModel.DefaultId;
+            var folderResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, fileId);
 
             if (folderResult.IsFailed)
             {

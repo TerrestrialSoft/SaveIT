@@ -19,3 +19,7 @@
     text-overflow: ellipsis;
     max-width: 6rem;
 }
+
+.min-size-content {
+    min-height: 180px;
+}

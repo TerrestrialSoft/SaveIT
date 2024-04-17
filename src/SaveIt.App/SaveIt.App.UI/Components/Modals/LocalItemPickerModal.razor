@@ -44,10 +44,13 @@
     </div>
 
     <div class="d-flex mt-3 justify-content-end">
-        <div class="me-5">
-            <b>Allowed extensions:</b><br />
-            @string.Join(",", AllowedExtensions)
-        </div>
+        @if(AllowedExtensions.Any())
+        {
+            <div class="me-5">
+                <b>Allowed extensions:</b><br />
+                @string.Join(",", AllowedExtensions)
+            </div>
+        }
         <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
     </div>
 </div>

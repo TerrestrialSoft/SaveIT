@@ -84,3 +84,9 @@ h1:focus {
         padding-left: env(safe-area-inset-left);
     }
 }
+
+img {
+    user-drag: none;
+    -webkit-user-drag: none;
+    -moz-user-select: none;
+}

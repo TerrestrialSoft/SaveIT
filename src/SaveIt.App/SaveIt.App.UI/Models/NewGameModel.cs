@@ -1,31 +1,26 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SaveIt.App.UI.Models;
 public class NewGameModel
 {
-    [Required]
+    [Required(ErrorMessage = "Game Name is required.")]
     public string Name { get; set; } = default!;
 
-    [Required]
+    [Required(ErrorMessage = "Username is required.")]
     public string Username { get; set; } = default!;
 
-    [Required]
-    [DisplayName("Game Save Name")]
+    [Required(ErrorMessage = "Game Save Name is required.")]
     public string GameSaveName { get; set; } = default!;
 
-    [Required]
-    [DisplayName("Local Game Save File")]
+    [Required(ErrorMessage = "Local Game Save File is required.")]
     public LocalFileItemModel? LocalGameSaveFile { get; set; } = default!;
 
-    [Required]
-    [DisplayName("Remote Game Save File")]
+    [Required(ErrorMessage = "Remote Game Save File is required.")]
     public RemoteFileItemModel? RemoteGameSaveFile { get; set; } = default!;
 
     public LocalFileItemModel? GameExecutableFile { get; set; }
 
-    [Required]
-    [DisplayName("Storage Account")]
+    [Required(ErrorMessage = "Storage Account is required.")]
     public Guid? StorageAccountId { get; set; }
 
     public ImageModel? Image { get; set; }

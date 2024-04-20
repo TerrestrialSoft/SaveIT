@@ -13,9 +13,9 @@ public class Game : BaseEntity
     [ForeignKey(typeof(ImageEntity))]
     public Guid? ImageId { get; set; }
 
-    [OneToOne]
+    [OneToOne(CascadeOperations = CascadeOperation.CascadeDelete)]
     public ImageEntity? Image { get; set; }
 
-    [OneToMany]
+    [OneToMany(CascadeOperations = CascadeOperation.CascadeDelete)]
     public List<GameSave>? GameSaves { get; set; }
 }

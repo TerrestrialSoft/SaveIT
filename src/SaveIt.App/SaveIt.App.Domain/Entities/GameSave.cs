@@ -16,10 +16,10 @@ public class GameSave : BaseEntity
     [ForeignKey(typeof(Game))]
     public Guid GameId { get; init; }
 
-    [ManyToOne]
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public Game Game { get; set; } = default!;
 
-    [ManyToOne]
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public StorageAccount StorageAccount { get; set; } = default!;
 
 }

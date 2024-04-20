@@ -8,22 +8,22 @@
 </div>
 <div>
     <Grid @ref="grid"
-          TItem="Employee4"
+          TItem="GameSave"
           Class="table table-hover table-bordered table-striped"
           DataProvider="EmployeesDataProvider"
           AllowFiltering="true"
           Responsive="true">
 
-        <GridColumn TItem="Employee4" HeaderText="Game Save Name" PropertyName="Name">
+        <GridColumn TItem="GameSave" HeaderText="Game Save Name" PropertyName="Name">
             @context.Name
         </GridColumn>
-        <GridColumn TItem="Employee4" HeaderText="Game Name" PropertyName="Designation">
+        <GridColumn TItem="GameSave" HeaderText="Game Name" PropertyName="Game Name">
             @context.Game.Name
         </GridColumn>
-        <GridColumn TItem="Employee4" HeaderText="Active" PropertyName="Active">
-            @context.Active
+        <GridColumn TItem="GameSave" HeaderText="Active" PropertyName="Active">
+            @* @context.Active *@
         </GridColumn>
-        <GridColumn TItem="Employee4" HeaderText="Actions">
+        <GridColumn TItem="GameSave" HeaderText="Actions">
             @* TODO ACTIONS *@
         </GridColumn>
 

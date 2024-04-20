@@ -10,14 +10,14 @@ public partial class GameSaves
     [Inject]
     public IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
-    private List<GameSave> _gameSaves = [];
-    private List<GameSave> _filteredGameSaves = [];
     private Modal _createNewGameSaveModal = default!;
+    private Grid<GameSave> grid = default!;
+    private List<GameSave> gameSaves = default!;
 
-    protected override async Task OnInitializedAsync()
+    private async Task<GridDataProviderResult<GameSave>> EmployeesDataProvider(GridDataProviderRequest<GameSave> request)
     {
-        _gameSaves = (await GameSaveRepository.GetAllGameSaveAsync()).ToList();
-        _filteredGameSaves = _gameSaves;
+        gameSaves ??= (await GameSaveRepository.GetAllGameSavesWithChildrenAsync()).ToList();
+        return await Task.FromResult(request.ApplyTo(gameSaves));
     }
 
     private async Task ShowCreateNewGameSaveModal()
@@ -32,7 +32,5 @@ public partial class GameSaves
 
     private void UpdateGameSaves(string filter)
     {
-        _filteredGameSaves = _gameSaves.Where(g => g.Name.Contains(filter, StringComparison.CurrentCultureIgnoreCase))
-            .ToList();
     }
 }

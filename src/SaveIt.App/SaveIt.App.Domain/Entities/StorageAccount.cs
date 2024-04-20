@@ -11,6 +11,6 @@ public class StorageAccount : BaseEntity
     public StorageAccountType Type { get; init; }
     public bool IsActive { get; set; }
 
-    [ManyToOne]
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public List<GameSave>? GameSaves { get; set; }
 }

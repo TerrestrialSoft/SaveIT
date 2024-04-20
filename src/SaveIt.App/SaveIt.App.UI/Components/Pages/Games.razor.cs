@@ -31,7 +31,8 @@ public partial class Games
     }
 
     private void UpdateGames(string searchText)
-        => _filteredGames = _allGames.Where(g => g.Name.Contains(searchText)).ToList();
+        => _filteredGames = _allGames.Where(g => g.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
+            .ToList();
 
     private void GameCardClicked(Game g)
         => _selectedGame = g;

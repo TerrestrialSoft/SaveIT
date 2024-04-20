@@ -1,7 +1,33 @@
 ﻿@page "/game-saves"
 
-<h3>GameSaves</h3>
+<div class="d-flex m-3 justify-content-center">
+    <SearchBar OnSearch="UpdateGameSaves" />
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="ShowCreateNewGameSaveModal">
+        <Icon Name="IconName.PlusLg" /> Create new Game
+    </Button>
+</div>
+<div>
+    <Grid @ref="grid"
+          TItem="Employee4"
+          Class="table table-hover table-bordered table-striped"
+          DataProvider="EmployeesDataProvider"
+          AllowFiltering="true"
+          Responsive="true">
 
-@code {
+        <GridColumn TItem="Employee4" HeaderText="Game Save Name" PropertyName="Name">
+            @context.Name
+        </GridColumn>
+        <GridColumn TItem="Employee4" HeaderText="Game Name" PropertyName="Designation">
+            @context.Game.Name
+        </GridColumn>
+        <GridColumn TItem="Employee4" HeaderText="Active" PropertyName="Active">
+            @context.Active
+        </GridColumn>
+        <GridColumn TItem="Employee4" HeaderText="Actions">
+            @* TODO ACTIONS *@
+        </GridColumn>
 
-}
+    </Grid>
+</div>
+
+<Modal @ref="_createNewGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />

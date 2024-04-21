@@ -8,8 +8,10 @@ public partial class GameSelect
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
 
+    public required EventCallback? OnCreateGameRequested { get; set; }
+
     [Parameter, EditorRequired]
-    public required EventCallback OnCreateGameRequested { get; set; }
+    public Guid? SelectedGameId { get; set; }
 
     [Parameter, EditorRequired]
     public required EventCallback<Guid?> OnSelectedGameChanged { get; set; }
@@ -20,8 +22,16 @@ public partial class GameSelect
     protected override async Task OnInitializedAsync()
     {
         _games = (await GameRepository.GetAllGamesAsync()).ToList();
-        _selectedGameId = _games.FirstOrDefault()?.Id;
-        await OnSelectedGameChanged.InvokeAsync(_selectedGameId);
+
+        if (SelectedGameId is not null)
+        {
+            _selectedGameId = SelectedGameId;
+        }
+        else
+        {
+            _selectedGameId = _games.FirstOrDefault()?.Id;
+            await OnSelectedGameChanged.InvokeAsync(_selectedGameId);
+        }
     }
 
     private Task GameChangedAsync(Guid? id)
@@ -30,5 +40,13 @@ public partial class GameSelect
         return OnSelectedGameChanged.InvokeAsync(_selectedGameId);
     }
 
-    private Task ShowCreateGameSaveModal() => OnCreateGameRequested.InvokeAsync();
+    private async Task ShowCreateGameSaveModal()
+    {
+        if(OnCreateGameRequested is null)
+        {
+            return;
+        }
+
+        await OnCreateGameRequested.Value.InvokeAsync();
+    }
 }

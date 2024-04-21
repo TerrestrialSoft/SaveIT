@@ -71,6 +71,7 @@ public partial class CreateGameModal
             GameId = game.Id,
             StorageAccountId = CreateNewGameModel.GameSave.StorageAccountId!.Value,
             RemoteLocationId = CreateNewGameModel.GameSave.RemoteGameSaveFile!.Id,
+            RemoteLocationName = CreateNewGameModel.GameSave.RemoteGameSaveFile!.Name,
             LocalGameSavePath = CreateNewGameModel.GameSave.LocalGameSaveFile!.FullPath,
         };
         

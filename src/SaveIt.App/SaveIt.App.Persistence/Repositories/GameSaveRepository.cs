@@ -43,7 +43,7 @@ internal class GameSaveRepository(IDatabaseHandler _dbHandler) : IGameSaveReposi
     public async Task<GameSave?> GetGameSaveWithChildrenAsync(Guid gameSaveId)
     {
         var gameSave = await _db.Table<GameSave>()
-                .FirstOrDefaultAsync(x => x.Id == gameSaveId);
+            .FirstOrDefaultAsync(x => x.Id == gameSaveId);
 
         if (gameSave is null)
         {
@@ -52,5 +52,10 @@ internal class GameSaveRepository(IDatabaseHandler _dbHandler) : IGameSaveReposi
 
         await _db.GetChildrenAsync(gameSave);
         return gameSave;
+    }
+
+    public async Task UpdateGameSaveAsync(GameSave gameSave)
+    {
+        await _db.UpdateAsync(gameSave);
     }
 }

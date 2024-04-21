@@ -1,0 +1,35 @@
+﻿<EditForm Model="Model" OnValidSubmit="ValidSubmitAsync" autocomplete="off">
+    <FluentValidationValidator />
+
+    <GameSelect OnSelectedGameChanged="SelectedGameChanged" SelectedGameId="Model.GameId" />
+
+    <div class="p-2">
+
+        <h3 class="p-2 mt-2">Game Save Information</h3>
+
+        <EditGameSave ModalLocalItemPicker="ModalLocalItemPicker"
+                      ModalRemoteItemPicker="ModalRemoteItemPicker"
+                      ModalAuthorizeStorage="ModalAuthorizeStorage"
+                      ModalCurrent="ModalCurrent"
+                      Model="Model.GameSave"
+                      GameSave="GameSave" />
+
+        <div class="d-flex justify-content-end">
+            <Button Color="ButtonColor.Primary"
+                    Size="Size.Large"
+                    Outline="true"
+                    TabIndex="8"
+                    @onclick="CancelUpdateAsync">
+                Cancel
+            </Button>
+
+            <Button Color="ButtonColor.Primary"
+                    Size="Size.Large"
+                    Type="ButtonType.Submit"
+                    Class="ms-3"
+                    TabIndex="8">
+                Update
+            </Button>
+        </div>
+    </div>
+</EditForm>

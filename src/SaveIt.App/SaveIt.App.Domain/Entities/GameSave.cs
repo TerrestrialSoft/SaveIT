@@ -6,15 +6,16 @@ namespace SaveIt.App.Domain.Entities;
 [Table("GameSaves")]
 public class GameSave : BaseEntity
 {
-    public string Name { get; init; } = default!;
-    public string LocalGameSavePath { get; init; } = default!;
-    public string RemoteLocationId { get; init; } = default!;
-    
+    public string Name { get; set; } = default!;
+    public string LocalGameSavePath { get; set; } = default!;
+    public string RemoteLocationId { get; set; } = default!;
+    public string RemoteLocationName { get; set; } = default!;
+
     [ForeignKey(typeof(ImageEntity))]
-    public Guid StorageAccountId { get; init; }
+    public Guid StorageAccountId { get; set; }
 
     [ForeignKey(typeof(Game))]
-    public Guid GameId { get; init; }
+    public Guid GameId { get; set; }
 
     [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public Game Game { get; set; } = default!;

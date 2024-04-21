@@ -13,16 +13,21 @@ public partial class GameSaves
     [Inject]
     public IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
+    [Inject]
+    public ToastService ToastMessageService { get; set; } = default!;
+
     private Grid<GameSaveViewModel> _grid = default!;
     private List<GameSaveViewModel> _gameSaves = default!;
     private NewGameSaveModel _createGameSave = new();
     private NewGameModel _createGame = new();
+    private GameSave _editGameSave = new();
 
     private Modal _createGameModal = default!;
     private Modal _localItemPickerModal = default!;
     private Modal _remoteItemPickerModal = default!;
     private Modal _authorizeStorageModal = default!;
     private Modal _createNewGameSaveModal = default!;
+    private Modal _editGameSaveModal = default!;
     private ConfirmDialog _confirmDialog = default!;
 
     private Modal _currentModal = default!;
@@ -43,6 +48,10 @@ public partial class GameSaves
         else if (_currentModal == _createGameModal)
         {
             await ShowCreateGameModalAsync();
+        }
+        else if (_currentModal == _editGameSaveModal)
+        {
+            await ShowEditGameSaveModalAsync(_editGameSave);
         }
     }
 
@@ -67,6 +76,7 @@ public partial class GameSaves
                     await _createNewGameSaveModal.HideAsync();
                     _gameSaves.Add(gs.ToViewModel()!);
                     await _grid.RefreshDataAsync();
+                    ToastMessageService.Notify(new(ToastType.Success, "Game save created successfully."));
                 })
             }
         };
@@ -90,6 +100,7 @@ public partial class GameSaves
                     await _createGameModal.HideAsync();
                     _gameSaves.Add(game.GameSaves![0].ToViewModel()!);
                     await _grid.RefreshDataAsync();
+                    ToastMessageService.Notify(new(ToastType.Success, "New game created successfully."));
                 })
             },
         };
@@ -99,6 +110,30 @@ public partial class GameSaves
 
     private async Task ShowEditGameSaveModalAsync(GameSave gameSave)
     {
+        _currentModal = _editGameSaveModal;
+        _editGameSave = gameSave;
+        var model = _editGameSave.ToNewGameSaveModel();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(EditGameSaveModal.ModalCurrent), _editGameSaveModal },
+            { nameof(EditGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
+            { nameof(EditGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
+            { nameof(EditGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
+            { nameof(EditGameSaveModal.GameSave), _editGameSave },
+            { nameof(EditGameSaveModal.Model), model },
+            { nameof(EditGameSaveModal.OnGameSaveUpdated),
+                EventCallback.Factory.Create<GameSave>(this, async (gs) =>
+                {
+                    await _editGameSaveModal.HideAsync();
+                    var index = _gameSaves.FindIndex(x => x.GameSave.Id == gs.Id);
+                    _gameSaves[index] = gs.ToViewModel()!;
+                    await _grid.RefreshDataAsync();
+                    ToastMessageService.Notify(new(ToastType.Success, "Game save updated successfully."));
+                })
+            },
+        };
+
+        await _editGameSaveModal.ShowAsync<EditGameSaveModal>(EditGameSaveModal.Title, parameters: parameters);
     }
 
     private async Task DeleteGameSaveAsync(GameSave gameSave)
@@ -113,13 +148,17 @@ public partial class GameSaves
         }
 
         await GameSaveRepository.DeleteGameSaveAsync(gameSave);
+        await _grid.RefreshDataAsync();
+        ToastMessageService.Notify(new(ToastType.Success, "Game save deleted successfully."));
     }
 
-    private async Task ShowShareGameSaveModalAsync(GameSave gameSave)
+    private Task ShowShareGameSaveModalAsync(GameSave gameSave)
     {
+        throw new NotImplementedException();
     }
 
-    private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
+    private Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
     {
+        throw new NotImplementedException();
     }
 }

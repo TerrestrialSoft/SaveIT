@@ -17,11 +17,14 @@
                         <option value="@g.Id" class="p-1">@g.Name</option>
                     }
                 </InputSelect>
-                <div>
-                    or <b @onclick="ShowCreateGameSaveModal" class="btn-create-new">create brand new game</b> along with the game save.
-                </div>
+                @if (OnCreateGameRequested.HasValue)
+                {
+                    <div>
+                        or <b @onclick="ShowCreateGameSaveModal" class="btn-create-new">create brand new game</b> along with the game save.
+                    </div>
+                }
             }
-            else
+            else if (OnCreateGameRequested.HasValue)
             {
                 <Button Color="ButtonColor.Primary"
                         Class="ms-4 mt-1 me-3"

@@ -27,23 +27,35 @@ public static class ModelExtensions
             return null;
         }
 
-        var fileName = Path.GetFileName(game.GameExecutablePath)!;
-        var directory = Path.GetDirectoryName(game.GameExecutablePath)!;
+        LocalFileItemModel? fileModel = null;
 
+        if(game.GameExecutablePath is not null)
+        {
+            var (fileName, directory) = GetNameAndPath(game.GameExecutablePath);
+            fileModel = new LocalFileItemModel()
+            {
+                Name = fileName!,
+                Path = directory!
+            };
+        }
         return new GameModel()
         {
             Id = game.Id,
             Name = game.Name,
             Username = game.Username,
-            GameExecutableFile = new LocalFileItemModel()
-            {
-                Name = fileName,
-                Path = directory
-            },
+            GameExecutableFile = fileModel,
             Image = game.Image is not null
                 ? new ImageModel(game.Image.Name, game.Image.Content)
                 : null
         };
+    }
+
+    private static (string?, string?) GetNameAndPath(string path)
+    {
+        var fileName = Path.GetFileName(path)!;
+        var directory = Path.GetDirectoryName(path)!;
+
+        return (fileName, directory);
     }
 
     public static GameSaveViewModel? ToViewModel(this GameSave? gameSave)
@@ -55,4 +67,33 @@ public static class ModelExtensions
                 GameSave = gameSave
             }
             : null;
+
+    public static NewGameSaveModel ToNewGameSaveModel(this GameSave gameSave)
+        => new()
+        {
+            GameId = gameSave.GameId,
+            GameSave = gameSave.ToGameSaveModel()
+        };
+
+    public static GameSaveModel ToGameSaveModel(this GameSave gameSave)
+    {
+        var (localFileName, localDirectory) = GetNameAndPath(gameSave.LocalGameSavePath);
+
+        return new()
+        {
+            Name = gameSave.Name,
+            LocalGameSaveFile = new LocalFileItemModel()
+            {
+                Name = localFileName!,
+                Path = localDirectory!,
+                IsDirectory = true
+            },
+            RemoteGameSaveFile = new RemoteFileItemModel()
+            {
+                Id = gameSave.RemoteLocationId,
+                Name = gameSave.RemoteLocationName,
+            },
+            StorageAccountId = gameSave.StorageAccountId
+        };
+    }
 }

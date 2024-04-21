@@ -46,7 +46,8 @@ public partial class CreateGameSaveModal
         GameSaveModel.GameId= _games.FirstOrDefault()?.Id;
     }
 
-    private Task ShowCreateGameSaveModalAsync() => OnCreateGameRequested.InvokeAsync();
+    private Task ShowCreateGameSaveModalAsync()
+        => OnCreateGameRequested.InvokeAsync();
 
     private void SelectedGameChanged(Guid? id)
     {
@@ -60,7 +61,8 @@ public partial class CreateGameSaveModal
             Id = Guid.NewGuid(),
             Name = GameSaveModel.GameSave.Name,
             LocalGameSavePath = GameSaveModel.GameSave.LocalGameSaveFile!.FullPath,
-            RemoteLocationId = GameSaveModel.GameSave.RemoteGameSaveFile!.FullPath,
+            RemoteLocationId = GameSaveModel.GameSave.RemoteGameSaveFile!.Id,
+            RemoteLocationName = GameSaveModel.GameSave.RemoteGameSaveFile!.Name,
             GameId = GameSaveModel.GameId!.Value,
             StorageAccountId = GameSaveModel.GameSave.StorageAccountId!.Value
         };

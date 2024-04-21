@@ -27,6 +27,9 @@ public partial class EditGameSave
     [Parameter, EditorRequired]
     public required GameSaveModel Model { get; set; }
 
+    [Parameter, EditorRequired]
+    public required GameSave GameSave { get; set; }
+
     private ConfirmDialog confirmDialog = default!;
     private List<StorageAccount> _storageAccounts = [];
 
@@ -42,6 +45,7 @@ public partial class EditGameSave
                 EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
                 {
                     Model.LocalGameSaveFile = file;
+                    GameSave.LocalGameSavePath = file.Path;
                     await ModalLocalItemPicker.HideAsync();
                     await ModalCurrent.ShowAsync();
                 })
@@ -79,6 +83,8 @@ public partial class EditGameSave
                 EventCallback.Factory.Create<RemoteFileItemModel>(this, async (file) =>
                 {
                     Model.RemoteGameSaveFile = file;
+                    GameSave.RemoteLocationId = file.Id;
+                    GameSave.RemoteLocationName = file.Name;
                     await ModalRemoteItemPicker.HideAsync();
                     await ModalCurrent.ShowAsync();
                 })

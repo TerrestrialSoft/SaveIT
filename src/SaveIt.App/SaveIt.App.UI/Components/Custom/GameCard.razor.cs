@@ -36,7 +36,7 @@ public partial class GameCard
     [Parameter, EditorRequired]
     public required Modal ModalEditGame { get; set; }
 
-    private readonly ConfirmDialog confirmDialog = default!;
+    private ConfirmDialog _confirmDialog = default!;
 
     private Guid? SelectedSaveId { get; set; }
 
@@ -69,7 +69,7 @@ public partial class GameCard
 
     private async Task DeleteGameAsync()
     {
-        var result = await confirmDialog.ShowDeleteDialogAsync($"Delete game {Game.Name}",
+        var result = await _confirmDialog.ShowDeleteDialogAsync($"Delete game {Game.Name}",
                 $"Are you sure you want to delete {Game.Name}?",
                 "This action cannot be undone.");
 

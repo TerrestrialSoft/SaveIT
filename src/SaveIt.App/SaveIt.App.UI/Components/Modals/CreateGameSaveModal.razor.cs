@@ -46,9 +46,14 @@ public partial class CreateGameSaveModal
         GameSaveModel.GameId= _games.FirstOrDefault()?.Id;
     }
 
-    private Task ShowCreateGameSaveModal() => OnCreateGameRequested.InvokeAsync();
+    private Task ShowCreateGameSaveModalAsync() => OnCreateGameRequested.InvokeAsync();
 
-    private async Task ValidSubmit()
+    private void SelectedGameChanged(Guid? id)
+    {
+        GameSaveModel.GameId = id;
+    }
+
+    private async Task ValidSubmitAsync()
     {
         var gameSave = new GameSave()
         {

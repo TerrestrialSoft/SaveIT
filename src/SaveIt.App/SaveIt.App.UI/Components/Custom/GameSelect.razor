@@ -1,0 +1,35 @@
+﻿<div>
+        <div class="m-1 mt-2 p-1">
+            <label class="fs-5">
+                Select Game
+                <RequiredMark />
+                <Help Text="Select the game in which you want to create a new game save." />
+            </label>
+            @if (_games.Any())
+            {
+            <InputSelect ValueChanged="@((Guid? id) => GameChangedAsync(id))"
+                        Value="@_selectedGameId"
+                        ValueExpression="@(() => _selectedGameId)"
+                        class="p-2 w-50 form-control form-select"
+                        tabindex="5">
+                    @foreach (var g in _games)
+                    {
+                        <option value="@g.Id" class="p-1">@g.Name</option>
+                    }
+                </InputSelect>
+                <div>
+                    or <b @onclick="ShowCreateGameSaveModal" class="btn-create-new">create brand new game</b> along with the game save.
+                </div>
+            }
+            else
+            {
+                <Button Color="ButtonColor.Primary"
+                        Class="ms-4 mt-1 me-3"
+                        Outline=true
+                        @onclick="ShowCreateGameSaveModal"
+                        TabIndex="5">
+                    Create Game
+                </Button>
+            }
+        </div>
+</div>

@@ -7,11 +7,12 @@ using SaveIt.App.UI.Models.Game;
 namespace SaveIt.App.UI.Components.Pages;
 public partial class Games
 {
-    private Modal _createNewGameModal = default!;
+    private Modal _createGameModal = default!;
     private Modal _localItemPickerModal = default!;
     private Modal _remoteItemPickerModal = default!;
     private Modal _authorizeStorageModal = default!;
     private Modal _startGameModal = default!;
+    private Modal _editGameModal = default!;
 
     private List<Game> _allGames = [];
     private List<Game> _filteredGames = [];
@@ -47,7 +48,7 @@ public partial class Games
     {
         var parameters = new Dictionary<string, object>
         {
-            { nameof(CreateGameModal.ModalCurrent), _createNewGameModal },
+            { nameof(CreateGameModal.ModalCurrent), _createGameModal },
             { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
@@ -57,7 +58,7 @@ public partial class Games
             },
         };
 
-        await _createNewGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
+        await _createGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
     }
 
     private Task GameCardUpdatedAsync()

@@ -14,9 +14,9 @@ public partial class EditGame
     public required Modal ModalCurrent { get; set; }
 
     [Parameter, EditorRequired]
-    public required CreateGameModel Model { get; set; }
+    public required GameModel Model { get; set; }
 
-    private void ImageUploaded(ImageModel image)
+    private void ImageChanged(ImageModel image)
     {
         Model.Image = image;
     }

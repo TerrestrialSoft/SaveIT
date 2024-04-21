@@ -10,7 +10,7 @@
                         Outline="true" Size="Size.Small"
                         @onclick="DeleteGame"
                         TooltipTitle="Delete">
-                            <Icon Name="IconName.Trash3Fill" />
+                            <Icon CustomIconName="@Icons.TrashSolid" />
                     </Button>
                 </div>
             </div>
@@ -30,14 +30,14 @@
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Outline="true"
-                        @onclick="ShowEditGameModal">
-                    <Icon Name="IconName.Pencil" />
+                        @onclick="ShowEditGameModalAsync">
+                    <Icon CustomIconName="@Icons.PenSolid" Class="me-1"/>
                     Edit
                 </Button>
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
-                        @onclick="StartGame">
-                    <Icon Name="IconName.Play" />
+                        @onclick="StartGameAsync">
+                    <Icon CustomIconName="@Icons.PlaySolid" Class="me-1" />
                     Start
                 </Button>
             </div>

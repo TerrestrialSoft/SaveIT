@@ -12,4 +12,9 @@ internal class ImageRepository(IDatabaseHandler _dbHandler) : IImageRepository
     {
         await _db.InsertAsync(image);
     }
+
+    public async Task DeleteImageAsync(Guid id)
+    {
+        await _db.DeleteAsync<ImageEntity>(id);
+    }
 }

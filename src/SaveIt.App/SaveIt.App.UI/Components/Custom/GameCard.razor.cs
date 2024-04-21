@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Components.Modals;
+using SaveIt.App.UI.Extensions;
+using SaveIt.App.UI.Models.Game;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class GameCard
@@ -28,7 +30,13 @@ public partial class GameCard
     [Parameter, EditorRequired]
     public required Modal ModalStartGame { get; set; }
 
-    private ConfirmDialog confirmDialog = default!;
+    [Parameter, EditorRequired]
+    public required Modal ModalLocalItemPicker { get; set; }
+
+    [Parameter, EditorRequired]
+    public required Modal ModalEditGame { get; set; }
+
+    private readonly ConfirmDialog confirmDialog = default!;
 
     private Guid? SelectedSaveId { get; set; }
 
@@ -47,7 +55,7 @@ public partial class GameCard
         }
     }
 
-    private async Task StartGame()
+    private async Task StartGameAsync()
     {
         var parameters = new Dictionary<string, object>
         {
@@ -88,8 +96,23 @@ public partial class GameCard
         await OnCardUpdated.InvokeAsync(Game);
     }
 
-    private void ShowEditGameModal()
+    private async Task ShowEditGameModalAsync()
     {
+        var gameModel = Game.ToEditGameModel();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(EditGameModal.Model), gameModel!},
+            { nameof(EditGameModal.Game), Game},
+            { nameof(EditGameModal.ModalLocalItemPicker), ModalLocalItemPicker},
+            { nameof(EditGameModal.OnSave), EventCallback.Factory.Create(this, async () =>
+                {
+                    await ModalEditGame.HideAsync();
+                    StateHasChanged();
+                })
+            },
+            { nameof(EditGameModal.OnClose), EventCallback.Factory.Create(this, ModalEditGame.HideAsync) }
+        };
 
+        await ModalEditGame.ShowAsync<EditGameModal>(EditGameModal.Title, parameters: parameters);
     }
 }

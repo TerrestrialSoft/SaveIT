@@ -39,4 +39,23 @@ internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
     {
         await _db.DeleteAsync<Game>(id);
     }
+
+    public async Task<Game?> GetGameWithChildrenAsync(Guid id)
+    {
+        var game = await _db.Table<Game>()
+            .FirstOrDefaultAsync(g => g.Id == id);
+
+        if (game is null)
+        {
+            return null;
+        }
+
+        await _db.GetChildrenAsync(game);
+        return game;
+    }
+
+    public async Task UpdateGameAsync(Game game)
+    {
+        await _db.UpdateAsync(game);
+    }
 }

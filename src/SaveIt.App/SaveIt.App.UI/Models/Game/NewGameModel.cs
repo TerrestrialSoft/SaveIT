@@ -4,7 +4,7 @@ using SaveIt.App.UI.Models.GameSave;
 namespace SaveIt.App.UI.Models.Game;
 public class NewGameModel
 {
-    public CreateGameModel Game { get; set; } = new();
+    public GameModel Game { get; set; } = new();
     public CreateGameSaveModel GameSave { get; set; } = new();
 }
 

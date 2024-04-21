@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
-using System.ComponentModel.DataAnnotations;
 
 namespace SaveIt.App.UI.Models.Game;
-public class CreateGameModel
+public class GameModel
 {
+    public Guid? Id { get; set; }
+
     public string Name { get; set; } = default!;
 
     public string Username { get; set; } = default!;
@@ -13,7 +14,7 @@ public class CreateGameModel
     public ImageModel? Image { get; set; }
 }
 
-public class CreateGameModelValidator : AbstractValidator<CreateGameModel>
+public class CreateGameModelValidator : AbstractValidator<GameModel>
 {
     public CreateGameModelValidator()
     {

@@ -4,4 +4,5 @@ namespace SaveIt.App.Domain.Repositories;
 public interface IImageRepository
 {
     Task CreateImageAsync(ImageEntity image);
+    Task DeleteImageAsync(Guid id);
 }

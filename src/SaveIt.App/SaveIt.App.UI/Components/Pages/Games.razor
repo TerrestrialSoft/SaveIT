@@ -26,14 +26,17 @@
             <GameCard Game="game"
                 ShowDetail="game == _selectedGame"
                 ModalStartGame="_startGameModal"
+                ModalLocalItemPicker="_localItemPickerModal"
+                ModalEditGame="_editGameModal"
                 OnCardClicked="GameCardClicked"
                 OnCardUpdated="GameCardUpdatedAsync" />
         }
     }
 </div>
 
-<Modal @ref="_createNewGameModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
+<Modal @ref="_createGameModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
 <Modal @ref="_localItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_remoteItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" OnHidden="ShowCreateNewGameModal" IsVerticallyCentered="true" />
 <Modal @ref="_startGameModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
+<Modal @ref="_editGameModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />

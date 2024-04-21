@@ -9,7 +9,7 @@ public partial class ImagePicker
     private string? _error = null;
 
     [Parameter, EditorRequired]
-    public required EventCallback<ImageModel> OnImageUploaded { get; set; }
+    public required EventCallback<ImageModel?> OnImageChanged { get; set; }
 
     [Parameter]
     public ImageModel? ImageSrc { get; set; }
@@ -38,11 +38,12 @@ public partial class ImagePicker
         string data = "data:image/png;base64," + Convert.ToBase64String(bytes);
 
         ImageModel imageModel = new(e.File.Name, data);
-        await OnImageUploaded.InvokeAsync(imageModel);
+        await OnImageChanged.InvokeAsync(imageModel);
     }
 
-    private void RemoveImage()
+    private async Task RemoveImage()
     {
         ImageSrc = null;
+        await OnImageChanged.InvokeAsync(null);
     }
 }

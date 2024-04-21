@@ -6,8 +6,8 @@ namespace SaveIt.App.Domain.Entities;
 [Table("Games")]
 public class Game : BaseEntity
 {
-    public string Name { get; init; } = default!;
-    public string Username { get; init; } = default!;
+    public string Name { get; set; } = default!;
+    public string Username { get; set; } = default!;
     public string? GameExecutablePath { get; set; }
 
     [ForeignKey(typeof(ImageEntity))]

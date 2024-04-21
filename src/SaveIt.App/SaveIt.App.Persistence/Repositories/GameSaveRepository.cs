@@ -12,6 +12,11 @@ internal class GameSaveRepository(IDatabaseHandler _dbHandler) : IGameSaveReposi
     public async Task CreateGameSaveAsync(GameSave gameSave)
         => await _db.InsertAsync(gameSave);
 
+    public async Task DeleteGameSaveAsync(GameSave gameSave)
+    {
+        await _db.DeleteAsync(gameSave);
+    }
+
     public async Task<IEnumerable<GameSave>> GetAllGameSaveAsync()
         => await _db.Table<GameSave>()
             .ToListAsync();

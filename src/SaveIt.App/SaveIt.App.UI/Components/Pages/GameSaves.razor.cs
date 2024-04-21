@@ -10,14 +10,16 @@ public partial class GameSaves
     [Inject]
     public IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
+    private Grid<GameSave> _grid = default!;
+    private List<GameSave> _gameSaves = default!;
+
     private Modal _createNewGameSaveModal = default!;
-    private Grid<GameSave> grid = default!;
-    private List<GameSave> gameSaves = default!;
+    private ConfirmDialog _confirmDialog = default!;
 
     private async Task<GridDataProviderResult<GameSave>> EmployeesDataProvider(GridDataProviderRequest<GameSave> request)
     {
-        gameSaves ??= (await GameSaveRepository.GetAllGameSavesWithChildrenAsync()).ToList();
-        return await Task.FromResult(request.ApplyTo(gameSaves));
+        _gameSaves ??= (await GameSaveRepository.GetAllGameSavesWithChildrenAsync()).ToList();
+        return await Task.FromResult(request.ApplyTo(_gameSaves));
     }
 
     private async Task ShowCreateNewGameSaveModal()
@@ -36,6 +38,16 @@ public partial class GameSaves
 
     private async Task DeleteGameSaveAsync(GameSave gameSave)
     {
+        var result = await _confirmDialog.ShowDeleteDialogAsync("Delete Game Save",
+            "Are you sure you want to delete this game save?",
+            "This action cannot be undone.");
+
+        if (!result)
+        {
+            return;
+        }
+
+        await GameSaveRepository.DeleteGameSaveAsync(gameSave);
     }
 
     private async Task ShowShareGameSaveModalAsync(GameSave gameSave)

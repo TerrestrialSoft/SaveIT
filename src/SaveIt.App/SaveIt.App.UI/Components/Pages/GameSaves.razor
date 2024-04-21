@@ -1,7 +1,7 @@
 ﻿@page "/game-saves"
 
 <div class="mt-3">
-    <Grid @ref="grid"
+    <Grid @ref="_grid"
         TItem="GameSave"
         Class="table table-hover table-bordered table-striped"
         DataProvider="EmployeesDataProvider"
@@ -51,3 +51,4 @@
 </div>
 
 <Modal @ref="_createNewGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
+<ConfirmDialog @ref="_confirmDialog" />

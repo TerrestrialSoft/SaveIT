@@ -1,10 +1,4 @@
 ﻿using BlazorBootstrap;
-using SaveIt.App.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SaveIt.App.UI.Components;
 public static class ConfirmDialogExtensions
@@ -15,7 +9,7 @@ public static class ConfirmDialogExtensions
         var options = new ConfirmDialogOptions
         {
             YesButtonText = "Delete",
-            YesButtonColor = ButtonColor.Primary,
+            YesButtonColor = ButtonColor.Danger,
             NoButtonText = "Cancel",
             NoButtonColor = ButtonColor.Light,
             Size = DialogSize.Large,

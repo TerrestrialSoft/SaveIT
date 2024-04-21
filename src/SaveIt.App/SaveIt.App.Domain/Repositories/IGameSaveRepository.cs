@@ -8,4 +8,5 @@ public interface IGameSaveRepository
     Task<IEnumerable<GameSave>> GetAllGameSaveAsync();
     Task<GameSave?> GetGameSaveWithChildrenAsync(Guid gameSaveId);
     Task<IEnumerable<GameSave>> GetAllGameSavesWithChildrenAsync();
+    Task DeleteGameSaveAsync(GameSave gameSave);
 }

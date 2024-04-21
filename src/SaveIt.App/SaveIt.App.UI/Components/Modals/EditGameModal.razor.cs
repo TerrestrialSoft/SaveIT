@@ -63,6 +63,7 @@ public partial class EditGameModal
 
             var image = new ImageEntity
             {
+                Id = Guid.NewGuid(),
                 Name = Model.Image.Name,
                 Content = Model.Image.ImageBase64
             };

@@ -67,26 +67,13 @@ public partial class GameCard
         await ModalStartGame.ShowAsync<StartGameModal>(StartGameModal.Title, parameters: parameters);
     }
 
-    private async Task DeleteGame()
+    private async Task DeleteGameAsync()
     {
-        var options = new ConfirmDialogOptions
-        {
-            YesButtonText = "Delete",
-            YesButtonColor = ButtonColor.Primary,
-            NoButtonText = "Cancel",
-            NoButtonColor = ButtonColor.Light,
-            Size = DialogSize.Large,
-            IsVerticallyCentered = true,
-            DialogCssClass = "fs-5"
-        };
+        var result = await confirmDialog.ShowDeleteDialogAsync($"Delete game {Game.Name}",
+                $"Are you sure you want to delete {Game.Name}?",
+                "This action cannot be undone.");
 
-        var confirmation = await confirmDialog.ShowAsync(
-            title: $"Delete game {Game.Name}",
-            message1: $"Are you sure you want to delete {Game.Name}?",
-            message2: "This action cannot be undone.",
-            options);
-
-        if (!confirmation)
+        if (!result)
         {
             return;
         }

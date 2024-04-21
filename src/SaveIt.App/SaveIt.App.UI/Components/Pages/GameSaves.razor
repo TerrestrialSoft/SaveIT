@@ -18,32 +18,32 @@
         </GridColumn>
         <GridColumn TItem="GameSave" HeaderText="Actions" Filterable="false">
             <Tooltip Title="Edit">
-                <Icon CustomIconName="fa-solid fa-pen"
+                <Icon CustomIconName="@Icons.PenSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Warning"
                     Class="p-1"
                     @onclick="() => ShowEditGameSaveModalAsync(context)" />
             </Tooltip>
             <Tooltip Title="Share">
-                <Icon CustomIconName="fa-solid fa-share"
+                <Icon CustomIconName="@Icons.ShareSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Primary"
                     Class="p-1"
                     @onclick="() => ShowShareGameSaveModalAsync(context)" />
             </Tooltip>
             <Tooltip Title="Advanced Settings">
-                <Icon CustomIconName="fa-solid fa-gear"
+                <Icon CustomIconName="@Icons.SettingsSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Secondary"
                     Class="p-1"
                     @onclick="() => ShowAdvancedGameSaveSettingsModalAsync(context)" />
             </Tooltip>
             <Tooltip Title="Delete">
-                <Icon CustomIconName="fa-solid fa-trash"
-                Size="IconSize.x5"
-                Color="IconColor.Danger"
-                Class="p-1"
-                @onclick="() => DeleteGameSaveAsync(context)" />
+                <Icon CustomIconName="@Icons.TrashSolid"
+                    Size="IconSize.x5"
+                    Color="IconColor.Danger"
+                    Class="p-1"
+                    @onclick="() => DeleteGameSaveAsync(context)" />
             </Tooltip>
         </GridColumn>
 

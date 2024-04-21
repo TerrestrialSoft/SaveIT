@@ -1,18 +1,14 @@
 ﻿@page "/game-saves"
 
-<div class="d-flex m-3 justify-content-center">
-    <SearchBar OnSearch="UpdateGameSaves" />
-    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="ShowCreateNewGameSaveModal">
-        <Icon Name="IconName.PlusLg" /> Create new Game
-    </Button>
-</div>
-<div>
+<div class="mt-3">
     <Grid @ref="grid"
-          TItem="GameSave"
-          Class="table table-hover table-bordered table-striped"
-          DataProvider="EmployeesDataProvider"
-          AllowFiltering="true"
-          Responsive="true">
+        TItem="GameSave"
+        Class="table table-hover table-bordered table-striped"
+        DataProvider="EmployeesDataProvider"
+        AllowFiltering="true"
+        Responsive="true"
+        AllowPaging="true"
+        AllowSorting="true">
 
         <GridColumn TItem="GameSave" HeaderText="Game Save Name" PropertyName="Name">
             @context.Name
@@ -20,11 +16,35 @@
         <GridColumn TItem="GameSave" HeaderText="Game Name" PropertyName="Game Name">
             @context.Game.Name
         </GridColumn>
-        <GridColumn TItem="GameSave" HeaderText="Active" PropertyName="Active">
-            @* @context.Active *@
-        </GridColumn>
-        <GridColumn TItem="GameSave" HeaderText="Actions">
-            @* TODO ACTIONS *@
+        <GridColumn TItem="GameSave" HeaderText="Actions" Filterable="false">
+            <Tooltip Title="Edit">
+                <Icon CustomIconName="fa-solid fa-pen"
+                    Size="IconSize.x5"
+                    Color="IconColor.Warning"
+                    Class="p-1"
+                    @onclick="() => ShowEditGameSaveModalAsync(context)" />
+            </Tooltip>
+            <Tooltip Title="Share">
+                <Icon CustomIconName="fa-solid fa-share"
+                    Size="IconSize.x5"
+                    Color="IconColor.Primary"
+                    Class="p-1"
+                    @onclick="() => ShowShareGameSaveModalAsync(context)" />
+            </Tooltip>
+            <Tooltip Title="Advanced Settings">
+                <Icon CustomIconName="fa-solid fa-gear"
+                    Size="IconSize.x5"
+                    Color="IconColor.Secondary"
+                    Class="p-1"
+                    @onclick="() => ShowAdvancedGameSaveSettingsModalAsync(context)" />
+            </Tooltip>
+            <Tooltip Title="Delete">
+                <Icon CustomIconName="fa-solid fa-trash"
+                Size="IconSize.x5"
+                Color="IconColor.Danger"
+                Class="p-1"
+                @onclick="() => DeleteGameSaveAsync(context)" />
+            </Tooltip>
         </GridColumn>
 
     </Grid>

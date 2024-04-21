@@ -30,7 +30,19 @@ public partial class GameSaves
         await _createNewGameSaveModal.ShowAsync<CreateGameSaveModal>(CreateGameSaveModal.Title, parameters: parameters);
     }
 
-    private void UpdateGameSaves(string filter)
+    private async Task ShowEditGameSaveModalAsync(GameSave gameSave)
+    {
+    }
+
+    private async Task DeleteGameSaveAsync(GameSave gameSave)
+    {
+    }
+
+    private async Task ShowShareGameSaveModalAsync(GameSave gameSave)
+    {
+    }
+
+    private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
     {
     }
 }

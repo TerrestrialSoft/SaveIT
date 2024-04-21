@@ -1,23 +1,18 @@
 ﻿using FluentValidation;
-using System.ComponentModel.DataAnnotations;
 
-namespace SaveIt.App.UI.Models.GameSave;
-public class CreateGameSaveModel
+namespace SaveIt.App.UI.Models.GameSaves;
+public class GameSaveModel
 {
-    [Required(ErrorMessage = "Game Save Name is required.")]
     public string Name { get; set; } = default!;
 
-    [Required(ErrorMessage = "Local Game Save File is required.")]
     public LocalFileItemModel? LocalGameSaveFile { get; set; } = default!;
 
-    [Required(ErrorMessage = "Remote Game Save File is required.")]
     public RemoteFileItemModel? RemoteGameSaveFile { get; set; } = default!;
 
-    [Required(ErrorMessage = "Storage Account is required.")]
     public Guid? StorageAccountId { get; set; }
 }
 
-public class CreateGameSaveModelValidator : AbstractValidator<CreateGameSaveModel>
+public class CreateGameSaveModelValidator : AbstractValidator<GameSaveModel>
 {
     public CreateGameSaveModelValidator()
     {

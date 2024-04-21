@@ -2,6 +2,7 @@
 using SaveIt.App.Domain.Models;
 using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.Game;
+using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Extensions;
 public static class ModelExtensions
@@ -44,4 +45,14 @@ public static class ModelExtensions
                 : null
         };
     }
+
+    public static GameSaveViewModel? ToViewModel(this GameSave? gameSave)
+        => gameSave is not null
+            ? new GameSaveViewModel()
+            {
+                Name = gameSave.Name,
+                GameName = gameSave.Game.Name,
+                GameSave = gameSave
+            }
+            : null;
 }

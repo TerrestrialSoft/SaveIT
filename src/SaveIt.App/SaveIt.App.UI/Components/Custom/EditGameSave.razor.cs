@@ -4,7 +4,7 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Models;
-using SaveIt.App.UI.Models.GameSave;
+using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class EditGameSave
@@ -25,7 +25,7 @@ public partial class EditGameSave
     public required Modal ModalCurrent { get; set; }
 
     [Parameter, EditorRequired]
-    public required CreateGameSaveModel Model { get; set; }
+    public required GameSaveModel Model { get; set; }
 
     private ConfirmDialog confirmDialog = default!;
     private List<StorageAccount> _storageAccounts = [];

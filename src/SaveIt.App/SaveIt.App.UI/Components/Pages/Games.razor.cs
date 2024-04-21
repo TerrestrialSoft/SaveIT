@@ -21,11 +21,9 @@ public partial class Games
     private NewGameModel _createGame = new();
 
     protected override async Task OnInitializedAsync()
-    {
-        await RefreshGames();
-    }
+        => await RefreshGamesAsync();
 
-    private async Task RefreshGames()
+    private async Task RefreshGamesAsync()
     {
         _allGames = (await gameRepository.GetAllGamesWithChildrenAsync()).ToList();
         UpdateGames(_searchText);
@@ -52,9 +50,9 @@ public partial class Games
             { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
-            { nameof(CreateGameModal.CreateNewCompleteGame), _createGame },
+            { nameof(CreateGameModal.CreateNewGameModel), _createGame },
             { nameof(CreateGameModal.OnGameCreated),
-                EventCallback.Factory.Create(this, RefreshGames)
+                EventCallback.Factory.Create<Game>(this, async (game) => await RefreshGamesAsync())
             },
         };
 
@@ -62,7 +60,5 @@ public partial class Games
     }
 
     private Task GameCardUpdatedAsync()
-    {
-        return RefreshGames();
-    }
+        => RefreshGamesAsync();
 }

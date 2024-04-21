@@ -1,11 +1,11 @@
 ﻿using FluentValidation;
-using SaveIt.App.UI.Models.GameSave;
+using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Models.Game;
 public class NewGameModel
 {
     public GameModel Game { get; set; } = new();
-    public CreateGameSaveModel GameSave { get; set; } = new();
+    public GameSaveModel GameSave { get; set; } = new();
 }
 
 public class NewGameModelValidator : AbstractValidator<NewGameModel>

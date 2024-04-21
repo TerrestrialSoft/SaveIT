@@ -35,22 +35,22 @@ public partial class CreateGameModal
     public required Modal ModalCurrent { get; set; }
 
     [Parameter, EditorRequired]
-    public required NewGameModel CreateNewCompleteGame { get; set; }
+    public required NewGameModel CreateNewGameModel { get; set; }
 
     [Parameter, EditorRequired]
-    public EventCallback OnGameCreated { get; set; }
+    public EventCallback<Game> OnGameCreated { get; set; }
 
     private async Task ValidSubmit()
     {
         var game = new Game()
         {
             Id = Guid.NewGuid(),
-            Name = CreateNewCompleteGame.Game.Name,
-            Username = CreateNewCompleteGame.Game.Username,
-            GameExecutablePath = CreateNewCompleteGame.Game.GameExecutableFile?.FullPath,
+            Name = CreateNewGameModel.Game.Name,
+            Username = CreateNewGameModel.Game.Username,
+            GameExecutablePath = CreateNewGameModel.Game.GameExecutableFile?.FullPath,
         };
 
-        if(CreateNewCompleteGame.Game.Image is ImageModel img)
+        if(CreateNewGameModel.Game.Image is ImageModel img)
         {
             var image = new ImageEntity()
             {
@@ -59,27 +59,30 @@ public partial class CreateGameModal
                 Content = img.ImageBase64
             };
 
-            game.ImageId = image.Id;
             await ImageRepository.CreateImageAsync(image);
+            game.ImageId = image.Id;
+            game.Image = image;
         }
 
         var gameSave = new GameSave()
         {
             Id = Guid.NewGuid(),
-            Name = CreateNewCompleteGame.GameSave.Name,
+            Name = CreateNewGameModel.GameSave.Name,
             GameId = game.Id,
-            StorageAccountId = CreateNewCompleteGame.GameSave.StorageAccountId!.Value,
-            RemoteLocationId = CreateNewCompleteGame.GameSave.RemoteGameSaveFile!.Id,
-            LocalGameSavePath = CreateNewCompleteGame.GameSave.LocalGameSaveFile!.FullPath,
+            StorageAccountId = CreateNewGameModel.GameSave.StorageAccountId!.Value,
+            RemoteLocationId = CreateNewGameModel.GameSave.RemoteGameSaveFile!.Id,
+            LocalGameSavePath = CreateNewGameModel.GameSave.LocalGameSaveFile!.FullPath,
         };
         
         await GameRepository.CreateGameAsync(game);
         await GameSaveRepository.CreateGameSaveAsync(gameSave);
-        
+
+        game.GameSaves = [ gameSave ];
+
         ToastService.Notify(new(ToastType.Success, "Game created successfully"));
 
-        CreateNewCompleteGame = new();
+        CreateNewGameModel = new();
         await ModalCurrent.HideAsync();
-        await OnGameCreated.InvokeAsync();
+        await OnGameCreated.InvokeAsync(game);
     }
 }

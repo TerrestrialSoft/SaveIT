@@ -1,7 +1,7 @@
-﻿<EditForm Model="CreateNewCompleteGame" OnValidSubmit=ValidSubmit autocomplete="off">
+﻿<EditForm Model="CreateNewGameModel" OnValidSubmit=ValidSubmit autocomplete="off">
     <FluentValidationValidator />
     <div>
-        <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="CreateNewCompleteGame.Game"/>
+        <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="CreateNewGameModel.Game"/>
 
         <h3 class="p-2">Game Save Information</h3>
 
@@ -10,14 +10,14 @@
             ModalRemoteItemPicker="ModalRemoteItemPicker"
             ModalAuthorizeStorage="ModalAuthorizeStorage"
             ModalCurrent="ModalCurrent"
-            Model="CreateNewCompleteGame.GameSave"/>
+            Model="CreateNewGameModel.GameSave"/>
 
         <div class="d-flex justify-content-end">
             <Button Color="ButtonColor.Primary"
                 Size="Size.Large"
                 Type="ButtonType.Submit"
                 TabIndex="8">
-                Save changes
+                Create Game
             </Button>
         </div>
     </div>

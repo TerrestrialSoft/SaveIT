@@ -79,6 +79,7 @@ public partial class StartGameModal
 
     private async Task PrepareSaveAsync()
     {
+        _errorMessage = null;
         _screenState = StartGameScreenState.DownloadingSave;
         StateHasChanged();
         var result = await GameService.PrepareGameSaveAsync(SaveId);
@@ -96,6 +97,7 @@ public partial class StartGameModal
 
     private async Task StartGameAndContinueWithAsync(StartGameScreenState state)
     {
+        _errorMessage = null;
         var result = await StartGameAsync();
         if (result.IsFailed)
         {

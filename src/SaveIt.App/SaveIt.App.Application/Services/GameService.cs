@@ -101,7 +101,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         if (fileDownloadResult.Value is null)
         {
-            return Result.Fail("No save file found");
+            return Result.Ok();
         }
 
         var downloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId,

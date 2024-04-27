@@ -4,8 +4,8 @@ using SaveIt.App.Domain.Models;
 namespace SaveIt.App.Domain.Auth;
 public interface IExternalStorageService
 {
-    Task<Result<FileItemModel>> GetFolderAsync(Guid storageAccountId, string fileId);
-    Task<Result<IEnumerable<FileItemModel>>> GetFoldersAsync(Guid storageAccountId, string parentId);
+    Task<Result<FileItemModel>> GetFileAsync(Guid storageAccountId, string? fileId = null);
+    Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId);
     Task<Result<string>> GetProfileEmailAsync(string accessToken);
     Task<Result> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null);
     Task<Result> DeleteFileAsync(Guid storageAccountId, string id);

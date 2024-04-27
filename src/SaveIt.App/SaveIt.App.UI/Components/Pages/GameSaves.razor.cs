@@ -163,7 +163,7 @@ public partial class GameSaves
             { nameof(ShareGameSaveModal.RemoteFileId), gameSave.RemoteLocationId },
         };
 
-        await _editGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
+        await _shareGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
     }
 
     private Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)

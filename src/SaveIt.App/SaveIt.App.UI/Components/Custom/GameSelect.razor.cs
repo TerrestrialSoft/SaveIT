@@ -8,9 +8,10 @@ public partial class GameSelect
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
 
-    public required EventCallback? OnCreateGameRequested { get; set; }
+    [Parameter]
+    public EventCallback OnCreateGameRequested { get; set; }
 
-    [Parameter, EditorRequired]
+    [Parameter]
     public Guid? SelectedGameId { get; set; }
 
     [Parameter, EditorRequired]
@@ -18,6 +19,7 @@ public partial class GameSelect
 
     private List<Game> _games = [];
     private Guid? _selectedGameId;
+    private bool IsOnCreateGameRequestSet => OnCreateGameRequested.HasDelegate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -42,11 +44,11 @@ public partial class GameSelect
 
     private async Task ShowCreateGameSaveModal()
     {
-        if(OnCreateGameRequested is null)
+        if(IsOnCreateGameRequestSet)
         {
             return;
         }
 
-        await OnCreateGameRequested.Value.InvokeAsync();
+        await OnCreateGameRequested.InvokeAsync();
     }
 }

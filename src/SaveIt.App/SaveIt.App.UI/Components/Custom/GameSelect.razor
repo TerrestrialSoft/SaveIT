@@ -7,7 +7,7 @@
             </label>
             @if (_games.Any())
             {
-            <InputSelect ValueChanged="@((Guid? id) => GameChangedAsync(id))"
+                <InputSelect ValueChanged="@((Guid? id) => GameChangedAsync(id))"
                         Value="@_selectedGameId"
                         ValueExpression="@(() => _selectedGameId)"
                         class="p-2 w-50 form-control form-select"
@@ -17,22 +17,22 @@
                         <option value="@g.Id" class="p-1">@g.Name</option>
                     }
                 </InputSelect>
-                @if (OnCreateGameRequested.HasValue)
+                @if (IsOnCreateGameRequestSet)
                 {
                     <div>
                         or <b @onclick="ShowCreateGameSaveModal" class="btn-create-new">create brand new game</b> along with the game save.
                     </div>
                 }
             }
-            else if (OnCreateGameRequested.HasValue)
-            {
-                <Button Color="ButtonColor.Primary"
-                        Class="ms-4 mt-1 me-3"
-                        Outline=true
-                        @onclick="ShowCreateGameSaveModal"
-                        TabIndex="5">
-                    Create Game
-                </Button>
-            }
+        else if (IsOnCreateGameRequestSet)
+        {
+            <Button Color="ButtonColor.Primary"
+                    Class="ms-4 mt-1 me-3"
+                    Outline=true
+                    @onclick="ShowCreateGameSaveModal"
+                    TabIndex="5">
+                Create Game
+            </Button>
+        }
         </div>
 </div>

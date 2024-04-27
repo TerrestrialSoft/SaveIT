@@ -50,7 +50,7 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
             : Result.Fail("Error ocurred during communication with external server");
     }
 
-    public Task<Result<IEnumerable<FileItemModel>>> GetFoldersAsync(Guid storageAccountId, string parentId)
+    public Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId)
     {
         var filter = string.Format(_filesFolderWithSpecificParentUrl, parentId);
 
@@ -71,8 +71,10 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         return Result.Ok(files);
     }
 
-    public async Task<Result<FileItemModel>> GetFolderAsync(Guid storageAccountId, string fileId)
+    public async Task<Result<FileItemModel>> GetFileAsync(Guid storageAccountId, string? fileId = null)
     {
+        fileId ??= GoogleFileModel.RootParentId;
+
         var filter = string.Format(_fileDetailUrl, fileId);
         var contentResult = await GetAsync<GoogleFileModel>(storageAccountId, filter);
 

@@ -15,10 +15,12 @@ public record GoogleFileModel(string Id, string Kind, string Name, string MimeTy
             }
 
             _parent = Parents is null || !Parents.Any()
-                ? "root"
+                ? RootParentId
                 : Parents.First();
 
             return _parent;
         }
     }
+
+    public const string RootParentId = "root";
 }

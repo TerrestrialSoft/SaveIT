@@ -46,7 +46,7 @@ public partial class RemoteRepositoryPickerModal
         try
         {
             var fileId = InitialSelectedItem?.Id ?? RemoteFileItemModel.DefaultId;
-            var folderResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, fileId);
+            var folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId);
 
             if (folderResult.IsFailed)
             {
@@ -84,7 +84,7 @@ public partial class RemoteRepositoryPickerModal
         string? error = null;
         try
         {
-            var itemsResult = await StorageService.GetFoldersAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+            var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
 
             if (itemsResult.IsFailed)
             {
@@ -161,7 +161,7 @@ public partial class RemoteRepositoryPickerModal
     private async Task ChangeToParentDirectory()
     {
         StartLoading();
-        var fileResult = await StorageService.GetFolderAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId);
+        var fileResult = await StorageService.GetFileAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId);
 
         if (fileResult.IsFailed)
         {

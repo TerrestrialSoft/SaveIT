@@ -28,6 +28,10 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         = _baseFileQueryUrl + "&orderBy=modifiedTime desc&q=trashed=false and name contains '{1}' and '{0}' in parents";
     private const string _mimeTypeFolder = "application/vnd.google-apps.folder";
     private const string _fileDownloadUrl = $"{_baseFileDetailUrl}?alt=media";
+    private const string _filePermissionsUrlList = $"{_baseFileDetailUrl}/permissions?fields=permissions" +
+        $"(id, displayName, type, kind, emailAddress, role)";
+    private const string _filePermissionsUrl = $"{_baseFileDetailUrl}/permissions";
+    private const string _fileDeletePermissionsUrl = _baseFileDetailUrl + "/permissions/{1}";
 
     public async Task<Result<string>> GetProfileEmailAsync(string accessToken)
     {
@@ -143,8 +147,8 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
     public Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value)
         => _googleApiUploadService.UploadFileAsync(storageAccountId, parentId, fileName, value);
 
-    public async Task<Result<FileItemModel?>> GetNewestFileWithSubstringInNameAsync(Guid storageAccountId, string remoteLocationId,
-        string substring)
+    public async Task<Result<FileItemModel?>> GetNewestFileWithSubstringInNameAsync(Guid storageAccountId,
+        string remoteLocationId, string substring)
     {
         var filter = string.Format(_findLastModifiedFileWithNameAndParentUrl, remoteLocationId, substring);
         var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
@@ -167,5 +171,57 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
 
         return await DownloadContentAsStreamAsync(storageAccountId, messageFactory);
+    }
+
+    public async Task<Result> ShareFileWithUserAsync(Guid storageAccountId, string fileId, string email)
+    {
+        var url = string.Format(_filePermissionsUrl, fileId);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Post, url)
+        {
+            Content = new StringContent(JsonSerializer.Serialize(new GooglePermissionCreateModel
+            {
+                Role = "writer",
+                Type = "user",
+                EmailAddress = email
+            }))
+        });
+
+        var result = await ExecuteRequestAsync(storageAccountId, messageFactory);
+
+        return result;
+    }
+
+    public async Task<Result<IEnumerable<ShareWithModel>>> GetSharedWithUsersForFile(Guid storageAccountId, string fileId)
+    {
+        var url = string.Format(_filePermissionsUrlList, fileId);
+        var contentResult = await GetAsync<GooglePermissionListModel>(storageAccountId, url);
+
+        if (contentResult.IsFailed)
+        {
+            return contentResult.ToResult();
+        }
+
+        if(contentResult.Value.Permissions is null)
+        {
+            return Result.Ok(Enumerable.Empty<ShareWithModel>());
+        }
+
+        var result = contentResult.Value.Permissions.Select(x => new ShareWithModel
+        {
+            PermissionId = x.Id,
+            Email = x.EmailAddress,
+            Username = x.DisplayName,
+            IsOwner = x.Role == GooglePermissionModel.OwnerRole
+        });
+
+        return Result.Ok(result);
+    }
+
+    public Task<Result> StopSharingFileWithUserAsync(Guid storageAccountId, string remoteFileId, string permissionId)
+    {
+        var url = string.Format(_fileDeletePermissionsUrl, remoteFileId, permissionId);
+        var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Delete, url));
+
+        return ExecuteRequestAsync(storageAccountId, messageFactory);
     }
 }

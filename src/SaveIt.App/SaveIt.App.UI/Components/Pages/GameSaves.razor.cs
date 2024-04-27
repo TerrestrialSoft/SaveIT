@@ -6,6 +6,7 @@ using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Extensions;
 using SaveIt.App.UI.Models.Game;
 using SaveIt.App.UI.Models.GameSaves;
+using System.Reflection;
 
 namespace SaveIt.App.UI.Components.Pages;
 public partial class GameSaves
@@ -28,9 +29,10 @@ public partial class GameSaves
     private Modal _authorizeStorageModal = default!;
     private Modal _createNewGameSaveModal = default!;
     private Modal _editGameSaveModal = default!;
-    private ConfirmDialog _confirmDialog = default!;
-
     private Modal _currentModal = default!;
+    private Modal _shareGameSaveModal = default!;
+
+    private ConfirmDialog _confirmDialog = default!;
 
     private async Task<GridDataProviderResult<GameSaveViewModel>> EmployeesDataProvider(
         GridDataProviderRequest<GameSaveViewModel> request)
@@ -152,9 +154,16 @@ public partial class GameSaves
         ToastMessageService.Notify(new(ToastType.Success, "Game save deleted successfully."));
     }
 
-    private Task ShowShareGameSaveModalAsync(GameSave gameSave)
+    private async Task ShowShareGameSaveModalAsync(GameSave gameSave)
     {
-        throw new NotImplementedException();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(ShareGameSaveModal.GameSave), gameSave },
+            { nameof(ShareGameSaveModal.StorageAccountId), gameSave.StorageAccountId },
+            { nameof(ShareGameSaveModal.RemoteFileId), gameSave.RemoteLocationId },
+        };
+
+        await _editGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
     }
 
     private Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)

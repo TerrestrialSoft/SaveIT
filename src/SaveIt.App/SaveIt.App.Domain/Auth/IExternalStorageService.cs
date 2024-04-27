@@ -17,4 +17,7 @@ public interface IExternalStorageService
     Task<Result<FileItemModel?>> GetNewestFileWithSubstringInNameAsync(Guid storageAccountId, string remoteLocationId,
         string substring);
     Task<Result<Stream>> DownloadFileAsync(Guid storageAccountId, string fileId);
+    Task<Result> ShareFileWithUserAsync(Guid storageAccountId, string fileId, string email);
+    Task<Result<IEnumerable<ShareWithModel>>> GetSharedWithUsersForFile(Guid storageAccountId, string fileId);
+    Task<Result> StopSharingFileWithUserAsync(Guid storageAccountId, string remoteFileId, string permissionId);
 }

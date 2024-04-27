@@ -129,7 +129,7 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsService accoun
         return Result.Ok();
 
         Func<HttpRequestMessage> GetStreamMessage(Stream stream)
-            => new(() => new HttpRequestMessage(HttpMethod.Put, url)
+            => new(() => new HttpRequestMessage(method, url)
             {
                 Content = new StreamContent(stream),
             });

@@ -1,0 +1,80 @@
+﻿<div class="min-size-modal">
+    <EditForm Model="@_model" OnValidSubmit="@OnValidSubmitAsync">
+        <FluentValidationValidator />
+
+        <div class="d-flex m-2 align-items-center justify-content-center">
+            <div class="me-3 fs-5 fw-bold">
+                Share with:
+            </div>
+            <div class="me-3 w-50">
+                <InputText @bind-Value="_model.Email" placeholder="email@example.com" class="form-control fs-5"/>
+            </div>
+            <div class="me-3">
+                <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Type="ButtonType.Submit"
+                        Disabled="_shareInProgress">
+                    Share
+                </Button>
+            </div>
+            <div class="content-placeholder">
+                &nbsp;
+                <Spinner Size="SpinnerSize.Small" Color="SpinnerColor.Primary" Visible="@_shareInProgress" />
+            </div>
+        </div>
+        <div class="text-center">
+            <ValidationMessage For="@(() => _model.Email)"/>
+        </div>
+
+               
+    </EditForm>
+
+    @if (_error is not null)
+    {
+        <Alert Color="AlertColor.Danger"> @_error </Alert>
+    }
+
+    <div class="m-3 mt-4">
+
+        @if (_unshareInProgress)
+        {
+            <div class="d-flex align-items-center">
+                <div class="fs-5">Removing user... Please wait.</div>
+                <Spinner Size="SpinnerSize.Small" Class="ms-2"/>
+            </div>
+        }
+
+        <Grid @ref="grid"
+                TItem="ShareWithModel"
+                Class="table table-hover table-bordered table-striped"
+                DataProvider="ShareWithUsersDataProvider"
+                Responsive="true"
+                AllowPaging="true"
+                AllowSorting="true">
+
+            <GridColumn TItem="ShareWithModel" HeaderText="Email" PropertyName="Email" SortKeySelector="x => x.Email">
+                @context.Username <span class="text-muted">(@context.Email) 
+                @if(context.IsOwner)
+                {
+                    <Badge Color="BadgeColor.Primary">Owner</Badge>
+                }
+                </span>
+            </GridColumn>
+            <GridColumn TItem="ShareWithModel" HeaderText="Actions" Filterable="false">
+                @if(!context.IsOwner)
+                {
+                    <Tooltip Title="Remove">
+                        <Icon CustomIconName="@Icons.TrashSolid"
+                              Size="IconSize.x5"
+                              Color="IconColor.Danger"
+                              Class="p-1"
+                              @onclick="() => StopSharingAsync(context)" />
+                    </Tooltip>
+                }
+            </GridColumn>
+
+        </Grid>
+    </div>
+    <ConfirmDialog @ref="confirmDialog" />
+</div>
+

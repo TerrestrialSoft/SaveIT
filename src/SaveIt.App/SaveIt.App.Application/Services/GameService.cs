@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
+using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -215,7 +216,9 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         var unlockResult = await UnlockRepositoryAsync(gameSaveId);
-
         return unlockResult;
     }
+
+    public Task<Result<IEnumerable<FileItemModel>>> GetGameSaveVersionsAsync(Guid storageAccountId, string remoteLocationId)
+        => _externalStorageService.GetFilesWithSubstringInNameAsync(storageAccountId, remoteLocationId, _savePrefix);
 }

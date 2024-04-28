@@ -24,6 +24,8 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         "and '{0}' in parents";
     private const string _fileDetailUrl = $"{_baseFileDetailUrl}?fields=" + _fileQueryfields;
     private const string _findFileWithNameAndParentUrl = _baseFileQueryUntrashedUrl + " and name='{1}' and '{0}' in parents";
+    private const string _findFileWithSubstringInNameAndParentUrl
+        = _baseFileQueryUntrashedUrl + " and name contains '{1}' and '{0}' in parents";
     private const string _findLastModifiedFileWithNameAndParentUrl
         = _baseFileQueryUrl + "&orderBy=modifiedTime desc&q=trashed=false and name contains '{1}' and '{0}' in parents";
     private const string _mimeTypeFolder = "application/vnd.google-apps.folder";
@@ -116,6 +118,17 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsService acco
         string name)
     {
         var filter = string.Format(_findFileWithNameAndParentUrl, remoteLocationId, name);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+
+        return contentResult.IsSuccess
+            ? Result.Ok(contentResult.Value.Files.Select(x => x.ToFileItem()))
+            : contentResult.ToResult();
+    }
+
+    public async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameAsync(Guid storageAccountId,
+        string remoteLocationId, string name)
+    {
+        var filter = string.Format(_findFileWithSubstringInNameAndParentUrl, remoteLocationId, name);
         var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
 
         return contentResult.IsSuccess

@@ -24,28 +24,28 @@
         </GridColumn>
         <GridColumn TItem="GameSaveViewModel" HeaderText="Actions" Filterable="false" FilterTextboxWidth="40">
             <Tooltip Title="Edit">
-                <Icon CustomIconName="@Icons.PenSolid"
+                <Icon CustomIconName="@CustomIcons.PenSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Warning"
                     Class="p-1"
                     @onclick="() => ShowEditGameSaveModalAsync(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Share">
-                <Icon CustomIconName="@Icons.ShareSolid"
+                <Icon CustomIconName="@CustomIcons.ShareSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Primary"
                     Class="p-1"
                     @onclick="() => ShowShareGameSaveModalAsync(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Advanced Settings">
-                <Icon CustomIconName="@Icons.SettingsSolid"
+                <Icon CustomIconName="@CustomIcons.SettingsSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Secondary"
                     Class="p-1"
                     @onclick="() => ShowAdvancedGameSaveSettingsModalAsync(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Delete">
-                <Icon CustomIconName="@Icons.TrashSolid"
+                <Icon CustomIconName="@CustomIcons.TrashSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Danger"
                     Class="p-1"
@@ -63,4 +63,7 @@
 <Modal @ref="_createNewGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
 <Modal @ref="_editGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
 <Modal @ref="_shareGameSaveModal" Size="ModalSize.Large" IsVerticallyCentered="true" />
+<Modal @ref="_advancedGameSaveSettingsModal" Size="ModalSize.Large" IsVerticallyCentered="true" />
+<Modal @ref="_uploadGameSaveModal" Size="ModalSize.ExtraLarge" OnHidden="ShowModalAsync" IsVerticallyCentered="true" />
+<Modal @ref="_gameSaveVersionsModal" Size="ModalSize.Large" OnHidden="ShowModalAsync" IsVerticallyCentered="true" />
 <ConfirmDialog @ref="_confirmDialog" />

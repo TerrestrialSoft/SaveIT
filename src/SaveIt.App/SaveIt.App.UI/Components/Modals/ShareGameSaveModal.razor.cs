@@ -27,11 +27,10 @@ public partial class ShareGameSaveModal
 
     private ShareWithCreateModel _model = new();
     private string? _error = null;
-    Grid<ShareWithModel> grid = default!;
+    private Grid<ShareWithModel> _grid = default!;
     private List<ShareWithModel> users = default!;
     private bool _shareInProgress = false;
     private bool _unshareInProgress = false;
-    private bool _loadingData = true;
 
     private ConfirmDialog confirmDialog = default!;
 
@@ -43,20 +42,19 @@ public partial class ShareGameSaveModal
             return await Task.FromResult(request.ApplyTo(users));
         }
 
-        _loadingData = true;
+        StateHasChanged();
+
         var result = await ExternalStorageService.GetSharedWithUsersForFile(StorageAccountId, RemoteFileId);
 
         if (result.IsFailed)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
-            _loadingData = false;
             StateHasChanged();
             users = [];
             return await Task.FromResult(request.ApplyTo(users));
         }
 
         users = result.Value.ToList();
-        _loadingData = false;
         StateHasChanged();
 
         return await Task.FromResult(request.ApplyTo(users));
@@ -82,7 +80,7 @@ public partial class ShareGameSaveModal
         _model = new ShareWithCreateModel();
 
         users = [];
-        await grid.RefreshDataAsync();
+        await _grid.RefreshDataAsync();
         _shareInProgress = false;
     }
 
@@ -123,6 +121,6 @@ public partial class ShareGameSaveModal
         ToastService.Notify(new ToastMessage(ToastType.Success, "User removed from sharing list."));
         _unshareInProgress = false;
         users = [];
-        await grid.RefreshDataAsync();
+        await _grid.RefreshDataAsync();
     }
 }

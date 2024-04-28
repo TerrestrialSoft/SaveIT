@@ -6,7 +6,6 @@ using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Extensions;
 using SaveIt.App.UI.Models.Game;
 using SaveIt.App.UI.Models.GameSaves;
-using System.Reflection;
 
 namespace SaveIt.App.UI.Components.Pages;
 public partial class GameSaves
@@ -21,7 +20,7 @@ public partial class GameSaves
     private List<GameSaveViewModel> _gameSaves = default!;
     private NewGameSaveModel _createGameSave = new();
     private NewGameModel _createGame = new();
-    private GameSave _editGameSave = new();
+    private GameSave _currentGameSave = new();
 
     private Modal _createGameModal = default!;
     private Modal _localItemPickerModal = default!;
@@ -31,6 +30,9 @@ public partial class GameSaves
     private Modal _editGameSaveModal = default!;
     private Modal _currentModal = default!;
     private Modal _shareGameSaveModal = default!;
+    private Modal _advancedGameSaveSettingsModal = default!;
+    private Modal _uploadGameSaveModal = default!;
+    private Modal _gameSaveVersionsModal = default!;
 
     private ConfirmDialog _confirmDialog = default!;
 
@@ -53,7 +55,11 @@ public partial class GameSaves
         }
         else if (_currentModal == _editGameSaveModal)
         {
-            await ShowEditGameSaveModalAsync(_editGameSave);
+            await ShowEditGameSaveModalAsync(_currentGameSave);
+        } 
+        else if (_currentModal == _advancedGameSaveSettingsModal)
+        {
+            await ShowAdvancedGameSaveSettingsModalAsync(_currentGameSave);
         }
     }
 
@@ -83,7 +89,7 @@ public partial class GameSaves
             }
         };
 
-        await _createNewGameSaveModal.ShowAsync<CreateGameSaveModal>(CreateGameSaveModal.Title, parameters: parameters);
+        await _currentModal.ShowAsync<CreateGameSaveModal>(CreateGameSaveModal.Title, parameters: parameters);
     }
 
     private async Task ShowCreateGameModalAsync()
@@ -107,21 +113,21 @@ public partial class GameSaves
             },
         };
 
-        await _createGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
+        await _currentModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
     }
 
     private async Task ShowEditGameSaveModalAsync(GameSave gameSave)
     {
         _currentModal = _editGameSaveModal;
-        _editGameSave = gameSave;
-        var model = _editGameSave.ToNewGameSaveModel();
+        _currentGameSave = gameSave;
+        var model = _currentGameSave.ToNewGameSaveModel();
         var parameters = new Dictionary<string, object>
         {
             { nameof(EditGameSaveModal.ModalCurrent), _editGameSaveModal },
             { nameof(EditGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(EditGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(EditGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
-            { nameof(EditGameSaveModal.GameSave), _editGameSave },
+            { nameof(EditGameSaveModal.GameSave), _currentGameSave },
             { nameof(EditGameSaveModal.Model), model },
             { nameof(EditGameSaveModal.OnGameSaveUpdated),
                 EventCallback.Factory.Create<GameSave>(this, async (gs) =>
@@ -135,7 +141,7 @@ public partial class GameSaves
             },
         };
 
-        await _editGameSaveModal.ShowAsync<EditGameSaveModal>(EditGameSaveModal.Title, parameters: parameters);
+        await _currentModal.ShowAsync<EditGameSaveModal>(EditGameSaveModal.Title, parameters: parameters);
     }
 
     private async Task DeleteGameSaveAsync(GameSave gameSave)
@@ -166,8 +172,19 @@ public partial class GameSaves
         await _shareGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
     }
 
-    private Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
+    private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
     {
-        throw new NotImplementedException();
+        _currentModal = _advancedGameSaveSettingsModal;
+        _currentGameSave = gameSave;
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(AdvancedGameSaveSettingsModal.ModalCurrent), _advancedGameSaveSettingsModal },
+            { nameof(AdvancedGameSaveSettingsModal.ModalUploadGameSave), _uploadGameSaveModal },
+            { nameof(AdvancedGameSaveSettingsModal.ModalGameSaveVersions), _gameSaveVersionsModal },
+            { nameof(AdvancedGameSaveSettingsModal.GameSave), gameSave },
+        };
+
+        await _currentModal.ShowAsync<AdvancedGameSaveSettingsModal>(AdvancedGameSaveSettingsModal.Title,
+            parameters: parameters);
     }
 }

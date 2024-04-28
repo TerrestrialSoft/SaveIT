@@ -44,6 +44,13 @@
             </div>
         }
 
+        @if (_loadingData is true)
+        {
+            <div class="text-center">
+                <Spinner Type="SpinnerType.Border" Size="SpinnerSize.ExtraLarge" />
+            </div>
+        }
+
         <Grid @ref="grid"
                 TItem="ShareWithModel"
                 Class="table table-hover table-bordered table-striped"
@@ -53,28 +60,29 @@
                 AllowSorting="true">
 
             <GridColumn TItem="ShareWithModel" HeaderText="Email" PropertyName="Email" SortKeySelector="x => x.Email">
-                @context.Username <span class="text-muted">(@context.Email) 
-                @if(context.IsOwner)
-                {
-                    <Badge Color="BadgeColor.Primary">Owner</Badge>
-                }
+                @context.Username <span class="text-muted">
+                    (@context.Email)
+                    @if (context.IsOwner)
+                    {
+                        <Badge Color="BadgeColor.Primary">Owner</Badge>
+                    }
                 </span>
             </GridColumn>
             <GridColumn TItem="ShareWithModel" HeaderText="Actions" Filterable="false">
-                @if(!context.IsOwner)
+                @if (!context.IsOwner)
                 {
                     <Tooltip Title="Remove">
                         <Icon CustomIconName="@Icons.TrashSolid"
-                              Size="IconSize.x5"
-                              Color="IconColor.Danger"
-                              Class="p-1"
-                              @onclick="() => StopSharingAsync(context)" />
+                                Size="IconSize.x5"
+                                Color="IconColor.Danger"
+                                Class="p-1"
+                                @onclick="() => StopSharingAsync(context)" />
                     </Tooltip>
                 }
             </GridColumn>
-
         </Grid>
     </div>
+
     <ConfirmDialog @ref="confirmDialog" />
 </div>
 

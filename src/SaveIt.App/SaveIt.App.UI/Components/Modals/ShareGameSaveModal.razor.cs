@@ -31,25 +31,33 @@ public partial class ShareGameSaveModal
     private List<ShareWithModel> users = default!;
     private bool _shareInProgress = false;
     private bool _unshareInProgress = false;
+    private bool _loadingData = true;
 
     private ConfirmDialog confirmDialog = default!;
 
     private async Task<GridDataProviderResult<ShareWithModel>> ShareWithUsersDataProvider(
         GridDataProviderRequest<ShareWithModel> request)
     {
-        if (users is null || users.Count == 0)
+        if (users is not null && users.Count != 0)
         {
-            var result = await ExternalStorageService.GetSharedWithUsersForFile(StorageAccountId, RemoteFileId);
-
-            if (result.IsFailed)
-            {
-                ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
-                users = [];
-                return await Task.FromResult(request.ApplyTo(users));
-            }
-
-            users = result.Value.ToList();
+            return await Task.FromResult(request.ApplyTo(users));
         }
+
+        _loadingData = true;
+        var result = await ExternalStorageService.GetSharedWithUsersForFile(StorageAccountId, RemoteFileId);
+
+        if (result.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
+            _loadingData = false;
+            StateHasChanged();
+            users = [];
+            return await Task.FromResult(request.ApplyTo(users));
+        }
+
+        users = result.Value.ToList();
+        _loadingData = false;
+        StateHasChanged();
 
         return await Task.FromResult(request.ApplyTo(users));
     }

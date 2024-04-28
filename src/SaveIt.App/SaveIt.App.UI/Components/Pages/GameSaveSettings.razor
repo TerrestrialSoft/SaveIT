@@ -1,0 +1,109 @@
+﻿@page "/gamesaves/{GameSaveIdString}"
+
+@if (_gameSaveExists)
+{
+    <h3>@_gameSave.Name Settings</h3>
+
+    <div class="d-flex justify-content-around m-2 mt-4">
+        <div class="custom-column">
+            <h4>Versions</h4>
+            <div class="ms-2">
+                <EditForm Model="_model" OnValidSubmit="ChangeVersionsCount">
+                    <FluentValidationValidator />
+
+                    <div class="d-flex m-2 align-items-center">
+                        <div class="fs-5">Keep</div>
+                        <div class="ms-2">
+                            <NumberInput TValue="int"
+                                @bind-Value="_model.Count"
+                                Placeholder="Enter amount"
+                                EnableMinMax="true"
+                                Min="1"
+                                Max="100"
+                                class="form-control fs-5"
+                                Style="width: 5rem;"/>
+                        </div>
+                        <div class="fs-5 ms-2">latest versions.</div>
+                        <div class="ms-3">
+                            <Button Color="ButtonColor.Primary"
+                                    Size="Size.Medium"
+                                    Type="ButtonType.Submit"
+                                    Disabled="_updateInProgress">
+                                Update
+                            </Button>
+                        </div>
+                        <div class="content-placeholder">
+                            &nbsp;
+                            <Spinner Size="SpinnerSize.Small" Color="SpinnerColor.Primary" Visible="@_updateInProgress" />
+                        </div>
+                    
+                    </div>
+                    <div class="text-center">
+                        <ValidationMessage For="@(() => _model.Count)" />
+                    </div>
+                </EditForm>
+            </div>
+            <div class="ms-2 mt-5">
+                <h5 class="mb-1">List of Game Saves:</h5>
+                <Grid @ref="_grid"
+                      TItem="FileItemModel"
+                      Class="table table-hover table-bordered table-striped"
+                      DataProvider="GameSaveVersionsProvider"
+                      Responsive="true"
+                      AllowPaging="true"
+                      AllowSorting="true">
+
+                    <GridColumn TItem="FileItemModel" HeaderText="Name" PropertyName="Name" SortKeySelector="x => x.Name">
+                        @context.Name
+                    </GridColumn>
+                    <GridColumn TItem="FileItemModel" HeaderText="Actions">
+                        <Tooltip Title="Download save">
+                            <Icon CustomIconName="@CustomIcons.DownloadSolid"
+                                  Size="IconSize.x5"
+                                  Color="IconColor.Primary"
+                                  Class="p-1"
+                                  @onclick="() => ShowDownloadSaveModalAsync(context)" />
+                        </Tooltip>
+                    </GridColumn>
+                </Grid>
+            </div>
+        </div>
+
+        <div class="custom-column">
+            <h4>Additional options</h4>
+
+            <h5 class="mt-3">Unlock Repository</h5>
+            <div class="d-flex justify-content-around" mt-1>
+                <div class="w-75">
+                    This feature provides users with the capability to manually unlock the cloud storage lock if they have encountered difficulty reopening it, regardless of who initiated the lock initially.
+                </div>
+                <div>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="UnlockRepositoryAsync">
+                        <Icon CustomIconName="@CustomIcons.UnlockSolid" /> Unlock
+                    </Button>
+                </div>
+            </div>
+
+            <h5 class="mt-3">Manual Upload</h5>
+            <div class="d-flex justify-content-around mt-1">
+                <div class="w-75">
+                    This feature allows usert to manually upload a local game save, defined by a path on the profile, to cloud storage. This save will then be automatically set as the newest save.
+                </div>
+                <div>
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="ShowManualUploadModalAsync">
+                        <Icon CustomIconName="@CustomIcons.UploadSolid" /> Upload
+                    </Button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div>
+        Not found.
+    </div>
+}
+
+<Modal @ref="_downloadGameSaveModal" Size="ModalSize.Large" IsVerticallyCentered="true" />
+<Modal @ref="_localItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowDownloadGameSaveModalAsync" IsVerticallyCentered="true" />

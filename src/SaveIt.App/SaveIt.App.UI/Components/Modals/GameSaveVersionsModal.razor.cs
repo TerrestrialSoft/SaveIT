@@ -17,20 +17,19 @@ public partial class GameSaveVersionsModal
     public ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public required Guid StorageAccountId { get; set; }
+    public required GameSave GameSave { get; set; }
 
     [Parameter, EditorRequired]
-    public required string RemoteRepositoryId { get; set; }
+    public required Modal ModalCurrent { get; set; }
 
     [Parameter, EditorRequired]
-    public required DownloadGameSaveModal ModalDownloadGameSave { get; set; }
+    public required Modal ModalDownloadGameSave { get; set; }
 
     private GameSaveVersionsCountModel _model = new();
     private Grid<FileItemModel> _grid = default!;
     private List<FileItemModel> files = default!;
     private bool _updateInProgress = false;
     private string? _error = null;
-    private Modal _downloadGameSaveModal = default!;
 
 
     private async Task<GridDataProviderResult<FileItemModel>> GameSaveVersionsProvider(
@@ -41,7 +40,7 @@ public partial class GameSaveVersionsModal
             return await Task.FromResult(request.ApplyTo(files));
         }
 
-        var result = await GameService.GetGameSaveVersionsAsync(StorageAccountId, RemoteRepositoryId);
+        var result = await GameService.GetGameSaveVersionsAsync(GameSave.StorageAccountId, GameSave.RemoteLocationId);
 
         if (result.IsFailed)
         {
@@ -59,18 +58,20 @@ public partial class GameSaveVersionsModal
 
     private async Task OnValidSubmitAsync()
     {
-
+        throw new NotImplementedException();
     }
 
     private async Task ShowDownloadSaveAsync(FileItemModel file)
     {
 
-        var parameters = new Dictionary<string, object>
-        {
-            { nameof(DownloadGameSaveModal.StorageAccountId), StorageAccountId },
-            { nameof(DownloadGameSaveModal.FileItem), file },
-        };
+        //await ModalCurrent.HideAsync();
+        //var parameters = new Dictionary<string, object>
+        //{
+        //    { nameof(DownloadGameSaveModal.StorageAccountId), GameSave.StorageAccountId },
+        //    { nameof(DownloadGameSaveModal.FileItem), file },
+        //    {nameof }
+        //};
 
-        await _downloadGameSaveModal.ShowAsync<DownloadGameSaveModal>(DownloadGameSaveModal.Title, parameters: parameters);
+        //await ModalDownloadGameSave.ShowAsync<DownloadGameSaveModal>(DownloadGameSaveModal.Title, parameters: parameters);
     }
 }

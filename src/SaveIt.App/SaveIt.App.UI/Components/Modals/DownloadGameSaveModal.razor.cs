@@ -1,31 +1,87 @@
 using BlazorBootstrap;
+using FluentResults;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Models;
+using SaveIt.App.Domain.Services;
+using SaveIt.App.UI.Models;
+using SaveIt.App.UI.Models.Game;
+using System.Reflection;
 
 namespace SaveIt.App.UI.Components.Modals;
 public partial class DownloadGameSaveModal
 {
     public const string Title = "Download Game Save";
 
+    [Inject]
+    public IGameService GameService { get; set; } = default!;
+
+    [Inject]
+    public ToastService ToastService { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public required Guid StorageAccountId { get; set; }
 
     [Parameter, EditorRequired]
-    public required FileItemModel FileItem { get; set; }
+    public required Guid GameSaveId { get; set; }
 
     [Parameter, EditorRequired]
-    public required EventCallback OnDownload { get; set; }
+    public required FileItemModel FileToDownload { get; set; }
 
     [Parameter, EditorRequired]
-    public required Modal CurrentModal { get; set; }
+    public required Modal ModalCurrent { get; set; }
 
-    private bool _lockRepository = false;
+    [Parameter, EditorRequired]
+    public required Modal ModalLocalItemPicker { get; set; }
+
+    private DownloadGameSaveModel _model = new()
+    {
+        SetAsActiveGameSave = true
+    };
 
     private Task HideModalAsync()
-        => CurrentModal.HideAsync();
+        => ModalCurrent.HideAsync();
 
     private async Task DownloadSaveAsync()
     {
+        var result = _model.SetAsActiveGameSave
+            ? await GameService.PrepareSpecificGameSaveAsync(GameSaveId, FileToDownload.Id!)
+            : await GameService.DownloadGameSaveToSpecificLocationAsync(GameSaveId,
+                FileToDownload.Id!, _model.LocalGameSaveFile!.FullPath);
 
+        if (result.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
+            await ModalCurrent.HideAsync();
+            return;
+        }
+
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Game Save downloaded successfully."));
+        await ModalCurrent.HideAsync();
+    }
+
+    private async Task ShowLocalFolderPickerModal()
+    {
+        await ModalCurrent.HideAsync();
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(LocalItemPickerModal.InitialSelectedFile), _model.LocalGameSaveFile! },
+            { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Folders },
+            { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Folders},
+            { nameof(LocalItemPickerModal.OnItemSelected),
+                EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
+                {
+                    _model.LocalGameSaveFile = file;
+                    await ModalLocalItemPicker.HideAsync();
+                })
+            },
+        };
+
+        await ModalLocalItemPicker.ShowAsync<LocalItemPickerModal>(
+            "Select the folder where you want to download the game save", parameters: parameters);
+    }
+
+    private void ClearLocalGameSavePath()
+    {
+        _model.LocalGameSaveFile = null;
     }
 }

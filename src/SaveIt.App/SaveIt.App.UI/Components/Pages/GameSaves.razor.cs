@@ -16,6 +16,9 @@ public partial class GameSaves
     [Inject]
     public ToastService ToastMessageService { get; set; } = default!;
 
+    [Inject]
+    public NavigationManager NavManager { get; set; } = default!;
+
     private Grid<GameSaveViewModel> _grid = default!;
     private List<GameSaveViewModel> _gameSaves = default!;
     private NewGameSaveModel _createGameSave = new();
@@ -33,6 +36,7 @@ public partial class GameSaves
     private Modal _advancedGameSaveSettingsModal = default!;
     private Modal _uploadGameSaveModal = default!;
     private Modal _gameSaveVersionsModal = default!;
+    private Modal _downloadGameSaveModal = default!;
 
     private ConfirmDialog _confirmDialog = default!;
 
@@ -68,7 +72,7 @@ public partial class GameSaves
         _currentModal = _createNewGameSaveModal;
         var parameters = new Dictionary<string, object>
         {
-            { nameof(CreateGameSaveModal.ModalCurrent), _createNewGameSaveModal },
+            { nameof(CreateGameSaveModal.ModalCurrent), _currentModal },
             { nameof(CreateGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
@@ -97,7 +101,7 @@ public partial class GameSaves
         _currentModal = _createGameModal;
         var parameters = new Dictionary<string, object>
         {
-            { nameof(CreateGameModal.ModalCurrent), _createGameModal },
+            { nameof(CreateGameModal.ModalCurrent), _currentModal },
             { nameof(CreateGameModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameModal.ModalAuthorizeStorage), _authorizeStorageModal },
@@ -123,7 +127,7 @@ public partial class GameSaves
         var model = _currentGameSave.ToNewGameSaveModel();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(EditGameSaveModal.ModalCurrent), _editGameSaveModal },
+            { nameof(EditGameSaveModal.ModalCurrent), _currentModal },
             { nameof(EditGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(EditGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(EditGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
@@ -174,17 +178,40 @@ public partial class GameSaves
 
     private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
     {
-        _currentModal = _advancedGameSaveSettingsModal;
-        _currentGameSave = gameSave;
+        NavManager.NavigateTo($"gamesaves/{gameSave.Id}");
+
+        //_currentModal = _advancedGameSaveSettingsModal;
+        //_currentGameSave = gameSave;
+        //var parameters = new Dictionary<string, object>
+        //{
+        //    { nameof(AdvancedGameSaveSettingsModal.ModalCurrent), _currentModal },
+        //    { nameof(AdvancedGameSaveSettingsModal.ModalUploadGameSave), _uploadGameSaveModal },
+        //    { nameof(AdvancedGameSaveSettingsModal.ModalGameSaveVersions), _gameSaveVersionsModal },
+        //    { nameof(AdvancedGameSaveSettingsModal.ModalDownloadGameSave), _downloadGameSaveModal },
+        //    { nameof(AdvancedGameSaveSettingsModal.GameSave), _currentGameSave },
+        //    { nameof(AdvancedGameSaveSettingsModal.OnGameSaveVersionsTemporarilyClosing),
+        //        EventCallback.Factory.Create(this, async () =>
+        //        {
+        //            await _gameSaveVersionsModal.HideAsync();
+        //            await ShowAdvancedGameSaveSettingsModalAsync(_currentGameSave);
+        //        })
+        //    }
+        //};
+
+        //await _currentModal.ShowAsync<AdvancedGameSaveSettingsModal>(AdvancedGameSaveSettingsModal.Title,
+        //    parameters: parameters);
+    }
+
+    private async Task ShowGameSaveVersionsModalAsync()
+    {
+        _currentModal = _gameSaveVersionsModal;
         var parameters = new Dictionary<string, object>
         {
-            { nameof(AdvancedGameSaveSettingsModal.ModalCurrent), _advancedGameSaveSettingsModal },
-            { nameof(AdvancedGameSaveSettingsModal.ModalUploadGameSave), _uploadGameSaveModal },
-            { nameof(AdvancedGameSaveSettingsModal.ModalGameSaveVersions), _gameSaveVersionsModal },
-            { nameof(AdvancedGameSaveSettingsModal.GameSave), gameSave },
+            { nameof(GameSaveVersionsModal.ModalCurrent), _currentModal },
+            { nameof(GameSaveVersionsModal.GameSave), _currentGameSave },
+            { nameof(GameSaveVersionsModal.ModalDownloadGameSave), _downloadGameSaveModal },
         };
 
-        await _currentModal.ShowAsync<AdvancedGameSaveSettingsModal>(AdvancedGameSaveSettingsModal.Title,
-            parameters: parameters);
+        await _gameSaveVersionsModal.ShowAsync<GameSaveVersionsModal>(GameSaveVersionsModal.Title, parameters: parameters);
     }
 }

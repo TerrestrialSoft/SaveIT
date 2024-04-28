@@ -17,7 +17,13 @@ public partial class AdvancedGameSaveSettingsModal
     public required Modal ModalGameSaveVersions { get; set; }
 
     [Parameter, EditorRequired]
+    public required Modal ModalDownloadGameSave { get; set; }
+
+    [Parameter, EditorRequired]
     public required GameSave GameSave { get; set; }
+
+    [Parameter, EditorRequired]
+    public required EventCallback OnGameSaveVersionsTemporarilyClosing { get; set; }
 
     private ConfirmDialog _confirmDialog = default!;
 
@@ -26,11 +32,11 @@ public partial class AdvancedGameSaveSettingsModal
         await ModalCurrent.HideAsync();
         var parameters = new Dictionary<string, object>
         {
-            { nameof(GameSaveVersionsModal.StorageAccountId), GameSave.StorageAccountId },
-            { nameof(GameSaveVersionsModal.RemoteRepositoryId), GameSave.RemoteLocationId },
+            { nameof(GameSaveVersionsModal.GameSave), GameSave },
+            { nameof(GameSaveVersionsModal.ModalCurrent), ModalGameSaveVersions },
+            { nameof(GameSaveVersionsModal.ModalDownloadGameSave), ModalDownloadGameSave }
         };
 
-        StateHasChanged();
         await ModalGameSaveVersions.ShowAsync<GameSaveVersionsModal>(GameSaveVersionsModal.Title, parameters: parameters);
     }
 

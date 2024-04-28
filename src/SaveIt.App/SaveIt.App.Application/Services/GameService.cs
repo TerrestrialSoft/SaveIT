@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
-using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -221,4 +220,54 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public Task<Result<IEnumerable<FileItemModel>>> GetGameSaveVersionsAsync(Guid storageAccountId, string remoteLocationId)
         => _externalStorageService.GetFilesWithSubstringInNameAsync(storageAccountId, remoteLocationId, _savePrefix);
+
+    public async Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId)
+    {
+        var gameSave = await _gameSaveRepository.GetGameSaveAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var result = await LockRepositoryAsync(gameSaveId);
+
+        if (result.IsFailed)
+        {
+            return result.HasError<GameErrors.GameSaveInUseError>() || result.HasError<GameErrors.GameSaveAlreadyLocked>()
+                ? Result.Fail("Unable to lock repository. Repository is already locked")
+                : Result.Fail("Unable to lock repository.");
+        }
+
+        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId);
+
+        if (fileDownloadResult.IsFailed)
+        {
+            return fileDownloadResult.ToResult();
+        }
+
+        return fileDownloadResult.Value is not null
+            ? _fileService.DecompressFile(gameSave.LocalGameSavePath, fileDownloadResult.Value)
+            : Result.Fail("File not found");
+    }
+
+    public async Task<Result> DownloadGameSaveToSpecificLocationAsync(Guid gameSaveId, string remoteLocationId,
+        string destinationPath)
+    {
+        var gameSave = await _gameSaveRepository.GetGameSaveAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId);
+
+        if (fileDownloadResult.IsFailed)
+        {
+            return fileDownloadResult.ToResult();
+        }
+
+        return fileDownloadResult.Value is not null
+           ? _fileService.DecompressFile(gameSave.LocalGameSavePath, fileDownloadResult.Value)
+           : Result.Fail("File not found");
+    }
 }

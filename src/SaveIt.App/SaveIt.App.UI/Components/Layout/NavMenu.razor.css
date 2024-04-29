@@ -22,6 +22,10 @@
             text-overflow: ellipsis;
         }
 
+.logo {
+    height: 3rem;
+}
+
 @media (max-width: 640.98px) {
     .top-row {
         justify-content: space-between;

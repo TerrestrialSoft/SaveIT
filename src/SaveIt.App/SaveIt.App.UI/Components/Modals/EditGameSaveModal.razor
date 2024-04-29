@@ -1,4 +1,4 @@
-﻿<EditForm Model="Model" OnValidSubmit="ValidSubmitAsync" autocomplete="off">
+﻿<EditForm Model="Model" OnValidSubmit="UpdateGameSaveAsync" autocomplete="off">
     <FluentValidationValidator />
 
     <GameSelect OnSelectedGameChanged="SelectedGameChanged" SelectedGameId="Model.GameId" />

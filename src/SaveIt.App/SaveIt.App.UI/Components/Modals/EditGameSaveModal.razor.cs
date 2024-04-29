@@ -38,12 +38,13 @@ public partial class EditGameSaveModal
         Model.GameId = id;
     }
 
-    private async Task ValidSubmitAsync()
+    private async Task UpdateGameSaveAsync()
     {
         GameSave.GameId = Model.GameId!.Value;
         GameSave.Name = Model.GameSave.Name;
         GameSave.LocalGameSavePath = Model.GameSave.LocalGameSaveFile!.FullPath;
-        GameSave.RemoteLocationId = Model.GameSave.RemoteGameSaveFile!.FullPath;
+        GameSave.RemoteLocationId = Model.GameSave.RemoteGameSaveFile!.Id;
+        GameSave.RemoteLocationName = Model.GameSave.RemoteGameSaveFile!.Name;
         GameSave.StorageAccountId = Model.GameSave.StorageAccountId!.Value;
 
         await GameSaveRepository.UpdateGameSaveAsync(GameSave);

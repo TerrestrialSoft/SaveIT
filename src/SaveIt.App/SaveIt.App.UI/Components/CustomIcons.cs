@@ -10,4 +10,5 @@ public static class CustomIcons
     public const string UploadSolid = "fa-solid fa-upload";
     public const string FloppyDiskSolid = "fa-solid fa-floppy-disk";
     public const string DownloadSolid = "fa-solid fa-download";
+    public const string RotateRightSolid = "fa-solid fa-rotate-right";
 }

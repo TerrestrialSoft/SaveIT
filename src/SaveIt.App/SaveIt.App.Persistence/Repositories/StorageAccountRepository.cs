@@ -18,7 +18,7 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler)
         if (account is null)
             return;
 
-        account.IsActive = false;
+        account.IsAuthorized = false;
 
         await _db.UpdateAsync(account);
     }

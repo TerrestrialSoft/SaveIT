@@ -53,9 +53,9 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             return result;
         }
 
-        if(account is { IsActive: false})
+        if(account is { IsAuthorized: false})
         {
-            account.IsActive = true;
+            account.IsAuthorized = true;
             await _accountRepository.UpdateAsync(account);
             return Result.Ok();
         }
@@ -69,7 +69,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             Id = accountId,
             Email = emailResult.Value,
             Type = StorageAccountType.Google,
-            IsActive = true,
+            IsAuthorized = true,
         };
 
         await _accountRepository.CreateAsync(account);

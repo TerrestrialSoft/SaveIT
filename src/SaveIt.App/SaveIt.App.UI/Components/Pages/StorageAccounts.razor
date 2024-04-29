@@ -1,0 +1,43 @@
+﻿@page "/storage-accounts"
+
+<div class="d-flex m-3 justify-content-end">
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="ShowAuthorizeStorageModalAsync">
+        <Icon Name="IconName.PlusLg" /> Authorize new Storage Account
+    </Button>
+</div>
+
+<div class="mt-3">
+    <Grid @ref="_grid"
+          TItem="StorageAccountModel"
+          Class="table table-hover table-bordered table-striped"
+          DataProvider="StorageAccountsDataProvider"
+          AllowFiltering="true"
+          Responsive="true"
+          AllowPaging="true"
+          AllowSorting="true">
+
+        <GridColumn TItem="StorageAccountModel" HeaderText="Email" PropertyName="Email" SortKeySelector="x => x.Email">
+            @context.Email
+        </GridColumn>
+        <GridColumn TItem="StorageAccountModel" HeaderText="Authorization Status" PropertyName="IsAuthorized" SortKeySelector="x => x.IsAuthorized">
+            @context.IsAuthorized
+        </GridColumn>
+        <GridColumn TItem="StorageAccountModel" HeaderText="Actions" Filterable="false">
+            <Tooltip Title="Renew authorization">
+                <Icon CustomIconName="@CustomIcons.SettingsSolid"
+                      Size="IconSize.x5"
+                      Color="IconColor.Warning"
+                      Class="p-1"
+                      @onclick="() => RenewAuthorizationAsync(context)" />
+            </Tooltip>
+            <Tooltip Title="Delete">
+                <Icon CustomIconName="@CustomIcons.RotateRightSolid"
+                      Size="IconSize.x5"
+                      Color="IconColor.Danger"
+                      Class="p-1"
+                      @onclick="() => DeleteStorageAccountAsync(context)" />
+            </Tooltip>
+        </GridColumn>
+
+    </Grid>
+</div>

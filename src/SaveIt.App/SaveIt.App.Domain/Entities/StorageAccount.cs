@@ -9,7 +9,7 @@ public class StorageAccount : BaseEntity
 {
     public string Email { get; init; } = default!;
     public StorageAccountType Type { get; init; }
-    public bool IsActive { get; set; }
+    public bool IsAuthorized { get; set; }
 
     [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public List<GameSave>? GameSaves { get; set; }

@@ -36,7 +36,7 @@ public partial class GameSaves
 
     private ConfirmDialog _confirmDialog = default!;
 
-    private async Task<GridDataProviderResult<GameSaveViewModel>> EmployeesDataProvider(
+    private async Task<GridDataProviderResult<GameSaveViewModel>> GameSavesDataProvider(
         GridDataProviderRequest<GameSaveViewModel> request)
     {
         var gs = await GameSaveRepository.GetAllWithChildrenAsync();

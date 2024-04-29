@@ -249,8 +249,10 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return fileDownloadResult.ToResult();
         }
 
+        using var stream = fileDownloadResult.Value;
+
         return fileDownloadResult.Value is not null
-            ? _fileService.DecompressFile(gameSave.LocalGameSavePath, fileDownloadResult.Value)
+            ? _fileService.DecompressFile(gameSave.LocalGameSavePath, stream)
             : Result.Fail("File not found");
     }
 
@@ -263,6 +265,13 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
+        var fileInfoResult = await _externalStorageService.GetFileAsync(gameSave.StorageAccountId, remoteLocationId);
+
+        if (fileInfoResult.IsFailed)
+        {
+            return fileInfoResult.ToResult();
+        }
+
         var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId);
 
         if (fileDownloadResult.IsFailed)
@@ -270,8 +279,10 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return fileDownloadResult.ToResult();
         }
 
+        using var stream = fileDownloadResult.Value;
+
         return fileDownloadResult.Value is not null
-           ? _fileService.DecompressFile(gameSave.LocalGameSavePath, fileDownloadResult.Value)
+           ? _fileService.DecompressFile(destinationPath, stream, fileInfoResult.Value.Name)
            : Result.Fail("File not found");
     }
 

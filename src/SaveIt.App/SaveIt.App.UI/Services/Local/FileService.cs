@@ -6,11 +6,18 @@ using System.IO.Compression;
 namespace SaveIt.App.UI.Service.Local;
 public class FileService : IFileService
 {
-    public Result DecompressFile(string localGameSavePath, Stream value)
+    public Result DecompressFile(string localGameSavePath, Stream value, string? fileName = null)
     {
         Guid guid = Guid.NewGuid();
         try
         {
+            if(fileName is not null)
+            {
+                var name = Path.GetFileNameWithoutExtension(fileName);
+                localGameSavePath = Path.Combine(localGameSavePath, name);
+                Directory.CreateDirectory(localGameSavePath);
+            }
+
             ZipFile.ExtractToDirectory(value, localGameSavePath + guid);
             Directory.Delete(localGameSavePath, true);
             Directory.Move(localGameSavePath + guid, localGameSavePath);

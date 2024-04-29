@@ -38,12 +38,16 @@ public partial class DownloadGameSaveModal
         SetAsActiveGameSave = true
     };
 
+    private bool _isDownloading = false;
+
     private Task HideModalAsync()
         => ModalCurrent.HideAsync();
 
     private async Task DownloadSaveAsync()
     {
         _isDownloading = true;
+        StateHasChanged();
+
         var result = _model.SetAsActiveGameSave
             ? await GameService.PrepareSpecificGameSaveAsync(GameSaveId, FileToDownload.Id!)
             : await GameService.DownloadGameSaveToSpecificLocationAsync(GameSaveId,
@@ -52,11 +56,17 @@ public partial class DownloadGameSaveModal
         if (result.IsFailed)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
+            _isDownloading = false;
             await ModalCurrent.HideAsync();
             return;
         }
 
         ToastService.Notify(new ToastMessage(ToastType.Success, "Game Save downloaded successfully."));
+        _isDownloading = false;
+        _model = new DownloadGameSaveModel()
+        {
+            SetAsActiveGameSave = true
+        };
         await ModalCurrent.HideAsync();
     }
 

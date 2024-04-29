@@ -1,61 +1,8 @@
 ﻿using SaveIt.App.Domain;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
-using SQLite;
-using SQLiteNetExtensionsAsync.Extensions;
 
 namespace SaveIt.App.Persistence.Repositories;
-internal class GameSaveRepository(IDatabaseHandler _dbHandler) : IGameSaveRepository
+internal class GameSaveRepository(IDatabaseHandler _dbHandler) : BaseRepository<GameSave>(_dbHandler), IGameSaveRepository
 {
-    private readonly SQLiteAsyncConnection _db = _dbHandler.CreateAsyncConnection();
-
-    public async Task CreateGameSaveAsync(GameSave gameSave)
-        => await _db.InsertAsync(gameSave);
-
-    public async Task DeleteGameSaveAsync(GameSave gameSave)
-    {
-        await _db.DeleteAsync(gameSave);
-    }
-
-    public async Task<IEnumerable<GameSave>> GetAllGameSaveAsync()
-        => await _db.Table<GameSave>()
-            .ToListAsync();
-
-    public async Task<IEnumerable<GameSave>> GetAllGameSavesWithChildrenAsync()
-    {
-        var results = await _db.Table<GameSave>()
-            .ToListAsync();
-        List<GameSave> gameSaves = [];
-
-        foreach (var gs in results)
-        {
-            await _db.GetChildrenAsync(gs);
-            gameSaves.Add(gs);
-        }
-
-        return gameSaves;
-    }
-
-    public async Task<GameSave?> GetGameSaveAsync(Guid gameSaveId)
-        => await _db.Table<GameSave>()
-            .FirstOrDefaultAsync(x => x.Id == gameSaveId);
-
-    public async Task<GameSave?> GetGameSaveWithChildrenAsync(Guid gameSaveId)
-    {
-        var gameSave = await _db.Table<GameSave>()
-            .FirstOrDefaultAsync(x => x.Id == gameSaveId);
-
-        if (gameSave is null)
-        {
-            return null;
-        }
-
-        await _db.GetChildrenAsync(gameSave);
-        return gameSave;
-    }
-
-    public async Task UpdateGameSaveAsync(GameSave gameSave)
-    {
-        await _db.UpdateAsync(gameSave);
-    }
 }

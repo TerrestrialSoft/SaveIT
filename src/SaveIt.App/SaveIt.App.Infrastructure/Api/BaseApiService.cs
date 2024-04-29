@@ -7,10 +7,10 @@ using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Auth;
 
 namespace SaveIt.App.Infrastructure.Api;
-public class BaseApiService(HttpClient httpClient, IAccountSecretsService accountSecretsRepo, ISaveItApiService saveItService)
+public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository accountSecretsRepo, ISaveItApiService saveItService)
 {
     protected readonly HttpClient _httpClient = httpClient;
-    protected readonly IAccountSecretsService _accountSecretsRepo = accountSecretsRepo;
+    protected readonly IAccountSecretsRepository _accountSecretsRepo = accountSecretsRepo;
     protected readonly ISaveItApiService _saveItService = saveItService;
 
     protected async Task<Result> ExecuteRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestFactory)

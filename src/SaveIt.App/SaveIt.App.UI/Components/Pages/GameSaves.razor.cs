@@ -39,7 +39,7 @@ public partial class GameSaves
     private async Task<GridDataProviderResult<GameSaveViewModel>> EmployeesDataProvider(
         GridDataProviderRequest<GameSaveViewModel> request)
     {
-        var gs = await GameSaveRepository.GetAllGameSavesWithChildrenAsync();
+        var gs = await GameSaveRepository.GetAllWithChildrenAsync();
         _gameSaves ??= gs.Select(x => x.ToViewModel()!).ToList();
         return await Task.FromResult(request.ApplyTo(_gameSaves));
     }
@@ -152,7 +152,7 @@ public partial class GameSaves
             return;
         }
 
-        await GameSaveRepository.DeleteGameSaveAsync(gameSave);
+        await GameSaveRepository.DeleteAsync(gameSave.Id);
         await _grid.RefreshDataAsync();
         ToastMessageService.Notify(new(ToastType.Success, "Game save deleted successfully."));
     }
@@ -169,7 +169,7 @@ public partial class GameSaves
         await _shareGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
     }
 
-    private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
+    private void ShowAdvancedGameSaveSettingsModal(GameSave gameSave)
     {
         NavManager.NavigateTo($"gamesaves/{gameSave.Id}");
     }

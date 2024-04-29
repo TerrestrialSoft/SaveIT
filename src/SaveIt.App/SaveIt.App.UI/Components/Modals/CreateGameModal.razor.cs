@@ -59,7 +59,7 @@ public partial class CreateGameModal
                 Content = img.ImageBase64
             };
 
-            await ImageRepository.CreateImageAsync(image);
+            await ImageRepository.CreateAsync(image);
             game.ImageId = image.Id;
             game.Image = image;
         }
@@ -75,8 +75,8 @@ public partial class CreateGameModal
             LocalGameSavePath = CreateNewGameModel.GameSave.LocalGameSaveFile!.FullPath,
         };
         
-        await GameRepository.CreateGameAsync(game);
-        await GameSaveRepository.CreateGameSaveAsync(gameSave);
+        await GameRepository.CreateAsync(game);
+        await GameSaveRepository.CreateAsync(gameSave);
 
         game.GameSaves = [ gameSave ];
 

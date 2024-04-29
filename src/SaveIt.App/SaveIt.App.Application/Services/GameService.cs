@@ -14,7 +14,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
@@ -86,7 +86,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result> PrepareGameSaveAsync(Guid gameSaveId)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
@@ -115,7 +115,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result> StartGameAsync(Guid gameId)
     {
-        var game = await _gameRepository.GetGameAsync(gameId);
+        var game = await _gameRepository.GetAsync(gameId);
 
         if (game is null)
         {
@@ -129,7 +129,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result> UnlockRepositoryAsync(Guid gameSaveId)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
@@ -191,7 +191,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result> UploadSaveAsync(Guid gameSaveId)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveWithChildrenAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
@@ -224,7 +224,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
     public async Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
@@ -254,7 +254,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
     public async Task<Result> DownloadGameSaveToSpecificLocationAsync(Guid gameSaveId, string remoteLocationId,
         string destinationPath)
     {
-        var gameSave = await _gameSaveRepository.GetGameSaveAsync(gameSaveId);
+        var gameSave = await _gameSaveRepository.GetAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");

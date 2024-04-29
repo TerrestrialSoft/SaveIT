@@ -7,7 +7,7 @@ using SaveIt.App.Domain.Enums;
 
 namespace SaveIt.App.Application.Services;
 public class AuthService(ISaveItApiService _saveItClient, IStorageAccountRepository _accountRepository,
-    IAccountSecretsService _secretsService, IExternalStorageService _externalStorage) : IAuthService
+    IAccountSecretsRepository _secretsService, IExternalStorageService _externalStorage) : IAuthService
 {
     public async Task<Result<Uri>> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken)
     {
@@ -56,7 +56,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         if(account is { IsActive: false})
         {
             account.IsActive = true;
-            await _accountRepository.UpdateAccountAsync(account);
+            await _accountRepository.UpdateAsync(account);
             return Result.Ok();
         }
         else if (account is not null)
@@ -72,7 +72,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             IsActive = true,
         };
 
-        await _accountRepository.CreateAccountAsync(account);
+        await _accountRepository.CreateAsync(account);
 
         return Result.Ok();
     }

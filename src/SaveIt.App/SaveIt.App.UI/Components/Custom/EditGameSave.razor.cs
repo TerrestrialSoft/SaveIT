@@ -152,7 +152,7 @@ public partial class EditGameSave
 
     private async Task RefreshStorageAccountsAsync()
     {
-        _storageAccounts = (await StorageAccountRepository.GetAllStorageAccounts()).ToList();
+        _storageAccounts = (await StorageAccountRepository.GetAllAsync()).ToList();
     }
 
     private void TrySetStorageAccount()

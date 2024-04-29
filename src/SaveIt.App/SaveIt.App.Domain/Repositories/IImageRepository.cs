@@ -1,8 +1,6 @@
 ﻿using SaveIt.App.Domain.Entities;
 
 namespace SaveIt.App.Domain.Repositories;
-public interface IImageRepository
+public interface IImageRepository : IRepository<ImageEntity>
 {
-    Task CreateImageAsync(ImageEntity image);
-    Task DeleteImageAsync(Guid id);
 }

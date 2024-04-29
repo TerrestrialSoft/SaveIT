@@ -47,9 +47,9 @@ public partial class EditGameSaveModal
         GameSave.RemoteLocationName = Model.GameSave.RemoteGameSaveFile!.Name;
         GameSave.StorageAccountId = Model.GameSave.StorageAccountId!.Value;
 
-        await GameSaveRepository.UpdateGameSaveAsync(GameSave);
+        await GameSaveRepository.UpdateAsync(GameSave);
 
-        var gs = await GameSaveRepository.GetGameSaveWithChildrenAsync(GameSave.Id);
+        var gs = await GameSaveRepository.GetWithChildrenAsync(GameSave.Id);
 
         if (gs is null)
         {

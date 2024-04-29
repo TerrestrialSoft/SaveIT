@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
-public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsService _accountsSecretsRepo,
+public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepository _accountsSecretsRepo,
     ISaveItApiService _saveItService) 
     : BaseApiService(_httpClient, _accountsSecretsRepo, _saveItService)
 {

@@ -66,7 +66,7 @@ public partial class GameSaveSettings
             return;
         }
 
-        var save = await GameSaveRepository.GetGameSaveAsync(id);
+        var save = await GameSaveRepository.GetAsync(id);
 
         if (save is null)
         {

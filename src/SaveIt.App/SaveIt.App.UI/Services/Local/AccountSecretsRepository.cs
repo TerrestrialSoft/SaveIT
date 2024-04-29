@@ -2,7 +2,7 @@
 using SaveIt.App.Domain.Repositories;
 
 namespace SaveIt.App.UI.Service.Local;
-internal class AccountSecretsService : IAccountSecretsService
+internal class AccountSecretsRepository : IAccountSecretsRepository
 {
     private const string AccessTokenKey = "{0}:AccessToken";
     private const string RefreshToken = "{0}:RefreshToken";

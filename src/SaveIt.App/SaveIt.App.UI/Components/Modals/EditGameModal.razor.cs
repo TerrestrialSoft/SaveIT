@@ -43,14 +43,14 @@ public partial class EditGameModal
 
         if (Model.Image?.ImageBase64 == Game.Image?.Content)
         {
-            await GameRepository.UpdateGameAsync(Game);
+            await GameRepository.UpdateAsync(Game);
             await OnSave.InvokeAsync();
             return;
         }
 
         if (Model.Image is null && Game.Image is not null)
         {
-            await ImageRepository.DeleteImageAsync(Game.Image.Id);
+            await ImageRepository.DeleteAsync(Game.Image.Id);
             Game.Image = null;
             Game.ImageId = null;
         }
@@ -58,7 +58,7 @@ public partial class EditGameModal
         {
             if(Game.Image is not null)
             {
-                await ImageRepository.DeleteImageAsync(Game.Image.Id);
+                await ImageRepository.DeleteAsync(Game.Image.Id, true);
             }
 
             var image = new ImageEntity
@@ -67,13 +67,13 @@ public partial class EditGameModal
                 Name = Model.Image.Name,
                 Content = Model.Image.ImageBase64
             };
-            await ImageRepository.CreateImageAsync(image);
+            await ImageRepository.CreateAsync(image);
 
             Game.Image = image;
             Game.ImageId = image.Id; 
         }
 
-        await GameRepository.UpdateGameAsync(Game);
+        await GameRepository.UpdateAsync(Game);
         await OnSave.InvokeAsync();
     }
 }

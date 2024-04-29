@@ -42,7 +42,7 @@ public partial class CreateGameSaveModal
 
     protected override async Task OnInitializedAsync()
     {
-        _games = (await GameRepository.GetAllGamesAsync()).ToList();
+        _games = (await GameRepository.GetAllAsync()).ToList();
         GameSaveModel.GameId= _games.FirstOrDefault()?.Id;
     }
 
@@ -67,9 +67,9 @@ public partial class CreateGameSaveModal
             StorageAccountId = GameSaveModel.GameSave.StorageAccountId!.Value
         };
 
-        await GameSaveRepository.CreateGameSaveAsync(gameSave);
+        await GameSaveRepository.CreateAsync(gameSave);
 
-        gameSave = await GameSaveRepository.GetGameSaveWithChildrenAsync(gameSave.Id);
+        gameSave = await GameSaveRepository.GetWithChildrenAsync(gameSave.Id);
         await OnGameSaveCreated.InvokeAsync(gameSave);
     }
 }

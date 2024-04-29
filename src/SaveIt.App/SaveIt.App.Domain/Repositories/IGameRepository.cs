@@ -1,13 +1,6 @@
 ﻿using SaveIt.App.Domain.Entities;
 
 namespace SaveIt.App.Domain.Repositories;
-public interface IGameRepository
+public interface IGameRepository : IRepository<Game>
 {
-    Task CreateGameAsync(Game game);
-    Task<Game?> GetGameAsync(Guid id);
-    Task<IEnumerable<Game>> GetAllGamesAsync();
-    Task<IEnumerable<Game>> GetAllGamesWithChildrenAsync();
-    Task DeleteGameAsync(Guid id);
-    Task<Game?> GetGameWithChildrenAsync(Guid id);
-    Task UpdateGameAsync(Game game);
 }

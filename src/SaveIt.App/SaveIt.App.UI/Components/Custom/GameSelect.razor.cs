@@ -23,7 +23,7 @@ public partial class GameSelect
 
     protected override async Task OnInitializedAsync()
     {
-        _games = (await GameRepository.GetAllGamesAsync()).ToList();
+        _games = (await GameRepository.GetAllAsync()).ToList();
 
         if (SelectedGameId is not null)
         {

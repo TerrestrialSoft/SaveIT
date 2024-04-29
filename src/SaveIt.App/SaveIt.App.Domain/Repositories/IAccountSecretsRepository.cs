@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 
 namespace SaveIt.App.Domain.Repositories;
-public interface IAccountSecretsService
+public interface IAccountSecretsRepository
 {
     Task<Result> StoreTokensAsync(Guid accountId, string accessToken, string refreshToken);
     Task<string?> GetAccessTokenAsync(Guid accountId);

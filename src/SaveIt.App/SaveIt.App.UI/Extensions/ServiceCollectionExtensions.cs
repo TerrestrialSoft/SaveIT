@@ -17,7 +17,7 @@ internal static class ServiceCollectionExtensions
 
     private static IServiceCollection AddServices(this IServiceCollection services)
         => services.AddScoped<IApplicationContext, ApplicationContext>()
-            .AddScoped<IAccountSecretsService, AccountSecretsService>()
+            .AddScoped<IAccountSecretsRepository, AccountSecretsRepository>()
             .AddScoped<IProcessService, ProcessService>()
             .AddScoped<IFileService, FileService>();
 

@@ -43,7 +43,7 @@ public partial class StartGameModal
         _errorMessage = null;
         _lockFile = null;
         _screenState = StartGameScreenState.Loading;
-        _gameSave = (await GameSaveRepository.GetGameSaveWithChildrenAsync(SaveId))!;
+        _gameSave = (await GameSaveRepository.GetWithChildrenAsync(SaveId))!;
 
         await LockRepositoryAsync();
     }

@@ -4,7 +4,6 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Extensions;
-using SaveIt.App.UI.Models.Game;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class GameCard
@@ -78,7 +77,7 @@ public partial class GameCard
             return;
         }
 
-        await GameRepository.DeleteGameAsync(Game.Id);
+        await GameRepository.DeleteAsync(Game.Id, true);
         ToastService.Notify(new(ToastType.Success, $"Game deleted successfully."));
         await OnCardUpdated.InvokeAsync(Game);
     }

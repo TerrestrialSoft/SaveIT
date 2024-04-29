@@ -43,6 +43,7 @@ public partial class DownloadGameSaveModal
 
     private async Task DownloadSaveAsync()
     {
+        _isDownloading = true;
         var result = _model.SetAsActiveGameSave
             ? await GameService.PrepareSpecificGameSaveAsync(GameSaveId, FileToDownload.Id!)
             : await GameService.DownloadGameSaveToSpecificLocationAsync(GameSaveId,

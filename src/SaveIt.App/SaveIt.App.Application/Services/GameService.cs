@@ -11,6 +11,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 {
     private const string _lockFileName = ".lockfile";
     private const string _savePrefix = "save_";
+    private const string _saveFileNameTemplate = _savePrefix + "{0}.zip";
+    private const string _dateTimeFormat = "yyyy-MM-dd_HH-mm-ss";
 
     public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId)
     {
@@ -171,7 +173,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Ok();
         }
 
-        if (lockFile.LockDetails!.LockedByUsername != gameSave.Game.Username)
+        if (lockFile.LockDetails!.LockedByUserId != gameSave.GameId)
         {
             return Result.Fail(GameErrors.GameLockedByAnotherUser(lockFile));
         }
@@ -205,7 +207,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         using var stream = fileResult.Value;
-        string fileName = $"{_savePrefix}{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss}.zip";
+
+        string fileName = string.Format(_saveFileNameTemplate, DateTime.UtcNow.ToString(_dateTimeFormat));
 
         var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
             fileName, stream);
@@ -270,5 +273,38 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return fileDownloadResult.Value is not null
            ? _fileService.DecompressFile(gameSave.LocalGameSavePath, fileDownloadResult.Value)
            : Result.Fail("File not found");
+    }
+
+    public async Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath)
+    {
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var lockResult = await LockRepositoryAsync(gameSaveId);
+
+        if (lockResult.IsFailed)
+        {
+            return lockResult.ToResult();
+        }
+
+        var fileResult = _fileService.GetCompressedFile(folderPath);
+
+        if (fileResult.IsFailed)
+        {
+            return fileResult.ToResult();
+        }
+
+        using var stream = fileResult.Value;
+        string fileName = string.Format(_saveFileNameTemplate, DateTime.UtcNow.ToString(_dateTimeFormat));
+
+        var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            fileName, stream);
+
+        return uploadResult.IsSuccess
+            ? await UnlockRepositoryAsync(gameSaveId)
+            : uploadResult;
     }
 }

@@ -1,0 +1,27 @@
+﻿<div>
+    <EditForm Model="@Model" OnValidSubmit="UploadGameSaveAsync">
+        <FluentValidationValidator />
+        <div class="d-flex flex-column m-1 p-1 align-items-center">
+            <ItemPicker Title="Select folder to be uploaded"
+                        Icon="IconName.PcDisplayHorizontal"
+                        IsRequired="true"
+                        SelectedFile="@Model.File"
+                        OnPickerClicked="ShowLocalFolderPickerModal"
+                        OnPathCleared="ClearLocalGameSavePath"
+                        HelpText="Select the game save folder that should be uploaded." />
+            <div class="ms-4">
+                <ValidationMessage For="() => Model.File" />
+            </div>
+
+            @if (_isUploading)
+            {
+                <Spinner Size="SpinnerSize.Large" />
+            }
+        </div>
+        
+        <div class="d-flex justify-content-around mt-4">
+            <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" @onclick="HideModalAsync">Cancel</Button>
+            <Button Color="ButtonColor.Primary" Size="Size.Large" Type="ButtonType.Submit" Disabled="_isUploading">Upload</Button>
+        </div>
+    </EditForm>
+</div>

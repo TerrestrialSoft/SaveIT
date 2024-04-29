@@ -8,14 +8,14 @@
         <div class="custom-column">
             <h4>Versions</h4>
             <div class="ms-2">
-                <EditForm Model="_model" OnValidSubmit="ChangeVersionsCount">
+                <EditForm Model="_versionsModel" OnValidSubmit="ChangeVersionsCount">
                     <FluentValidationValidator />
 
                     <div class="d-flex m-2 align-items-center">
                         <div class="fs-5">Keep</div>
                         <div class="ms-2">
                             <NumberInput TValue="int"
-                                @bind-Value="_model.Count"
+                                @bind-Value="_versionsModel.Count"
                                 Placeholder="Enter amount"
                                 EnableMinMax="true"
                                 Min="1"
@@ -39,7 +39,7 @@
                     
                     </div>
                     <div class="text-center">
-                        <ValidationMessage For="@(() => _model.Count)" />
+                        <ValidationMessage For="@(() => _versionsModel.Count)" />
                     </div>
                 </EditForm>
             </div>
@@ -90,7 +90,7 @@
                     This feature allows usert to manually upload a local game save, defined by a path on the profile, to cloud storage. This save will then be automatically set as the newest save.
                 </div>
                 <div>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="ShowManualUploadModalAsync">
+                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="ShowUploadGameSaveModalAsync">
                         <Icon CustomIconName="@CustomIcons.UploadSolid" /> Upload
                     </Button>
                 </div>
@@ -107,3 +107,6 @@ else
 
 <Modal @ref="_downloadGameSaveModal" Size="ModalSize.Large" IsVerticallyCentered="true" />
 <Modal @ref="_localItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowDownloadGameSaveModalAsync" IsVerticallyCentered="true" />
+<Modal @ref="_uploadFolderAsGameSaveModal" Size="ModalSize.Regular" IsVerticallyCentered="true" />
+<Modal @ref="_uploadFolderPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowUploadGameSaveModalAsync" IsVerticallyCentered="true" />
+<ConfirmDialog @ref="_confirmDialog" />

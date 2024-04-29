@@ -5,7 +5,6 @@ using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Domain.Services;
 using SaveIt.App.UI.Components.Modals;
-using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Components.Pages;
@@ -20,19 +19,26 @@ public partial class GameSaveSettings
     [Inject]
     public ToastService ToastService { get; set; } = default!;
 
+    [Inject]
+    public PreloadService PreloadService { get; set; } = default!;
+
     [Parameter]
     public string? GameSaveIdString { get; set; }
 
     private GameSave _gameSave = new();
-    private GameSaveVersionsCountModel _model = new();
+    private UploadGameSaveModel _uploadModel = new();
+    private GameSaveVersionsCountModel _versionsModel = new();
     private bool _updateInProgress = false;
     private bool _gameSaveExists = true;
     private Grid<FileItemModel> _grid = default!;
     private List<FileItemModel> files = default!;
     private FileItemModel _currentFile = default!;
 
+    private Modal _uploadFolderPickerModal = default!;
     private Modal _localItemPickerModal = default!;
     private Modal _downloadGameSaveModal = default!;
+    private Modal _uploadFolderAsGameSaveModal = default!;
+    private ConfirmDialog _confirmDialog = default!;
 
     private async Task<GridDataProviderResult<FileItemModel>> GameSaveVersionsProvider(
         GridDataProviderRequest<FileItemModel> request)
@@ -102,12 +108,40 @@ public partial class GameSaveSettings
 
     private async Task UnlockRepositoryAsync()
     {
+        var dialogResult = await _confirmDialog.ShowDialogAsync("Unlock Repository",
+                       "Are you sure you want to unlock the repository? You risk current host progress.",
+                       "This action cannot be undone.",
+                       "Unlock",
+                       "No");
 
-    }
+        if (!dialogResult)
+        {
+            return;
+        }
 
-    private async Task ShowManualUploadModalAsync()
-    {
-
-    }
+        PreloadService.Show();
+        var result = await GameService.UnlockRepositoryAsync(_gameSave.Id);
+        PreloadService.Hide();
         
+        if (result.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
+            return;
+        }
+
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Repository unlocked successfully."));
+    }
+
+    private async Task ShowUploadGameSaveModalAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(UploadGameSaveModal.ModalCurrent), _uploadFolderAsGameSaveModal },
+            { nameof(UploadGameSaveModal.ModalLocalItemPicker), _uploadFolderPickerModal },
+            { nameof(UploadGameSaveModal.GameSaveId), _gameSave.Id },
+            { nameof(UploadGameSaveModal.Model), _uploadModel }
+        };
+
+        await _uploadFolderAsGameSaveModal.ShowAsync<UploadGameSaveModal>(UploadGameSaveModal.Title, parameters: parameters);
+    }
 }

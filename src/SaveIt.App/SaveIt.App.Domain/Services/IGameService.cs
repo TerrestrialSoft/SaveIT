@@ -11,5 +11,6 @@ public interface IGameService
     Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId);
     Task<Result> StartGameAsync(Guid gameId);
     Task<Result> UnlockRepositoryAsync(Guid gameSaveId);
+    Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath);
     Task<Result> UploadSaveAsync(Guid gameSaveId);
 }

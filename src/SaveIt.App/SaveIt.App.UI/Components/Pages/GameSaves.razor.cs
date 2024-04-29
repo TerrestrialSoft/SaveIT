@@ -33,10 +33,6 @@ public partial class GameSaves
     private Modal _editGameSaveModal = default!;
     private Modal _currentModal = default!;
     private Modal _shareGameSaveModal = default!;
-    private Modal _advancedGameSaveSettingsModal = default!;
-    private Modal _uploadGameSaveModal = default!;
-    private Modal _gameSaveVersionsModal = default!;
-    private Modal _downloadGameSaveModal = default!;
 
     private ConfirmDialog _confirmDialog = default!;
 
@@ -62,10 +58,6 @@ public partial class GameSaves
         {
             await ShowEditGameSaveModalAsync(_currentGameSave);
         } 
-        else if (_currentModal == _advancedGameSaveSettingsModal)
-        {
-            await ShowAdvancedGameSaveSettingsModalAsync(_currentGameSave);
-        }
     }
 
     private async Task ShowCreateGameSaveModalAsync()
@@ -180,39 +172,5 @@ public partial class GameSaves
     private async Task ShowAdvancedGameSaveSettingsModalAsync(GameSave gameSave)
     {
         NavManager.NavigateTo($"gamesaves/{gameSave.Id}");
-
-        //_currentModal = _advancedGameSaveSettingsModal;
-        //_currentGameSave = gameSave;
-        //var parameters = new Dictionary<string, object>
-        //{
-        //    { nameof(AdvancedGameSaveSettingsModal.ModalCurrent), _currentModal },
-        //    { nameof(AdvancedGameSaveSettingsModal.ModalUploadGameSave), _uploadGameSaveModal },
-        //    { nameof(AdvancedGameSaveSettingsModal.ModalGameSaveVersions), _gameSaveVersionsModal },
-        //    { nameof(AdvancedGameSaveSettingsModal.ModalDownloadGameSave), _downloadGameSaveModal },
-        //    { nameof(AdvancedGameSaveSettingsModal.GameSave), _currentGameSave },
-        //    { nameof(AdvancedGameSaveSettingsModal.OnGameSaveVersionsTemporarilyClosing),
-        //        EventCallback.Factory.Create(this, async () =>
-        //        {
-        //            await _gameSaveVersionsModal.HideAsync();
-        //            await ShowAdvancedGameSaveSettingsModalAsync(_currentGameSave);
-        //        })
-        //    }
-        //};
-
-        //await _currentModal.ShowAsync<AdvancedGameSaveSettingsModal>(AdvancedGameSaveSettingsModal.Title,
-        //    parameters: parameters);
-    }
-
-    private async Task ShowGameSaveVersionsModalAsync()
-    {
-        _currentModal = _gameSaveVersionsModal;
-        var parameters = new Dictionary<string, object>
-        {
-            { nameof(GameSaveVersionsModal.ModalCurrent), _currentModal },
-            { nameof(GameSaveVersionsModal.GameSave), _currentGameSave },
-            { nameof(GameSaveVersionsModal.ModalDownloadGameSave), _downloadGameSaveModal },
-        };
-
-        await _gameSaveVersionsModal.ShowAsync<GameSaveVersionsModal>(GameSaveVersionsModal.Title, parameters: parameters);
     }
 }

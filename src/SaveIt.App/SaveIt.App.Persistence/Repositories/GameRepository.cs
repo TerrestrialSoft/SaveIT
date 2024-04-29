@@ -40,6 +40,12 @@ internal class GameRepository(IDatabaseHandler _dbHandler) : IGameRepository
         var game = await _db.Table<Game>()
             .FirstOrDefaultAsync(g => g.Id == id);
 
+        if (game is null)
+        {
+            return;
+        }
+
+        await _db.GetChildrenAsync(game);
         await _db.DeleteAsync(game, true);
     }
 

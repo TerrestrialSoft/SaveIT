@@ -7,6 +7,7 @@ public class LockFileModel
 
 public class LockDetailsModel
 {
-    public required string LockedBy { get; set; }
+    public required Guid LockedByUserId { get; set; }
+    public required string LockedByUsername { get; set; }
     public required DateTime LockedAt { get; set; }
 }

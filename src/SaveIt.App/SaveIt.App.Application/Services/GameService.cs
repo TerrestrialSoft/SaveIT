@@ -32,7 +32,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         if (!lockFilesResult.Value.Any())
         {
-            lockFile = GetLockFile(gameSave.Game.Username);
+            lockFile = GetLockFile(gameSave.Game.Id, gameSave.Game.Username);
 
             var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _lockFileName, lockFile,
                 gameSave.RemoteLocationId);
@@ -58,12 +58,12 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         if (lockFile.Status == LockFileStatus.Locked)
         {
-            return lockFile.LockDetails!.LockedBy == gameSave.Game.Username
+            return lockFile.LockDetails!.LockedByUserId == gameSave.Game.Id
                 ? Result.Fail(GameErrors.CurrentUserLockedGameSave(lockFile))
                 : Result.Fail(GameErrors.GameSaveInUse(lockFile));
         }
 
-        lockFile = GetLockFile(gameSave.Game.Username);
+        lockFile = GetLockFile(gameSave.Game.Id, gameSave.Game.Username);
 
         var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
             lockFile);
@@ -72,13 +72,14 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             ? Result.Ok(lockFile)!
             : updateResult)!;
 
-        static LockFileModel GetLockFile(string username) => new()
+        static LockFileModel GetLockFile(Guid userId, string username) => new()
         {
             Status = LockFileStatus.Locked,
             LockDetails = new LockDetailsModel()
             {
-                LockedAt = DateTime.UtcNow,
-                LockedBy = username
+                LockedByUserId = userId,
+                LockedByUsername = username,
+                LockedAt = DateTime.UtcNow
             }
         };
     }
@@ -170,7 +171,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Ok();
         }
 
-        if (lockFile.LockDetails!.LockedBy != gameSave.Game.Username)
+        if (lockFile.LockDetails!.LockedByUsername != gameSave.Game.Username)
         {
             return Result.Fail(GameErrors.GameLockedByAnotherUser(lockFile));
         }

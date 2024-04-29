@@ -43,7 +43,8 @@ public partial class GameSaves
     private async Task<GridDataProviderResult<GameSaveViewModel>> EmployeesDataProvider(
         GridDataProviderRequest<GameSaveViewModel> request)
     {
-        _gameSaves ??= (await GameSaveRepository.GetAllGameSavesWithChildrenAsync()).Select(x => x.ToViewModel()!).ToList();
+        var gs = await GameSaveRepository.GetAllGameSavesWithChildrenAsync();
+        _gameSaves ??= gs.Select(x => x.ToViewModel()!).ToList();
         return await Task.FromResult(request.ApplyTo(_gameSaves));
     }
 

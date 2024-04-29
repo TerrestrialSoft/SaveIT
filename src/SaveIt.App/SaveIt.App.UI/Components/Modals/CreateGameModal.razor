@@ -1,4 +1,4 @@
-﻿<EditForm Model="CreateNewGameModel" OnValidSubmit=ValidSubmit autocomplete="off">
+﻿<EditForm Model="CreateNewGameModel" OnValidSubmit="CreateNewGameAsync" autocomplete="off">
     <FluentValidationValidator />
     <div>
         <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="CreateNewGameModel.Game"/>

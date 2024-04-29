@@ -13,7 +13,7 @@
                 break;
             case StartGameScreenState.SaveInUse:
                 <div class="fs-5">
-                    Game save is already in use by <b>@_lockFile?.LockDetails?.LockedBy</b> who locked it at
+                    Game save is already in use by <b>@_lockFile?.LockDetails?.LockedByUsername</b> who locked it at
                     <b>@_lockFile?.LockDetails?.LockedAt.ToLocalTime().ToString("g")</b>.
                     <br/>
                     You have the option to either wait for the user to finish or you can try to join them.

@@ -13,4 +13,5 @@ public interface IGameService
     Task<Result> UnlockRepositoryAsync(Guid gameSaveId);
     Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath);
     Task<Result> UploadSaveAsync(Guid gameSaveId);
+    Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId);
 }

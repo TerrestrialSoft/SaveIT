@@ -2,21 +2,29 @@
     <EditForm Model="_model" OnValidSubmit="DownloadSaveAsync">
         <FluentValidationValidator />
 
+        @if(_isRepositoryLocked)
+        {
+            <Alert Color="AlertColor.Primary"> Currently it is not possible to set the game save as the latest, because the repository is locked. </Alert>
+        }
+
         <div class="d-flex justify-content-center">
-            <div class="content-width mt-3">
-                <h5>Latest Game Save</h5>
-                <div class="d-flex m-2 fs-5">
-                    <div>
-                        Set as latest <Help Text="By selecting this option to set the game save as the latest version, your current game save will be replaced with the downloaded version. Additionaly the remote repository will be locked requiring you to upload the newest Game Save back to the repository." />:
-                    </div>
-                    <div class="ms-2">
-                        <InputCheckbox @bind-Value="_model.SetAsActiveGameSave" />
+            @if(!_isRepositoryLocked)
+            {
+                <div class="content-width mt-3">
+                    <h5>Latest Game Save</h5>
+                    <div class="d-flex m-2 fs-5">
+                        <div>
+                            Set as latest <Help Text="By selecting this option to set the game save as the latest version, your current game save will be replaced with the downloaded version. Additionaly the remote repository will be locked requiring you to upload the newest Game Save back to the repository." />:
+                        </div>
+                        <div class="ms-2">
+                            <InputCheckbox @bind-Value="_model.SetAsActiveGameSave" />
+                        </div>
                     </div>
                 </div>
-            </div>
+            }
             <div class="content-width">
                 &nbsp;
-                @if (!_model.SetAsActiveGameSave)
+                @if (!_model.SetAsActiveGameSave || _isRepositoryLocked)
                 {
                     <h5>Pick Destination folder for the Download</h5>
                     <div class="m-1 p-1">

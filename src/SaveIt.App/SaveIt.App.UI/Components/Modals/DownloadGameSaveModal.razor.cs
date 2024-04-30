@@ -1,11 +1,9 @@
 using BlazorBootstrap;
-using FluentResults;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Services;
 using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.Game;
-using System.Reflection;
 
 namespace SaveIt.App.UI.Components.Modals;
 public partial class DownloadGameSaveModal
@@ -13,7 +11,7 @@ public partial class DownloadGameSaveModal
     public const string Title = "Download Game Save";
 
     [Inject]
-    public IGameService GameService { get; set; } = default!;
+    private IGameService GameService { get; set; } = default!;
 
     [Inject]
     public ToastService ToastService { get; set; } = default!;
@@ -39,6 +37,21 @@ public partial class DownloadGameSaveModal
     };
 
     private bool _isDownloading = false;
+    private bool _isRepositoryLocked = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isLockedResult = await GameService.IsRepositoryLockedAsync(GameSaveId);
+
+        if (isLockedResult.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, isLockedResult.Errors[0].Message));
+            return;
+        }
+
+        _model.SetAsActiveGameSave = false;
+        _isRepositoryLocked = isLockedResult.Value;
+    }
 
     private Task HideModalAsync()
         => ModalCurrent.HideAsync();

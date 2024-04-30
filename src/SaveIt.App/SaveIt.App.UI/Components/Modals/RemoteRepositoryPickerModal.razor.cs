@@ -90,7 +90,7 @@ public partial class RemoteRepositoryPickerModal
             {
                 if(itemsResult.HasError<AuthError>())
                 {
-                    await StorageAccountRepository.DeactiveAccountAsync(SelectedStorageAccountId);
+                    await StorageAccountRepository.UnauthorizeAccountAsync(SelectedStorageAccountId);
                     FinishLoadingWithResult("Unable to refresh token. Storage account was deactivated");
                     return;
                 }

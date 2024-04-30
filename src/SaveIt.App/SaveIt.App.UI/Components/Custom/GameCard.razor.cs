@@ -12,6 +12,9 @@ public partial class GameCard
     private IGameRepository GameRepository { get; set; } = default!;
 
     [Inject]
+    private IStorageAccountRepository StorageAccountRepository { get; set; } = default!;
+
+    [Inject]
     private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
@@ -56,6 +59,22 @@ public partial class GameCard
 
     private async Task StartGameAsync()
     {
+        var accountId = Game.GameSaves!.First(x => x.Id == SelectedSaveId).StorageAccountId;
+        var account = await StorageAccountRepository.GetAsync(accountId);
+
+        if(account is null)
+        {
+            ToastService.Notify(new(ToastType.Danger, $"Storage account not found"));
+            return;
+        }
+
+        if (!account.IsAuthorized)
+        {
+            ToastService.Notify(new(ToastType.Danger, $"Storage account not authorized",
+                "Navigate to Storage accounts page and authorize the account."));
+            return;
+        }
+
         var parameters = new Dictionary<string, object>
         {
             { nameof(StartGameModal.SaveId), SelectedSaveId!.Value },

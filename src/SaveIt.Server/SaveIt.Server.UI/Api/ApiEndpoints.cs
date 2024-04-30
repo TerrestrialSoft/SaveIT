@@ -1,4 +1,5 @@
 ﻿using SaveIt.Server.UI.Models;
+using SaveIt.Server.UI.Results;
 using SaveIt.Server.UI.Services.Auth;
 using System.Web;
 
@@ -18,7 +19,7 @@ public static class ApiEndpoints
             var serverUrl = GetServerUrl(context.Request);
             var authorization = authService.RegisterAuthorizationRequest(model.RequestId, serverUrl);
 
-            return Results.Ok(new AuthorizationUrlResponseModel(authorization.Uri.ToString()));
+            return Microsoft.AspNetCore.Http.Results.Ok(new AuthorizationUrlResponseModel(authorization.Uri.ToString()));
         });
 
         apiGroup.MapGet("google/callback", async (string state, string? code, string? error, HttpContext context,
@@ -27,7 +28,7 @@ public static class ApiEndpoints
             if (!string.IsNullOrEmpty(error) || string.IsNullOrEmpty(code))
             {
                 _logger.LogInformation("Failed to authenticate with Google: {Error}", error);
-                return Results.Redirect(string.Format(_failedAuth, error));
+                return Microsoft.AspNetCore.Http.Results.Redirect(string.Format(_failedAuth, error));
             }
 
             var serverUrl = GetServerUrl(context.Request);
@@ -41,7 +42,7 @@ public static class ApiEndpoints
                 path = string.Format(_failedAuth, errors);
             }
 
-            return Results.Redirect(path);
+            return Microsoft.AspNetCore.Http.Results.Redirect(path);
         });
 
         apiGroup.MapPost("retrieve", async (RequestModel model, CancellationToken token,
@@ -50,8 +51,8 @@ public static class ApiEndpoints
             var result = await authService.RetrieveTokensAsync(model.RequestId, token);
 
             return result.IsSuccess
-                ? Results.Ok(result.Value)
-                : Results.NoContent();
+                ? Microsoft.AspNetCore.Http.Results.Ok(result.Value)
+                : Microsoft.AspNetCore.Http.Results.NoContent();
         });
 
         apiGroup.MapPost("refresh", async (RefreshTokenRequestModel model, CancellationToken token,
@@ -59,9 +60,7 @@ public static class ApiEndpoints
         {
             var result = await authService.RefreshAccessTokenAsync(model.RefreshToken, token);
 
-            return result.IsSuccess
-                ? Results.Ok(result.Value)
-                : Results.BadRequest();
+            return result.ToAspResult();
         });
     }
 

@@ -26,7 +26,8 @@ public static class ServiceCollectionExtensions
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddPolicyHandler(_ => HttpPolicyExtensions
                 .HandleTransientHttpError()
-                .OrResult(x => !x.IsSuccessStatusCode)
+                .OrResult(x => !x.IsSuccessStatusCode && x.StatusCode != System.Net.HttpStatusCode.Unauthorized
+                    && x.StatusCode != System.Net.HttpStatusCode.Forbidden)
                 .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
         services.AddHttpClient<IExternalStorageService, GoogleApiService>((serviceProvider, client) =>

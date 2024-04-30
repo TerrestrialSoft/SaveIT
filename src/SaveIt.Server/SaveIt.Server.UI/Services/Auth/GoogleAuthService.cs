@@ -75,17 +75,19 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             { "redirect_uri", redirectUri },
         };
 
-        // TODO: Add retry mechanisms:
-        var result = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
+        var response = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
 
-        if (!result.IsSuccessStatusCode)
+        var responseResult = response.ToResult();
+
+        if (responseResult.IsFailed)
         {
             _logger.LogError("Error occured during communication with identity provider. {ReasonPhrase}",
-                result.ReasonPhrase);
-            return Result.Fail($"Identity Provider communication error");
+                response.ReasonPhrase);
+            return responseResult.ToResult();
         }
 
-        var token = await result.Content.ReadFromJsonAsync<OAuthCompleteTokenResponseModel>(cancellationToken: cancellationToken);
+        var token = await response.Content.ReadFromJsonAsync<OAuthCompleteTokenResponseModel>(
+            cancellationToken: cancellationToken);
 
         if (token is null)
         {
@@ -110,7 +112,7 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
     }
 
     public Task<Result<OAuthCompleteTokenResponseModel>> RetrieveTokensAsync(Guid requestId, CancellationToken cancellationToken)
-        => _tokenStorage.WaitForToken(requestId, cancellationToken);
+        => _tokenStorage.WaitForTokenAsync(requestId, cancellationToken);
 
     public async Task<Result<OAuthAccessTokenResponseModel>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken)
     {
@@ -122,17 +124,18 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             { "grant_type", "refresh_token" },
         };
 
-        // TODO: Add retry mechanisms:
-        var result = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
+        var response = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
 
-        if (!result.IsSuccessStatusCode)
+        var responseResult = response.ToResult();
+
+        if (responseResult.IsFailed)
         {
             _logger.LogError("Error occured during refreshing the access token. {ReasonPhrase}",
-                result.ReasonPhrase);
-            return Result.Fail($"Error occured during refreshing the access token.");
+                response.ReasonPhrase);
+            return responseResult.ToResult();
         }
 
-        var token = await result.Content.ReadFromJsonAsync<OAuthAccessTokenResponseModel>(cancellationToken: cancellationToken);
+        var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenResponseModel>(cancellationToken: cancellationToken);
 
         if (token is null)
         {

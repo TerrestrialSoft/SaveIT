@@ -1,6 +1,9 @@
-﻿using SaveIt.App.Domain.Auth;
+﻿using FluentResults;
+using SaveIt.App.Domain.Auth;
+using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Infrastructure.Models;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
@@ -35,7 +38,7 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
         return token;
     }
 
-    public async Task<string> RefreshAccessTokenAsync(string refreshToken)
+    public async Task<Result<string>> RefreshAccessTokenAsync(string refreshToken)
     {
         var dictionary = new Dictionary<string, string>
         {
@@ -43,12 +46,16 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
         };
 
         var response = await _httpClient.PostAsJsonAsync(_refreshUrl, dictionary);
-        response.EnsureSuccessStatusCode();
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+        {
+            return Result.Fail(ApiErrors.InvalidAuthorization());
+        }
 
         var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenModel>();
 
         ArgumentNullException.ThrowIfNull(token);
 
-        return token.AccessToken;
+        return Result.Ok(token.AccessToken);
     }
 }

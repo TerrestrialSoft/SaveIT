@@ -10,7 +10,7 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler)
         => await _db.Table<StorageAccount>()
             .Where(x => x.Email == email)
             .ToListAsync();
-    public async Task DeactiveAccountAsync(Guid id)
+    public async Task UnauthorizeAccountAsync(Guid id)
     {
         var account = await _db.Table<StorageAccount>()
             .FirstOrDefaultAsync(x => x.Id == id);

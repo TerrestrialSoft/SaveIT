@@ -6,16 +6,21 @@ public class ApiErrors(string message) : Error(message)
     public static GeneralError General() => new();
     public static IncompleteUploadError IncompleteUpload() => new();
     public static NotFoundError NotFound() => new();
+    public static AuthorizationError InvalidAuthorization() => new();
 
-    public class GeneralError(string? message = null) : FileErrors("There was an error when working with the file. " + message)
+    public class GeneralError(string? message = null) : ApiErrors("There was an error when working with external API. " + message)
     {
     }
 
-    public class IncompleteUploadError(string? message = null) : FileErrors("Incomplete upload error. " + message)
+    public class IncompleteUploadError(string? message = null) : ApiErrors("Incomplete upload error. " + message)
     {
     }
 
-    public class NotFoundError(string? message = null) : FileErrors("Not Found error. " + message)
+    public class NotFoundError(string? message = null) : ApiErrors("Not Found error. " + message)
+    {
+    }
+
+    public class AuthorizationError(string? message = null) : ApiErrors("Authorization error. " + message)
     {
     }
 

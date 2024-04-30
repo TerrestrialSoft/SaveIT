@@ -7,5 +7,5 @@ public interface ITokenStorage
 {
     void SetToken(Guid key, StoredRequest value);
     bool TryGetToken(Guid key, out StoredRequest? value);
-    Task<Result<OAuthCompleteTokenResponseModel>> WaitForToken(Guid key, CancellationToken cancellationToken);
+    Task<Result<OAuthCompleteTokenResponseModel>> WaitForTokenAsync(Guid key, CancellationToken cancellationToken);
 }

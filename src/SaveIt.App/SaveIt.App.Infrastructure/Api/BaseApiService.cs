@@ -7,11 +7,13 @@ using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Auth;
 
 namespace SaveIt.App.Infrastructure.Api;
-public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository accountSecretsRepo, ISaveItApiService saveItService)
+public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository accountSecretsRepo, ISaveItApiService saveItService,
+    IStorageAccountRepository storageAccountsRepository)
 {
     protected readonly HttpClient _httpClient = httpClient;
     protected readonly IAccountSecretsRepository _accountSecretsRepo = accountSecretsRepo;
     protected readonly ISaveItApiService _saveItService = saveItService;
+    protected readonly IStorageAccountRepository _storageAccountsRepository = storageAccountsRepository;
 
     protected async Task<Result> ExecuteRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestFactory)
     {
@@ -200,7 +202,21 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
         string accessToken;
         try
         {
-            accessToken = await _saveItService.RefreshAccessTokenAsync(refreshToken);
+            var accessTokenResult = await _saveItService.RefreshAccessTokenAsync(refreshToken);
+
+            if (accessTokenResult.IsSuccess)
+            {
+                accessToken = accessTokenResult.Value;
+            }
+            else
+            {
+                if (accessTokenResult.HasError<ApiErrors.AuthorizationError>())
+                {
+                    await _storageAccountsRepository.UnauthorizeAccountAsync(storageAccountId);
+                }
+
+                return Result.Fail(new AuthError("Unable to refresh access token"));
+            }
         }
         catch (Exception)
         {

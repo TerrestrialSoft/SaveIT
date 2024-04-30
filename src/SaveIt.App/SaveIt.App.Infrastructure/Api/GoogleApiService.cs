@@ -10,8 +10,9 @@ using System.Text.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository accountSecretsRepo,
-    ISaveItApiService saveItService, GoogleApiUploadService _googleApiUploadService)
-    : BaseApiService(httpClient, accountSecretsRepo, saveItService), IExternalStorageService
+    ISaveItApiService saveItService, GoogleApiUploadService _googleApiUploadService,
+    IStorageAccountRepository storageAccountRepository)
+    : BaseApiService(httpClient, accountSecretsRepo, saveItService, storageAccountRepository), IExternalStorageService
 {
     private const string _profileUrl = "about?fields=user";
     private const string _baseFilesUrl = "files";

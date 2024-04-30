@@ -8,8 +8,8 @@ using System.Text.Json;
 
 namespace SaveIt.App.Infrastructure.Api;
 public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepository _accountsSecretsRepo,
-    ISaveItApiService _saveItService) 
-    : BaseApiService(_httpClient, _accountsSecretsRepo, _saveItService)
+    ISaveItApiService _saveItService, IStorageAccountRepository storageAccountRepository) 
+    : BaseApiService(_httpClient, _accountsSecretsRepo, _saveItService, storageAccountRepository)
 {
     private const string _mimeTypeFile = "application/vnd.google-apps.file";
     private const string _mimeTypeZip = "application/zip";

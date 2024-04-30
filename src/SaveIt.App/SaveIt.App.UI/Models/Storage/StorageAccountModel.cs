@@ -7,4 +7,5 @@ public class StorageAccountModel
     public required string Email { get; set; }
     public required bool IsAuthorized { get; set; }
     public required StorageAccountType Type { get; set; }
+    public required int GameSavesCount { get; set; }
 }

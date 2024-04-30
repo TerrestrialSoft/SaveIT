@@ -54,7 +54,7 @@ public partial class GameSaveSettings
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
             StateHasChanged();
-            files = [];
+            files.Clear();
             return await Task.FromResult(request.ApplyTo(files));
         }
 

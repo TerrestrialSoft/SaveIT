@@ -18,26 +18,42 @@
 
         <GridColumn TItem="StorageAccountModel" HeaderText="Email" PropertyName="Email" SortKeySelector="x => x.Email">
             @context.Email
-        </GridColumn>
-        <GridColumn TItem="StorageAccountModel" HeaderText="Authorization Status" PropertyName="IsAuthorized" SortKeySelector="x => x.IsAuthorized">
-            @context.IsAuthorized
+            
+            @if(context.IsAuthorized)
+            {
+                <Badge Color="BadgeColor.Success" VisuallyHiddenText="Account is successfully authorized." Class="ms-2">Authorized</Badge>
+            }
+            else
+            {
+                <Badge Color="BadgeColor.Warning" VisuallyHiddenText="Account requires authorization." Class="ms-2">Unauthorized</Badge>
+            }
         </GridColumn>
         <GridColumn TItem="StorageAccountModel" HeaderText="Actions" Filterable="false">
-            <Tooltip Title="Renew authorization">
-                <Icon CustomIconName="@CustomIcons.SettingsSolid"
-                      Size="IconSize.x5"
-                      Color="IconColor.Warning"
-                      Class="p-1"
-                      @onclick="() => RenewAuthorizationAsync(context)" />
-            </Tooltip>
-            <Tooltip Title="Delete">
-                <Icon CustomIconName="@CustomIcons.RotateRightSolid"
-                      Size="IconSize.x5"
-                      Color="IconColor.Danger"
-                      Class="p-1"
-                      @onclick="() => DeleteStorageAccountAsync(context)" />
-            </Tooltip>
+            @if(!context.IsAuthorized)
+            {
+                <Tooltip Title="Renew authorization">
+                    <Icon CustomIconName="@CustomIcons.RotateRightSolid"
+                          Size="IconSize.x5"
+                          Color="IconColor.Warning"
+                          Class="p-1"
+                          @onclick="() => RenewAuthorizationAsync(context)" />
+                </Tooltip>
+            }
+
+            @if(context.GameSavesCount == 0)
+            {
+                <Tooltip Title="Delete">
+                    <Icon CustomIconName="@CustomIcons.TrashSolid"
+                          Size="IconSize.x5"
+                          Color="IconColor.Danger"
+                          Class="p-1"
+                          @onclick="() => DeleteStorageAccountAsync(context)" />
+                </Tooltip>
+            }
         </GridColumn>
 
     </Grid>
 </div>
+
+<Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" />
+<ConfirmDialog @ref="_confirmDialog" />

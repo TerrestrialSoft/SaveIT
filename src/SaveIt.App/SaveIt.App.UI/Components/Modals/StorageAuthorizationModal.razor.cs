@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using SaveIt.App.Domain.Enums;
 
 namespace SaveIt.App.UI.Components.Modals;
 public partial class StorageAuthorizationModal
@@ -6,7 +7,18 @@ public partial class StorageAuthorizationModal
     [Parameter, EditorRequired]
     public required EventCallback OnClose { get; set; }
 
+    [Parameter]
+    public StorageAccountType? StorageAccountType { get; set; }
+
     private AuthorizationScreenState _authState = AuthorizationScreenState.SelectProvider;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (StorageAccountType.HasValue)
+        {
+            await AuthorizeProviderAsync();
+        }
+    }
 
     private Task SelectGoogleProvider()
         => AuthorizeProviderAsync();

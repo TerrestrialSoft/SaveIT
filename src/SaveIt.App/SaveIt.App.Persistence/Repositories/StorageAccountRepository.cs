@@ -22,4 +22,9 @@ public class StorageAccountRepository(IDatabaseHandler _dbHandler)
 
         await _db.UpdateAsync(account);
     }
+
+    public async Task<IEnumerable<StorageAccount>> GetAllAuthorizedAccountsAsync()
+        => await _db.Table<StorageAccount>()
+            .Where(x => x.IsAuthorized)
+            .ToListAsync();
 }

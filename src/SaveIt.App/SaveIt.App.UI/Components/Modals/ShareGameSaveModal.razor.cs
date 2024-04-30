@@ -50,7 +50,7 @@ public partial class ShareGameSaveModal
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
             StateHasChanged();
-            users = [];
+            users!.Clear();
             return await Task.FromResult(request.ApplyTo(users));
         }
 
@@ -79,7 +79,7 @@ public partial class ShareGameSaveModal
 
         _model = new ShareWithCreateModel();
 
-        users = [];
+        users.Clear();
         await _grid.RefreshDataAsync();
         _shareInProgress = false;
     }
@@ -120,7 +120,7 @@ public partial class ShareGameSaveModal
 
         ToastService.Notify(new ToastMessage(ToastType.Success, "User removed from sharing list."));
         _unshareInProgress = false;
-        users = [];
+        users.Clear();
         await _grid.RefreshDataAsync();
     }
 }

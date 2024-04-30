@@ -11,6 +11,6 @@ public class StorageAccount : BaseEntity
     public StorageAccountType Type { get; init; }
     public bool IsAuthorized { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
+    [OneToMany(CascadeOperations = CascadeOperation.CascadeRead)]
     public List<GameSave>? GameSaves { get; set; }
 }

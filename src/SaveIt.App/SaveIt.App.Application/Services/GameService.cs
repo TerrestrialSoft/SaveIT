@@ -364,7 +364,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : result.ToResult();
     }
 
-    private async Task<Result<(string?, LockFileModel?)>> GetLockFileContentWithIdAsync(Guid storageAccountId, string remoteLocationId)
+    private async Task<Result<(string?, LockFileModel?)>> GetLockFileContentWithIdAsync(Guid storageAccountId,
+        string remoteLocationId)
     {
         var lockFileResult = await GetLockFileMetadataAsync(storageAccountId, remoteLocationId);
 

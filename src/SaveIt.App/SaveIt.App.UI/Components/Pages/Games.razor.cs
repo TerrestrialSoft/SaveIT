@@ -73,4 +73,9 @@ public partial class Games
         game = (await gameRepository.GetWithChildrenAsync(game.Id))!;
         GameCardUpdated(game);
     }
+
+    private void GameCardMinimized()
+    {
+        _selectedGame = null;
+    }
 }

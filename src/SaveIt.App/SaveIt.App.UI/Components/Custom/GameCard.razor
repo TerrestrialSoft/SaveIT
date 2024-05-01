@@ -1,9 +1,9 @@
-﻿<div class="card m-2 prevent-select" style="width: 18rem; height:18rem;" @onclick="ToggleDetailShowing">
+﻿<div class="card m-2 prevent-select" style="width: 18rem; height:18rem;">
     
     @if (ShowDetail)
     {
         <div class="card-body">
-            <div class="d-flex flex-row justify-content-between">
+            <div class="d-flex flex-row justify-content-between align-items-start">
                 <div class="d-flex">
                     <h5 class="card-title">@Game.Name</h5>
                     @if (IsGameHosting())
@@ -15,12 +15,21 @@
                         </div>
                     }
                 </div>
-                <div>
+                <div class="d-flex justify-content-end">
                     <Button Color="ButtonColor.Danger"
-                        Outline="true" Size="Size.Small"
+                        Outline="true"
+                        Size="Size.Small"
                         @onclick="DeleteGameAsync"
                         TooltipTitle="Delete">
                             <Icon CustomIconName="@CustomIcons.TrashSolid" />
+                    </Button>
+                    <Button Color="ButtonColor.Dark"
+                        Outline="true"
+                        Size="Size.Small"
+                        @onclick="MinimizeCardAsync"
+                        TooltipTitle="Minimize"
+                        Class="ms-1">
+                        <Icon CustomIconName="@CustomIcons.MinimizeSolid" />
                     </Button>
                 </div>
             </div>
@@ -58,20 +67,23 @@
     }
     else
     {
-        @if (IsGameHosting())
-        {
-            <div class="hosting-location hosting-container d-flex justify-content-center align-items-center">
-                <Tooltip Title="Hosting the game">
-                    <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
-                </Tooltip>
+        <div @onclick="StartDetailShowing">
+            @if (IsGameHosting())
+            {
+                <div class="hosting-location hosting-container d-flex justify-content-center align-items-center">
+                    <Tooltip Title="Hosting the game">
+                        <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
+                    </Tooltip>
+                </div>
+            }
+            <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")"
+                class="card-img-top image"
+                alt="@Game.Name Image">
+            <div class="card-body divider">
+                <h5 class="card-title">@Game.Name</h5>
             </div>
-        }
-        <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")"
-            class="card-img-top image"
-            alt="@Game.Name Image">
-        <div class="card-body divider">
-            <h5 class="card-title">@Game.Name</h5>
         </div>
+
     }
     <ConfirmDialog @ref="_confirmDialog" />
 </div>

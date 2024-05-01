@@ -24,6 +24,9 @@ public partial class GameCard
     public required EventCallback<Game> OnCardClicked { get; set; }
 
     [Parameter, EditorRequired]
+    public required EventCallback OnCardMinimized { get; set; }
+
+    [Parameter, EditorRequired]
     public required EventCallback<Game> OnCardUpdated { get; set; }
 
     [Parameter]
@@ -41,7 +44,6 @@ public partial class GameCard
     private ConfirmDialog _confirmDialog = default!;
 
     private GameSave? selectedSave;
-    private string _startGameButtonText = "";
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -55,13 +57,15 @@ public partial class GameCard
 
     private bool IsGameHosting() => Game.GameSaves?.Exists(x => x.IsHosting) ?? false;
 
-    private async Task ToggleDetailShowing()
+    private async Task StartDetailShowing()
     {
-        if (!ShowDetail)
+        if (ShowDetail)
         {
-            ShowDetail = true;
-            await OnCardClicked.InvokeAsync(Game);
+            return;
         }
+
+        ShowDetail = true;
+        await OnCardClicked.InvokeAsync(Game);
     }
 
     private async Task StartGameAsync()
@@ -143,5 +147,16 @@ public partial class GameCard
         };
 
         await ModalEditGame.ShowAsync<EditGameModal>(EditGameModal.Title, parameters: parameters);
+    }
+
+    private async Task MinimizeCardAsync()
+    {
+        if (!ShowDetail)
+        {
+            return;
+        }
+
+        ShowDetail = false;
+        await OnCardMinimized.InvokeAsync();
     }
 }

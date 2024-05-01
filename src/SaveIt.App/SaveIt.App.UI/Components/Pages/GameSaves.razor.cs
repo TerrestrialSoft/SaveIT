@@ -10,6 +10,10 @@ using SaveIt.App.UI.Models.GameSaves;
 namespace SaveIt.App.UI.Components.Pages;
 public partial class GameSaves
 {
+    public const string CreateOperationTemplate = "/game-saves?operation=create&id={0}";
+    public const string EditOperationTemplate = "/game-saves?operation=edit&id={0}";
+    private const string GameSaveSettingsUrl = "/game-saves/{0}";
+
     [Inject]
     public IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
@@ -36,11 +40,46 @@ public partial class GameSaves
 
     private ConfirmDialog _confirmDialog = default!;
 
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!NavManager.TryGetQueryParameter<string>("operation", out var operation) || operation is null)
+        {
+            return;
+        }
+
+        if (!NavManager.TryGetQueryParameter<Guid>("id", out var id))
+        {
+            return;
+        }
+
+        switch (operation.ToLower())
+        {
+            case "create":
+                await ShowCreateGameSaveModalAsync(id);
+                break;
+            case "edit":
+                var gameSave = await GameSaveRepository.GetWithChildrenAsync(id);
+                if (gameSave is null)
+                {
+                    return;
+                }
+                await ShowEditGameSaveModalAsync(gameSave);
+                break;
+        }
+    }
+
     private async Task<GridDataProviderResult<GameSaveViewModel>> GameSavesDataProvider(
         GridDataProviderRequest<GameSaveViewModel> request)
     {
+        if (_gameSaves is not null && _gameSaves.Count > 0)
+        {
+            return await Task.FromResult(request.ApplyTo(_gameSaves));
+        }
+
         var gs = await GameSaveRepository.GetAllWithChildrenAsync();
-        _gameSaves ??= gs.Select(x => x.ToViewModel()!).ToList();
+        _gameSaves = gs.Select(x => x.ToViewModel()!).ToList();
+
         return await Task.FromResult(request.ApplyTo(_gameSaves));
     }
 
@@ -60,7 +99,7 @@ public partial class GameSaves
         } 
     }
 
-    private async Task ShowCreateGameSaveModalAsync()
+    private async Task ShowCreateGameSaveModalAsync(Guid? gameId = null)
     {
         _currentModal = _createNewGameSaveModal;
         var parameters = new Dictionary<string, object>
@@ -69,6 +108,7 @@ public partial class GameSaves
             { nameof(CreateGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
+            { nameof(CreateGameSaveModal.InitialGameId), gameId! },
             { nameof(CreateGameSaveModal.GameSaveModel), _createGameSave},
             { nameof(CreateGameSaveModal.OnCreateGameRequested), EventCallback.Factory.Create(this, async () =>
                 {
@@ -153,6 +193,7 @@ public partial class GameSaves
         }
 
         await GameSaveRepository.DeleteAsync(gameSave.Id);
+        _gameSaves.Clear();
         await _grid.RefreshDataAsync();
         ToastMessageService.Notify(new(ToastType.Success, "Game save deleted successfully."));
     }
@@ -171,6 +212,7 @@ public partial class GameSaves
 
     private void ShowAdvancedGameSaveSettingsModal(GameSave gameSave)
     {
-        NavManager.NavigateTo($"gamesaves/{gameSave.Id}");
+        var url = string.Format(GameSaveSettingsUrl, gameSave.Id);
+        NavManager.NavigateTo(url);
     }
 }

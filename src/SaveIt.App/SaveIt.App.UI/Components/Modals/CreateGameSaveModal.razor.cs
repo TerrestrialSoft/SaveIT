@@ -38,12 +38,18 @@ public partial class CreateGameSaveModal
     [Parameter, EditorRequired]
     public required EventCallback OnCreateGameRequested { get; set; }
 
+    [Parameter]
+    public Guid? InitialGameId { get; set; }
+
     private List<Game> _games = [];
 
     protected override async Task OnInitializedAsync()
     {
         _games = (await GameRepository.GetAllAsync()).ToList();
-        GameSaveModel.GameId= _games.FirstOrDefault()?.Id;
+
+        GameSaveModel.GameId = InitialGameId is not null
+            ? InitialGameId
+            : _games.FirstOrDefault()?.Id;
     }
 
     private Task ShowCreateGameSaveModalAsync()

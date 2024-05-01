@@ -10,7 +10,7 @@
                     {
                         <div class="hosting-container">
                             <Tooltip Title="Hosting the game">
-                                <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
+                                <Icon CustomIconName="@CustomIcons.Hosting" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
                             </Tooltip>
                         </div>
                     }
@@ -21,7 +21,7 @@
                         Size="Size.Small"
                         @onclick="DeleteGameAsync"
                         TooltipTitle="Delete">
-                            <Icon CustomIconName="@CustomIcons.TrashSolid" />
+                            <Icon CustomIconName="@CustomIcons.Delete" />
                     </Button>
                     <Button Color="ButtonColor.Dark"
                         Outline="true"
@@ -29,20 +29,48 @@
                         @onclick="MinimizeCardAsync"
                         TooltipTitle="Minimize"
                         Class="ms-1">
-                        <Icon CustomIconName="@CustomIcons.MinimizeSolid" />
+                        <Icon CustomIconName="@CustomIcons.Minimize" />
                     </Button>
                 </div>
             </div>
             <div>
-                <label class="fs-6">Profile</label>
-                <InputSelect @bind-Value="selectedSave" class="p-2 w-100 form-control form-select">
-                    @foreach(var save in Game.GameSaves!)
-                    {
-                        <option value="@save" class="p-1">
-                            @save.Name @(save.IsHosting ? " (Hosting)" : "")
-                        </option>
-                    }
-                </InputSelect>
+                <div class="fs-6">
+                    Game Save:
+                </div>
+                @if(Game.GameSaves is not null && Game.GameSaves.Any())
+                {
+                    <div class="d-flex align-items-center">
+                        <div class="ms-1 flex-grow-1">
+                            <InputSelect @bind-Value="selectedSave" class="p-2 form-control form-select">
+                                @foreach (var save in Game.GameSaves)
+                                {
+                                    <option value="@save" class="p-1">
+                                        @save.Name @(save.IsHosting ? " (Hosting)" : "")
+                                    </option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="d-flex justify-content-end ms-1">
+                            <Button Color="ButtonColor.Warning"
+                                Size="Size.Small"
+                                Outline="true"
+                                TooltipTitle="Edit Game Save"
+                                @onclick="EditGameSaveRedirect">
+                                <Icon CustomIconName="@CustomIcons.Edit" />
+                            </Button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Medium"
+                        @onclick="CreateGameSaveRedirect">
+                        <Icon Name="IconName.Plus" Class="me-1"/>
+                        Create Game Save
+                    </Button>                    
+                }
+
             </div>
         </div>
 
@@ -52,14 +80,14 @@
                         Size="Size.Large"
                         Outline="true"
                         @onclick="ShowEditGameModalAsync">
-                    <Icon CustomIconName="@CustomIcons.PenSolid" Class="me-1"/>
+                    <Icon CustomIconName="@CustomIcons.Edit" Class="me-1"/>
                     Edit
                 </Button>
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Disabled="@(selectedSave is null)"
                         @onclick="StartGameAsync">
-                    <Icon CustomIconName="@CustomIcons.PlaySolid" Class="me-1" />
+                    <Icon CustomIconName="@CustomIcons.Play" Class="me-1" />
                     Start
                 </Button>
             </div>
@@ -72,7 +100,7 @@
             {
                 <div class="hosting-location hosting-container d-flex justify-content-center align-items-center">
                     <Tooltip Title="Hosting the game">
-                        <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
+                        <Icon CustomIconName="@CustomIcons.Hosting" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
                     </Tooltip>
                 </div>
             }

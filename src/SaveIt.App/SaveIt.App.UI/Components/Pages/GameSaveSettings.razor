@@ -1,4 +1,4 @@
-﻿@page "/gamesaves/{GameSaveIdString}"
+﻿@page "/game-saves/{GameSaveIdString}"
 
 @if (_gameSaveExists)
 {
@@ -58,7 +58,7 @@
                     </GridColumn>
                     <GridColumn TItem="FileItemModel" HeaderText="Actions">
                         <Tooltip Title="Download save">
-                            <Icon CustomIconName="@CustomIcons.DownloadSolid"
+                            <Icon CustomIconName="@CustomIcons.Download"
                                   Size="IconSize.x5"
                                   Color="IconColor.Primary"
                                   Class="p-1"
@@ -79,7 +79,7 @@
                 </div>
                 <div>
                     <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="UnlockRepositoryAsync">
-                        <Icon CustomIconName="@CustomIcons.UnlockSolid" /> Unlock
+                        <Icon CustomIconName="@CustomIcons.Unlock" /> Unlock
                     </Button>
                 </div>
             </div>
@@ -91,7 +91,7 @@
                 </div>
                 <div>
                     <Button Color="ButtonColor.Primary" Size="Size.Large" Class="ps-3 pe-3" @onclick="ShowUploadGameSaveModalAsync">
-                        <Icon CustomIconName="@CustomIcons.UploadSolid" /> Upload
+                        <Icon CustomIconName="@CustomIcons.Upload" /> Upload
                     </Button>
                 </div>
             </div>

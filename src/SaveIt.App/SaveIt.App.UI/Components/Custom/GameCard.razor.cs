@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Components.Modals;
+using SaveIt.App.UI.Components.Pages;
 using SaveIt.App.UI.Extensions;
 
 namespace SaveIt.App.UI.Components.Custom;
@@ -16,6 +17,9 @@ public partial class GameCard
 
     [Inject]
     private ToastService ToastService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required Game Game { get; set; }
@@ -158,5 +162,22 @@ public partial class GameCard
 
         ShowDetail = false;
         await OnCardMinimized.InvokeAsync();
+    }
+
+    private void CreateGameSaveRedirect()
+    {
+        var url = string.Format(GameSaves.CreateOperationTemplate, Game.Id);
+        NavigationManager.NavigateTo(url);
+    }
+
+    private void EditGameSaveRedirect()
+    {
+        if (selectedSave is null)
+        {
+            return;
+        }
+
+        var url = string.Format(GameSaves.EditOperationTemplate, selectedSave.Id);
+        NavigationManager.NavigateTo(url);
     }
 }

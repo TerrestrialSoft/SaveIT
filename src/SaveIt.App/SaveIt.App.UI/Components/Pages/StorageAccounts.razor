@@ -32,7 +32,7 @@
             @if(!context.IsAuthorized)
             {
                 <Tooltip Title="Renew authorization">
-                    <Icon CustomIconName="@CustomIcons.RotateRightSolid"
+                    <Icon CustomIconName="@CustomIcons.Refresh"
                           Size="IconSize.x5"
                           Color="IconColor.Warning"
                           Class="p-1"
@@ -43,7 +43,7 @@
             @if(context.GameSavesCount == 0)
             {
                 <Tooltip Title="Delete">
-                    <Icon CustomIconName="@CustomIcons.TrashSolid"
+                    <Icon CustomIconName="@CustomIcons.Delete"
                           Size="IconSize.x5"
                           Color="IconColor.Danger"
                           Class="p-1"

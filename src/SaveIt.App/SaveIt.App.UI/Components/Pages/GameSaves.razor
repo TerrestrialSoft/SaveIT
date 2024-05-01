@@ -1,7 +1,7 @@
 ﻿@page "/game-saves"
 
 <div class="d-flex m-3 justify-content-end">
-    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="ShowCreateGameSaveModalAsync">
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="() => ShowCreateGameSaveModalAsync()">
         <Icon Name="IconName.PlusLg" /> Create new Game Save
     </Button>
 </div>
@@ -21,7 +21,7 @@
             @if(context.GameSave.IsHosting)
             {
                 <Badge Color="BadgeColor.Primary" VisuallyHiddenText="Currently hosting this game save" Class="ms-2">
-                    <Icon CustomIconName="@CustomIcons.CrownSolid" Class="me-1"/>
+                    <Icon CustomIconName="@CustomIcons.Hosting" Class="me-1"/>
                     Hosting
                 </Badge>
             }
@@ -31,7 +31,7 @@
         </GridColumn>
         <GridColumn TItem="GameSaveViewModel" HeaderText="Actions" Filterable="false" FilterTextboxWidth="40">
             <Tooltip Title="Edit">
-                <Icon CustomIconName="@CustomIcons.PenSolid"
+                <Icon CustomIconName="@CustomIcons.Edit"
                     Size="IconSize.x5"
                     Color="IconColor.Warning"
                     Class="p-1"
@@ -45,14 +45,14 @@
                     @onclick="() => ShowShareGameSaveModalAsync(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Advanced Settings">
-                <Icon CustomIconName="@CustomIcons.SettingsSolid"
+                <Icon CustomIconName="@CustomIcons.Settings"
                     Size="IconSize.x5"
                     Color="IconColor.Secondary"
                     Class="p-1"
                     @onclick="() => ShowAdvancedGameSaveSettingsModal(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Delete">
-                <Icon CustomIconName="@CustomIcons.TrashSolid"
+                <Icon CustomIconName="@CustomIcons.Delete"
                     Size="IconSize.x5"
                     Color="IconColor.Danger"
                     Class="p-1"

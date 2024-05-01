@@ -26,13 +26,20 @@ public partial class LocalItemPickerModal
 
     protected override void OnInitialized()
     {
-        if (InitialSelectedFile is not null)
-        {
-            _selectedFile = new(InitialSelectedFile);
-        }
-
         try
         {
+            if (InitialSelectedFile is not null)
+            {
+                var folder = Path.GetDirectoryName(InitialSelectedFile.FullPath);
+                _selectedFile = new(new LocalFileItemModel
+                {
+                    Name = Path.GetFileName(folder)!,
+                    Path = Directory.GetParent(folder!)?.FullName ?? "",
+                    IsDirectory = true
+                });
+                return;
+            }
+
             if (_selectedFile is null)
             {
                 var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);

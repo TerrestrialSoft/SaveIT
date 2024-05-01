@@ -10,7 +10,9 @@ namespace SaveIt.App.UI.Components.Modals;
 public partial class RemoteRepositoryPickerModal
 {
     private readonly List<SelectedItemViewModel<RemoteFileItemModel>> _items = [];
-    private string? _error;
+    private string? _error = null;
+    private string? _warning = null;
+
     private bool _isLoading = true;
 
     [Inject]
@@ -38,6 +40,7 @@ public partial class RemoteRepositoryPickerModal
         }
     }
 
+
     protected override async Task OnInitializedAsync()
     {
         string? error = null;
@@ -50,9 +53,23 @@ public partial class RemoteRepositoryPickerModal
 
             if (folderResult.IsFailed)
             {
-                error = folderResult.Errors[0].Message;
-                FinishLoadingWithResult(error);
-                return;
+                if(InitialSelectedItem is null)
+                {
+                    error = folderResult.Errors[0].Message;
+                    FinishLoadingWithResult(error);
+                    return;
+                }
+
+                _warning = "Requested folder was not found. Redirecting to the root folder.";
+                fileId = RemoteFileItemModel.DefaultId;
+                folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId);
+
+                if (folderResult.IsFailed)
+                {
+                    error = folderResult.Errors[0].Message;
+                    FinishLoadingWithResult(error);
+                    return;
+                }
             }
 
             folder = folderResult.Value;
@@ -142,6 +159,7 @@ public partial class RemoteRepositoryPickerModal
 
     private Task MoveToItem(SelectedItemViewModel<RemoteFileItemModel> item)
     {
+        _warning = null;
         _selectedItem = item;
         StartLoading();
         return RedrawItemsAsync();

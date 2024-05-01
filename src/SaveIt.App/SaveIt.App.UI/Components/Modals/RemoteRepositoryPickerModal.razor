@@ -28,6 +28,13 @@
                 }
             </div>
 
+            @if(_warning is not null)
+            {
+                <div>
+                    <Alert Color="AlertColor.Warning">@_warning</Alert>
+                </div>
+            }
+
             <div class="d-flex flex-wrap flex-grow-1">
                 @foreach (var item in _items)
                 {

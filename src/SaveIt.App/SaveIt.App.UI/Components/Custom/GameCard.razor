@@ -4,7 +4,17 @@
     {
         <div class="card-body">
             <div class="d-flex flex-row justify-content-between">
-                <h5 class="card-title">@Game.Name</h5>
+                <div class="d-flex">
+                    <h5 class="card-title">@Game.Name</h5>
+                    @if (IsGameHosting())
+                    {
+                        <div class="hosting-container">
+                            <Tooltip Title="Hosting the game">
+                                <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
+                            </Tooltip>
+                        </div>
+                    }
+                </div>
                 <div>
                     <Button Color="ButtonColor.Danger"
                         Outline="true" Size="Size.Small"
@@ -16,10 +26,12 @@
             </div>
             <div>
                 <label class="fs-6">Profile</label>
-                <InputSelect @bind-Value="SelectedSaveId" class="p-2 w-100 form-control form-select">
+                <InputSelect @bind-Value="SelectedSave" class="p-2 w-100 form-control form-select">
                     @foreach(var save in Game.GameSaves!)
                     {
-                        <option value="@save.Id" class="p-1">@save.Name</option>
+                        <option value="@save" class="p-1">
+                            @save.Name @(save.IsHosting ? " (Hosting)" : "")
+                        </option>
                     }
                 </InputSelect>
             </div>
@@ -36,15 +48,24 @@
                 </Button>
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
+                        Disabled="@(SelectedSave is null)"
                         @onclick="StartGameAsync">
                     <Icon CustomIconName="@CustomIcons.PlaySolid" Class="me-1" />
-                    Start
+                    @(SelectedSave?.IsHosting ?? false ? "Continue" : "Start") 
                 </Button>
             </div>
         </div>
     }
     else
     {
+        @if (IsGameHosting())
+        {
+            <div class="hosting-location hosting-container d-flex justify-content-center align-items-center">
+                <Tooltip Title="Hosting the game">
+                    <Icon CustomIconName="@CustomIcons.CrownSolid" Color="IconColor.Primary" Size="IconSize.x5" Class="p-1" />
+                </Tooltip>
+            </div>
+        }
         <img src="@(Game.Image is not null ? Game.Image.Content : "img/icons/image-placeholder-icon.svg")"
             class="card-img-top image"
             alt="@Game.Name Image">

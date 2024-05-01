@@ -10,6 +10,7 @@ public class GameSave : BaseEntity
     public string LocalGameSavePath { get; set; } = default!;
     public string RemoteLocationId { get; set; } = default!;
     public string RemoteLocationName { get; set; } = default!;
+    public bool IsHosting { get; set; }
 
     [ForeignKey(typeof(ImageEntity))]
     public Guid StorageAccountId { get; set; }
@@ -17,10 +18,10 @@ public class GameSave : BaseEntity
     [ForeignKey(typeof(Game))]
     public Guid GameId { get; set; }
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public Game Game { get; set; } = default!;
 
-    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead | CascadeOperation.CascadeInsert)]
+    [ManyToOne(CascadeOperations = CascadeOperation.CascadeRead)]
     public StorageAccount StorageAccount { get; set; } = default!;
 
 }

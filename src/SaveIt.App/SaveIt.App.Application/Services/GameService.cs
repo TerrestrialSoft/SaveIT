@@ -70,9 +70,15 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
             lockFile);
 
-        return (updateResult.IsSuccess
-            ? Result.Ok(lockFile)!
-            : updateResult)!;
+        if(updateResult.IsFailed)
+        {
+            return updateResult;
+        }
+
+        gameSave.IsHosting = true;
+        await _gameSaveRepository.UpdateAsync(gameSave);
+
+        return Result.Ok(lockFile)!;
 
         static LockFileModel GetLockFile(Guid userId, string username) => new()
         {
@@ -186,9 +192,15 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
             lockFile);
 
-        return updateResult.IsSuccess
-            ? Result.Ok()
-            : updateResult;
+        if (updateResult.IsFailed)
+        {
+            return updateResult;
+        }
+
+        gameSave.IsHosting = false;
+        await _gameSaveRepository.UpdateAsync(gameSave);
+
+        return Result.Ok();
     }
 
     public async Task<Result> UploadSaveAsync(Guid gameSaveId)

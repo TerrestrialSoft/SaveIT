@@ -40,13 +40,17 @@ public partial class GameCard
 
     private ConfirmDialog _confirmDialog = default!;
 
-    private Guid? SelectedSaveId { get; set; }
+    private GameSave? SelectedSave { get; set; }
 
     protected override void OnInitialized()
     {
         if (Game.GameSaves is not null && Game.GameSaves.Count > 0)
-            SelectedSaveId = Game.GameSaves[0].Id;
+        {
+            SelectedSave = Game.GameSaves[0];
+        }
     }
+
+    private bool IsGameHosting() => Game.GameSaves?.Exists(x => x.IsHosting) ?? false;
 
     private async Task ToggleDetailShowing()
     {
@@ -59,7 +63,13 @@ public partial class GameCard
 
     private async Task StartGameAsync()
     {
-        var accountId = Game.GameSaves!.First(x => x.Id == SelectedSaveId).StorageAccountId;
+        if(SelectedSave is null)
+        {
+            ToastService.Notify(new(ToastType.Danger, $"No save found for game {Game.Name}"));
+            return;
+        }
+
+        var accountId = Game.GameSaves!.First(x => x.Id == SelectedSave.Id).StorageAccountId;
         var account = await StorageAccountRepository.GetAsync(accountId);
 
         if(account is null)
@@ -77,9 +87,20 @@ public partial class GameCard
 
         var parameters = new Dictionary<string, object>
         {
-            { nameof(StartGameModal.SaveId), SelectedSaveId!.Value },
+            { nameof(StartGameModal.SaveId), SelectedSave.Id},
             { nameof(StartGameModal.DefaultGameName), Game.Name },
-            { nameof(StartGameModal.OnClose), EventCallback.Factory.Create(this, ModalStartGame.HideAsync) }
+            { nameof(StartGameModal.OnClose), EventCallback.Factory.Create(this, async () =>
+                {
+                    await ModalStartGame.HideAsync();
+                    await OnCardUpdated.InvokeAsync(Game);
+                })
+            },
+            { nameof(StartGameModal.OnGameSaveUpdate), EventCallback.Factory.Create(this, async (GameSave gs) =>
+                {
+                    SelectedSave = gs;
+                    await OnCardUpdated.InvokeAsync(Game);
+                })
+            }
         };
 
         await ModalStartGame.ShowAsync<StartGameModal>(StartGameModal.Title, parameters: parameters);

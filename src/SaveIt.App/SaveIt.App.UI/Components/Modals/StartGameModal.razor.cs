@@ -13,6 +13,15 @@ public partial class StartGameModal
 {
     public const string Title = "Play Game";
 
+    [Inject]
+    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+
+    [Inject]
+    public IGameService GameService { get; set; } = default!;
+
+    [Inject]
+    public ToastService ToastService { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public required Guid SaveId { get; set; }
 
@@ -22,14 +31,9 @@ public partial class StartGameModal
     [Parameter, EditorRequired]
     public required EventCallback OnClose { get; set; }
 
-    [Inject]
-    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+    [Parameter, EditorRequired]
+    public required EventCallback<GameSave> OnGameSaveUpdate { get; set; }
 
-    [Inject]
-    public IGameService GameService { get; set; } = default!;
-
-    [Inject]
-    public ToastService ToastService { get; set; } = default!;
 
     private GameSave _gameSave = default!;
     private StartGameScreenState _screenState = StartGameScreenState.Loading;
@@ -92,6 +96,7 @@ public partial class StartGameModal
         }
 
         _screenState = StartGameScreenState.HostingGame;
+        await OnGameSaveUpdate.InvokeAsync(_gameSave);
         await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
     }
 

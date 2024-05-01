@@ -18,6 +18,13 @@
 
         <GridColumn TItem="GameSaveViewModel" HeaderText="Game Save Name" PropertyName="Name" SortKeySelector="item => item.Name">
             @context.Name
+            @if(context.GameSave.IsHosting)
+            {
+                <Badge Color="BadgeColor.Primary" VisuallyHiddenText="Currently hosting this game save" Class="ms-2">
+                    <Icon CustomIconName="@CustomIcons.CrownSolid" Class="me-1"/>
+                    Hosting
+                </Badge>
+            }
         </GridColumn>
         <GridColumn TItem="GameSaveViewModel" HeaderText="Game Name" PropertyName="GameName" SortKeySelector="item => item.GameName">
             @context.GameName

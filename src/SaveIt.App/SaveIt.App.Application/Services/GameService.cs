@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
+using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -22,7 +23,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockFileResult = await GetLockFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
 
         if (lockFileResult.IsFailed)
         {
@@ -143,52 +144,38 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockFileResult = await GetLockFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
-
-        if (lockFileResult.IsFailed)
-        {
-            return lockFileResult.ToResult();
-        }
-
-        var lockFileModel = lockFileResult.Value;
-
-        if (lockFileResult.Value is null)
-        {
-            return Result.Ok();
-        }
-
-        var lockfileResult = await _externalStorageService
-            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
+        var lockfileResult = await GetLockFileContentWithIdAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
 
         if (lockfileResult.IsFailed)
         {
             return lockfileResult.ToResult();
-        }
+        }   
 
-        var lockFile = lockfileResult.Value;
+        var lockfileId = lockfileResult.Value.Item1;
+        var lockfileContent = lockfileResult.Value.Item2;
 
-        if (lockFile is null)
+        if (lockfileId is null || lockfileContent is null)
         {
             return Result.Fail("Invalid lockfile content structure");
         }
 
-        if (lockFile.Status != LockFileStatus.Locked)
+        if (lockfileContent.Status != LockFileStatus.Locked)
         {
             return Result.Ok();
         }
 
-        if (lockFile.LockDetails!.LockedByUserId != gameSave.GameId)
+        if (lockfileContent.LockDetails!.LockedByUserId != gameSave.GameId)
         {
-            return Result.Fail(GameErrors.GameLockedByAnotherUser(lockFile));
+            return Result.Fail(GameErrors.GameLockedByAnotherUser(lockfileContent));
         }
 
-        lockFile = new()
+        lockfileContent = new()
         {
             Status = LockFileStatus.Unlocked
         };
 
-        var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
-            lockFile);
+        var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockfileId!,
+            lockfileContent);
 
         if (updateResult.IsFailed)
         {
@@ -201,12 +188,34 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return Result.Ok();
     }
 
-    public async Task<Result> UploadSaveAsync(Guid gameSaveId)
+    public async Task<Result> UploadGameSaveAsync(Guid gameSaveId)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
         {
             return Result.Fail("Game save not found");
+        }
+
+        var lockfileResult = await GetLockFileContentAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+
+        if (lockfileResult.IsFailed)
+        {
+            return lockfileResult.ToResult();
+        }
+
+        if (lockfileResult.Value is null)
+        {
+            return Result.Fail("Lockfile not found");
+        }
+
+        if (lockfileResult.Value.Status != LockFileStatus.Locked)
+        {
+            return Result.Fail("Repository is not locked");
+        }
+
+        if (lockfileResult.Value.LockDetails!.LockedByUserId != gameSave.GameId)
+        {
+            return Result.Fail(GameErrors.GameLockedByAnotherUser(lockfileResult.Value));
         }
 
         var fileResult = _fileService.GetCompressedFile(gameSave.LocalGameSavePath);
@@ -329,7 +338,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : uploadResult;
     }
 
-    private async Task<Result<FileItemModel?>> GetLockFileAsync(Guid storageAccountId, string remoteLocationId)
+    private async Task<Result<FileItemModel?>> GetLockFileMetadataAsync(Guid storageAccountId, string remoteLocationId)
     {
         var lockFilesResult = await _externalStorageService.GetFilesWithNameAsync(storageAccountId, remoteLocationId,
             _lockFileName);
@@ -346,9 +355,49 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return Result.Ok(result);
     }
 
-    private async Task<Result<LockFileModel>> GetLockFileContent()
+    private async Task<Result<LockFileModel?>> GetLockFileContentAsync(Guid storageAccountId, string remoteLocationId)
     {
+        var result = await GetLockFileContentWithIdAsync(storageAccountId, remoteLocationId);
 
+        return result.IsSuccess
+            ? result.Value.Item2
+            : result.ToResult();
+    }
+
+    private async Task<Result<(string?, LockFileModel?)>> GetLockFileContentWithIdAsync(Guid storageAccountId, string remoteLocationId)
+    {
+        var lockFileResult = await GetLockFileMetadataAsync(storageAccountId, remoteLocationId);
+
+        if (lockFileResult.IsFailed)
+        {
+            return lockFileResult.ToResult();
+        }
+
+        var lockFileModel = lockFileResult.Value;
+
+        string? fileId = null;
+        LockFileModel? lockFile = null;
+
+        if (lockFileModel is null)
+        {
+            return Result.Ok((fileId, lockFile));
+        }
+
+        fileId = lockFileModel.Id;
+
+        var lockfileResult = await _externalStorageService
+            .DownloadJsonFileAsync<LockFileModel>(storageAccountId, fileId!);
+
+        if (lockfileResult.IsFailed)
+        {
+            return lockfileResult.ToResult();
+        }
+        
+        lockFile = lockfileResult.Value;
+
+        return (lockFile is not null
+            ? Result.Ok((fileId, lockFile))
+            : Result.Fail("Invalid lockfile content structure"))!;
     }
 
     public async Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId)
@@ -359,7 +408,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockFileResult = await GetLockFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
 
         if (lockFileResult.IsFailed)
         {

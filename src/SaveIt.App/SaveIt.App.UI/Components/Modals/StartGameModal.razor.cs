@@ -157,7 +157,7 @@ public partial class StartGameModal
     private async Task UploadSaveAndCloseAsync()
     {
         _loading = true;
-        var result = await GameService.UploadSaveAsync(SaveId);
+        var result = await GameService.UploadGameSaveAsync(SaveId);
         
         if (result.IsSuccess)
         {

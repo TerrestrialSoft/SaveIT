@@ -132,6 +132,7 @@ public partial class GameCard
             { nameof(EditGameModal.Model), gameModel!},
             { nameof(EditGameModal.Game), Game},
             { nameof(EditGameModal.ModalLocalItemPicker), ModalLocalItemPicker},
+            { nameof(EditGameModal.ModalCurrent), ModalEditGame},
             { nameof(EditGameModal.OnSave), EventCallback.Factory.Create(this, async () =>
                 {
                     await ModalEditGame.HideAsync();

@@ -4,7 +4,7 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Extensions;
-using SaveIt.App.UI.Models.Game;
+using SaveIt.App.UI.Models.Games;
 using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Components.Pages;

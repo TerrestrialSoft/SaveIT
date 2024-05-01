@@ -2,7 +2,7 @@ using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.UI.Components.Modals;
 using SaveIt.App.UI.Models;
-using SaveIt.App.UI.Models.Game;
+using SaveIt.App.UI.Models.Games;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class EditGame

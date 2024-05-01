@@ -18,4 +18,6 @@ public class Game : BaseEntity
 
     [OneToMany(CascadeOperations = CascadeOperation.All)]
     public List<GameSave>? GameSaves { get; set; }
+
+
 }

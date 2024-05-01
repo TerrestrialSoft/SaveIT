@@ -23,13 +23,13 @@
     {
         @foreach (var game in _filteredGames)
         {
-            <GameCard Game="game"
+            <GameCard Game="game.Game"
                 ShowDetail="game == _selectedGame"
                 ModalStartGame="_startGameModal"
                 ModalLocalItemPicker="_localItemPickerModal"
                 ModalEditGame="_editGameModal"
                 OnCardClicked="GameCardClicked"
-                OnCardUpdated="GameCardUpdatedAsync" />
+                OnCardUpdated="GameCardDataUpdatedAsync" />
         }
     }
 </div>

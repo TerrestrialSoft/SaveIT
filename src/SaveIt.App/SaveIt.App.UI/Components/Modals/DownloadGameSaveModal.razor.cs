@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Services;
 using SaveIt.App.UI.Models;
-using SaveIt.App.UI.Models.Game;
+using SaveIt.App.UI.Models.Games;
 
 namespace SaveIt.App.UI.Components.Modals;
 public partial class DownloadGameSaveModal

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace SaveIt.App.UI.Models.Game;
+namespace SaveIt.App.UI.Models.Games;
 public class GameModel
 {
     public Guid? Id { get; set; }

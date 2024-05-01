@@ -40,13 +40,16 @@ public partial class GameCard
 
     private ConfirmDialog _confirmDialog = default!;
 
-    private GameSave? SelectedSave { get; set; }
+    private GameSave? selectedSave;
+    private string _startGameButtonText = "";
 
-    protected override void OnInitialized()
+    protected override void OnAfterRender(bool firstRender)
     {
         if (Game.GameSaves is not null && Game.GameSaves.Count > 0)
         {
-            SelectedSave = Game.GameSaves[0];
+            selectedSave = selectedSave is not null
+                ? Game.GameSaves.Find(x => x.Id == selectedSave.Id)
+                : Game.GameSaves[0];
         }
     }
 
@@ -63,13 +66,13 @@ public partial class GameCard
 
     private async Task StartGameAsync()
     {
-        if(SelectedSave is null)
+        if(selectedSave is null)
         {
             ToastService.Notify(new(ToastType.Danger, $"No save found for game {Game.Name}"));
             return;
         }
 
-        var accountId = Game.GameSaves!.First(x => x.Id == SelectedSave.Id).StorageAccountId;
+        var accountId = Game.GameSaves!.First(x => x.Id == selectedSave.Id).StorageAccountId;
         var account = await StorageAccountRepository.GetAsync(accountId);
 
         if(account is null)
@@ -87,7 +90,7 @@ public partial class GameCard
 
         var parameters = new Dictionary<string, object>
         {
-            { nameof(StartGameModal.SaveId), SelectedSave.Id},
+            { nameof(StartGameModal.SaveId), selectedSave.Id},
             { nameof(StartGameModal.DefaultGameName), Game.Name },
             { nameof(StartGameModal.OnClose), EventCallback.Factory.Create(this, async () =>
                 {
@@ -97,8 +100,7 @@ public partial class GameCard
             },
             { nameof(StartGameModal.OnGameSaveUpdate), EventCallback.Factory.Create(this, async (GameSave gs) =>
                 {
-                    SelectedSave = gs;
-                    await OnCardUpdated.InvokeAsync(Game);
+                    await OnCardUpdated.InvokeAsync(gs.Game);
                 })
             }
         };

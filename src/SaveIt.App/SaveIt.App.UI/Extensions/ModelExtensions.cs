@@ -1,7 +1,7 @@
 ﻿using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.UI.Models;
-using SaveIt.App.UI.Models.Game;
+using SaveIt.App.UI.Models.Games;
 using SaveIt.App.UI.Models.GameSaves;
 
 namespace SaveIt.App.UI.Extensions;

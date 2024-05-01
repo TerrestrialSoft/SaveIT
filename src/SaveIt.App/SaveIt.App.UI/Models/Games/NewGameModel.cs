@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using SaveIt.App.UI.Models.GameSaves;
 
-namespace SaveIt.App.UI.Models.Game;
+namespace SaveIt.App.UI.Models.Games;
 public class NewGameModel
 {
     public GameModel Game { get; set; } = new();

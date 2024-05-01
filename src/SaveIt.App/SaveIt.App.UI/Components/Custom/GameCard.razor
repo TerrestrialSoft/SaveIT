@@ -26,7 +26,7 @@
             </div>
             <div>
                 <label class="fs-6">Profile</label>
-                <InputSelect @bind-Value="SelectedSave" class="p-2 w-100 form-control form-select">
+                <InputSelect @bind-Value="selectedSave" class="p-2 w-100 form-control form-select">
                     @foreach(var save in Game.GameSaves!)
                     {
                         <option value="@save" class="p-1">
@@ -48,10 +48,10 @@
                 </Button>
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
-                        Disabled="@(SelectedSave is null)"
+                        Disabled="@(selectedSave is null)"
                         @onclick="StartGameAsync">
                     <Icon CustomIconName="@CustomIcons.PlaySolid" Class="me-1" />
-                    @(SelectedSave?.IsHosting ?? false ? "Continue" : "Start") 
+                    Start
                 </Button>
             </div>
         </div>

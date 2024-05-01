@@ -6,6 +6,7 @@ using SaveIt.App.UI.Components.Modals.Games;
 using SaveIt.App.UI.Components.Modals.GameSaves;
 using SaveIt.App.UI.Components.Pages;
 using SaveIt.App.UI.Extensions;
+using SaveIt.App.UI.Models.Games;
 
 namespace SaveIt.App.UI.Components.Custom;
 public partial class GameCard
@@ -21,6 +22,9 @@ public partial class GameCard
 
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public EditGameModel Model { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required Game Game { get; set; }
@@ -135,10 +139,10 @@ public partial class GameCard
 
     private async Task ShowEditGameModalAsync()
     {
-        var gameModel = Game.ToEditGameModel();
+        Model.GameModel = Game.ToEditGameModel()!;
         var parameters = new Dictionary<string, object>
         {
-            { nameof(EditGameModal.Model), gameModel!},
+            { nameof(EditGameModal.Model), Model!},
             { nameof(EditGameModal.Game), Game},
             { nameof(EditGameModal.ModalLocalItemPicker), ModalLocalItemPicker},
             { nameof(EditGameModal.ModalCurrent), ModalEditGame},

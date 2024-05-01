@@ -13,12 +13,14 @@ public partial class Games
     private Modal _authorizeStorageModal = default!;
     private Modal _startGameModal = default!;
     private Modal _editGameModal = default!;
+    private Modal _editGameLocalItemPickerModal = default!;
 
     private List<GameCardModel> _allGames = [];
     private List<GameCardModel> _filteredGames = [];
     private readonly string _searchText = "";
     private GameCardModel? _selectedGame;
     private NewGameModel _createGame = new();
+    private EditGameModel _editGame = new();
 
     protected override async Task OnInitializedAsync()
         => await RefreshGamesAsync();
@@ -77,5 +79,25 @@ public partial class Games
     private void GameCardMinimized()
     {
         _selectedGame = null;
+    }
+
+    private async Task ShowEditGameLocalPickerModalAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(EditGameModal.Model), _editGame!},
+            { nameof(EditGameModal.Game), _selectedGame!.Game},
+            { nameof(EditGameModal.ModalLocalItemPicker), _editGameLocalItemPickerModal},
+            { nameof(EditGameModal.ModalCurrent), _editGameModal},
+            { nameof(EditGameModal.OnSave), EventCallback.Factory.Create(this, async () =>
+                {
+                    await _editGameModal.HideAsync();
+                    StateHasChanged();
+                })
+            },
+            { nameof(EditGameModal.OnClose), EventCallback.Factory.Create(this, _editGameModal.HideAsync) }
+        };
+
+        await _editGameModal.ShowAsync<EditGameModal>(EditGameModal.Title, parameters: parameters);
     }
 }

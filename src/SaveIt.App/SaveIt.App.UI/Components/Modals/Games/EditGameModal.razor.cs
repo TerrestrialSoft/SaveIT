@@ -19,7 +19,7 @@ public partial class EditGameModal
     public Game Game { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public required GameModel Model { get; set; }
+    public required EditGameModel Model { get; set; }
 
     [Parameter, EditorRequired]
     public required Modal ModalLocalItemPicker { get; set; }
@@ -35,26 +35,27 @@ public partial class EditGameModal
 
     private Task CancelUpdateAsync() => OnClose.InvokeAsync();
 
+
     private async Task ValidSubmitAsync()
     {
-        Game.Name = Model.Name;
-        Game.Username = Model.Username;
-        Game.GameExecutablePath = Model.GameExecutableFile?.FullPath;
+        Game.Name = Model.GameModel.Name;
+        Game.Username = Model.GameModel.Username;
+        Game.GameExecutablePath = Model.GameModel.GameExecutableFile?.FullPath;
 
-        if (Model.Image?.ImageBase64 == Game.Image?.Content)
+        if (Model.GameModel.Image?.ImageBase64 == Game.Image?.Content)
         {
             await GameRepository.UpdateAsync(Game);
             await OnSave.InvokeAsync();
             return;
         }
 
-        if (Model.Image is null && Game.Image is not null)
+        if (Model.GameModel.Image is null && Game.Image is not null)
         {
             await ImageRepository.DeleteAsync(Game.Image.Id);
             Game.Image = null;
             Game.ImageId = null;
         }
-        else if (Model.Image is not null)
+        else if (Model.GameModel.Image is not null)
         {
             if (Game.Image is not null)
             {
@@ -64,8 +65,8 @@ public partial class EditGameModal
             var image = new ImageEntity
             {
                 Id = Guid.NewGuid(),
-                Name = Model.Image.Name,
-                Content = Model.Image.ImageBase64
+                Name = Model.GameModel.Image.Name,
+                Content = Model.GameModel.Image.ImageBase64
             };
             await ImageRepository.CreateAsync(image);
 

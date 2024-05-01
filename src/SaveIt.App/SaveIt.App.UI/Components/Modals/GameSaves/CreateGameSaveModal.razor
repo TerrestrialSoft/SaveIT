@@ -1,7 +1,9 @@
 ﻿<EditForm Model="GameSaveModel" OnValidSubmit=ValidSubmitAsync autocomplete="off">
     <FluentValidationValidator />
     
-    <GameSelect OnSelectedGameChanged="SelectedGameChanged" OnCreateGameRequested="ShowCreateGameSaveModalAsync" />
+    <GameSelect OnSelectedGameChanged="SelectedGameChanged"
+        OnCreateGameRequested="ShowCreateGameSaveModalAsync"
+        SelectedGameId="GameSaveModel.GameId" />
 
     <div class="p-2">
 
@@ -11,6 +13,7 @@
                       ModalRemoteItemPicker="ModalRemoteItemPicker"
                       ModalAuthorizeStorage="ModalAuthorizeStorage"
                       ModalCurrent="ModalCurrent"
+                      
                       Model="GameSaveModel.GameSave" />
 
         <div class="d-flex justify-content-end">

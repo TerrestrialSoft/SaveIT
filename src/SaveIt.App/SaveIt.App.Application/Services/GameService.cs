@@ -1,6 +1,5 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
-using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;

@@ -8,8 +8,8 @@ using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Domain.Services;
 
-namespace SaveIt.App.UI.Components.Modals;
-public partial class StartGameModal
+namespace SaveIt.App.UI.Components.Modals.GameSaves;
+public partial class StartGameSaveModal
 {
     public const string Title = "Play Game";
 
@@ -121,7 +121,7 @@ public partial class StartGameModal
 
         var result = await GameService.StartGameAsync(_gameSave.Game.Id);
 
-        if(result.IsFailed)
+        if (result.IsFailed)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, "Failed to start the game."));
         }
@@ -140,7 +140,7 @@ public partial class StartGameModal
         if (result.IsFailed)
         {
             string? errorMessage = null;
-            if(result.HasError<GameErrors.GameLockedByDifferentUser>(out var error))
+            if (result.HasError<GameErrors.GameLockedByDifferentUser>(out var error))
             {
                 errorMessage = error.First().Message;
             }
@@ -158,7 +158,7 @@ public partial class StartGameModal
     {
         _loading = true;
         var result = await GameService.UploadGameSaveAsync(SaveId);
-        
+
         if (result.IsSuccess)
         {
             _loading = false;
@@ -176,9 +176,9 @@ public partial class StartGameModal
         => state switch
         {
             StartGameScreenState.SaveInUse => "text-warning",
-            var v when (v == StartGameScreenState.LockFailed || v == StartGameScreenState.UploadFailed
-                || v == StartGameScreenState.DownloadFailed) => "text-danger",
-            var v when (v == StartGameScreenState.PlayingGame || v == StartGameScreenState.HostingGame) => "text-success",
+            var v when v == StartGameScreenState.LockFailed || v == StartGameScreenState.UploadFailed
+                || v == StartGameScreenState.DownloadFailed => "text-danger",
+            var v when v == StartGameScreenState.PlayingGame || v == StartGameScreenState.HostingGame => "text-success",
             StartGameScreenState.HostingGame => "text-success",
             _ => ""
         };

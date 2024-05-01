@@ -1,7 +1,7 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Repositories;
-using SaveIt.App.UI.Components.Modals;
+using SaveIt.App.UI.Components.Modals.Utility;
 using SaveIt.App.UI.Models.StorageAccounts;
 
 namespace SaveIt.App.UI.Components.Pages;

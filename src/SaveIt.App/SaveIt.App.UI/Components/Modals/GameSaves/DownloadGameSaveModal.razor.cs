@@ -2,10 +2,11 @@ using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Services;
+using SaveIt.App.UI.Components.Modals.Utility;
 using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.Games;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class DownloadGameSaveModal
 {
     public const string Title = "Download Game Save";

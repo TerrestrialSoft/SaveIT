@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.UI.Models;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class LocalItemPickerModal
 {
     private readonly List<SelectedItemViewModel<LocalFileItemModel>> _items = [];
@@ -33,7 +33,7 @@ public partial class LocalItemPickerModal
 
         try
         {
-            if(_selectedFile is null)
+            if (_selectedFile is null)
             {
                 var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
 
@@ -74,7 +74,7 @@ public partial class LocalItemPickerModal
 
                 var filteredFiles = files
                     .Where(x => !enableFiltering || AllowedExtensions.Any(y =>
-                        string.Equals(y, Path.GetExtension(x),StringComparison.InvariantCultureIgnoreCase)))
+                        string.Equals(y, Path.GetExtension(x), StringComparison.InvariantCultureIgnoreCase)))
                     .Select(x => GetFileItem(x, _selectedFile.Item.FullPath));
 
                 _items.AddRange(filteredFiles);
@@ -146,18 +146,18 @@ public partial class LocalItemPickerModal
     {
         var selectedItem = _items.Find(x => x.IsSelected);
 
-        if(selectedItem is null && (PickerMode == LocalPickerMode.Folders || PickerMode == LocalPickerMode.Both))
+        if (selectedItem is null && (PickerMode == LocalPickerMode.Folders || PickerMode == LocalPickerMode.Both))
         {
             await OnItemSelected.InvokeAsync(_selectedFile.Item);
             return;
         }
 
-        if(selectedItem is null)
+        if (selectedItem is null)
         {
             return;
         }
 
-        if(selectedItem.Item.IsDirectory && PickerMode == LocalPickerMode.Files)
+        if (selectedItem.Item.IsDirectory && PickerMode == LocalPickerMode.Files)
         {
             MoveToDirectory(selectedItem);
             return;

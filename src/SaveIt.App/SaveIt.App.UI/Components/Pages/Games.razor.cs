@@ -1,7 +1,7 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
-using SaveIt.App.UI.Components.Modals;
+using SaveIt.App.UI.Components.Modals.Games;
 using SaveIt.App.UI.Models.Games;
 
 namespace SaveIt.App.UI.Components.Pages;

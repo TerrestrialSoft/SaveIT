@@ -5,14 +5,14 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.UI.Models.Users;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class ShareGameSaveModal
 {
     public const string Title = "Share Game Save";
 
     [Inject]
     public ToastService ToastService { get; set; } = default!;
-    
+
     [Inject]
     public IExternalStorageService ExternalStorageService { get; set; } = default!;
 
@@ -86,11 +86,11 @@ public partial class ShareGameSaveModal
 
     private async Task StopSharingAsync(ShareWithModel user)
     {
-        if(_unshareInProgress)
+        if (_unshareInProgress)
         {
             return;
         }
-        
+
         if (user.IsOwner)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, "You cannot remove the owner of the file."));

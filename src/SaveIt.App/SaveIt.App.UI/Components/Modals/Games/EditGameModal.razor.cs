@@ -4,7 +4,7 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Models.Games;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.Games;
 public partial class EditGameModal
 {
     public const string Title = "Edit Game";
@@ -56,7 +56,7 @@ public partial class EditGameModal
         }
         else if (Model.Image is not null)
         {
-            if(Game.Image is not null)
+            if (Game.Image is not null)
             {
                 await ImageRepository.DeleteAsync(Game.Image.Id, true);
             }
@@ -70,7 +70,7 @@ public partial class EditGameModal
             await ImageRepository.CreateAsync(image);
 
             Game.Image = image;
-            Game.ImageId = image.Id; 
+            Game.ImageId = image.Id;
         }
 
         await GameRepository.UpdateAsync(Game);

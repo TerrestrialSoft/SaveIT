@@ -1,10 +1,11 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Services;
+using SaveIt.App.UI.Components.Modals.Utility;
 using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.GameSaves;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class UploadGameSaveModal
 {
     public const string Title = "Upload Folder as Game Save";
@@ -35,7 +36,7 @@ public partial class UploadGameSaveModal
         StateHasChanged();
 
         var result = await GameService.UploadFolderAsGameSaveAsync(GameSaveId, Model.File!.FullPath);
-        
+
         if (result.IsFailed)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));

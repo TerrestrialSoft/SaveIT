@@ -6,7 +6,7 @@ using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Extensions;
 using SaveIt.App.UI.Models;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class RemoteRepositoryPickerModal
 {
     private readonly List<SelectedItemViewModel<RemoteFileItemModel>> _items = [];
@@ -53,7 +53,7 @@ public partial class RemoteRepositoryPickerModal
 
             if (folderResult.IsFailed)
             {
-                if(InitialSelectedItem is null)
+                if (InitialSelectedItem is null)
                 {
                     error = folderResult.Errors[0].Message;
                     FinishLoadingWithResult(error);
@@ -105,7 +105,7 @@ public partial class RemoteRepositoryPickerModal
 
             if (itemsResult.IsFailed)
             {
-                if(itemsResult.HasError<AuthError>())
+                if (itemsResult.HasError<AuthError>())
                 {
                     await StorageAccountRepository.UnauthorizeAccountAsync(SelectedStorageAccountId);
                     FinishLoadingWithResult("Unable to refresh token. Storage account was deactivated");
@@ -138,7 +138,7 @@ public partial class RemoteRepositoryPickerModal
     {
         _isLoading = false;
 
-        if(error is not null)
+        if (error is not null)
         {
             _error = error;
             _items.Clear();
@@ -207,7 +207,7 @@ public partial class RemoteRepositoryPickerModal
 
     private async Task DeleteFileAsync()
     {
-        if(_selectedItem.Item.ParentId == RemoteFileItemModel.DefaultId)
+        if (_selectedItem.Item.ParentId == RemoteFileItemModel.DefaultId)
         {
             return;
         }

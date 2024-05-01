@@ -4,7 +4,7 @@ using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Models.GameSaves;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class EditGameSaveModal
 {
     public const string Title = "Edit Game Save";

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Enums;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class StorageAuthorizationModal
 {
     [Parameter, EditorRequired]

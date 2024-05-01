@@ -2,7 +2,8 @@ using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
-using SaveIt.App.UI.Components.Modals;
+using SaveIt.App.UI.Components.Modals.Games;
+using SaveIt.App.UI.Components.Modals.GameSaves;
 using SaveIt.App.UI.Components.Pages;
 using SaveIt.App.UI.Extensions;
 
@@ -98,22 +99,22 @@ public partial class GameCard
 
         var parameters = new Dictionary<string, object>
         {
-            { nameof(StartGameModal.SaveId), selectedSave.Id},
-            { nameof(StartGameModal.DefaultGameName), Game.Name },
-            { nameof(StartGameModal.OnClose), EventCallback.Factory.Create(this, async () =>
+            { nameof(StartGameSaveModal.SaveId), selectedSave.Id},
+            { nameof(StartGameSaveModal.DefaultGameName), Game.Name },
+            { nameof(StartGameSaveModal.OnClose), EventCallback.Factory.Create(this, async () =>
                 {
                     await ModalStartGame.HideAsync();
                     await OnCardUpdated.InvokeAsync(Game);
                 })
             },
-            { nameof(StartGameModal.OnGameSaveUpdate), EventCallback.Factory.Create(this, async (GameSave gs) =>
+            { nameof(StartGameSaveModal.OnGameSaveUpdate), EventCallback.Factory.Create(this, async (GameSave gs) =>
                 {
                     await OnCardUpdated.InvokeAsync(gs.Game);
                 })
             }
         };
 
-        await ModalStartGame.ShowAsync<StartGameModal>(StartGameModal.Title, parameters: parameters);
+        await ModalStartGame.ShowAsync<StartGameSaveModal>(StartGameSaveModal.Title, parameters: parameters);
     }
 
     private async Task DeleteGameAsync()

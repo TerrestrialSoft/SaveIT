@@ -5,7 +5,7 @@ using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Models;
 using SaveIt.App.UI.Models.Games;
 
-namespace SaveIt.App.UI.Components.Modals;
+namespace SaveIt.App.UI.Components.Modals.Games;
 public partial class CreateGameModal
 {
     public const string Title = "Create New Game";
@@ -50,7 +50,7 @@ public partial class CreateGameModal
             GameExecutablePath = CreateNewGameModel.Game.GameExecutableFile?.FullPath,
         };
 
-        if(CreateNewGameModel.Game.Image is ImageModel img)
+        if (CreateNewGameModel.Game.Image is ImageModel img)
         {
             var image = new ImageEntity()
             {
@@ -74,11 +74,11 @@ public partial class CreateGameModal
             RemoteLocationName = CreateNewGameModel.GameSave.RemoteGameSaveFile!.Name,
             LocalGameSavePath = CreateNewGameModel.GameSave.LocalGameSaveFile!.FullPath,
         };
-        
+
         await GameRepository.CreateAsync(game);
         await GameSaveRepository.CreateAsync(gameSave);
 
-        game.GameSaves = [ gameSave ];
+        game.GameSaves = [gameSave];
 
         ToastService.Notify(new(ToastType.Success, "Game created successfully"));
 

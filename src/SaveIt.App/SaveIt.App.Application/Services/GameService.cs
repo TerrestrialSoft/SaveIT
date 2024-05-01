@@ -152,8 +152,6 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         var lockFileModel = lockFileResult.Value;
 
-        LockFileModel? lockFile;
-
         if (lockFileResult.Value is null)
         {
             return Result.Ok();
@@ -167,7 +165,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return lockfileResult.ToResult();
         }
 
-        lockFile = lockfileResult.Value;
+        var lockFile = lockfileResult.Value;
 
         if (lockFile is null)
         {
@@ -346,6 +344,11 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : null;
 
         return Result.Ok(result);
+    }
+
+    private async Task<Result<LockFileModel>> GetLockFileContent()
+    {
+
     }
 
     public async Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId)

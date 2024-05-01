@@ -20,5 +20,8 @@ public interface IExternalStorageService
     Task<Result> ShareFileWithUserAsync(Guid storageAccountId, string fileId, string email);
     Task<Result<IEnumerable<ShareWithModel>>> GetSharedWithUsersForFile(Guid storageAccountId, string fileId);
     Task<Result> StopSharingFileWithUserAsync(Guid storageAccountId, string remoteFileId, string permissionId);
-    Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameAsync(Guid storageAccountId, string remoteLocationId, string name);
+    Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameAsync(Guid storageAccountId, string remoteLocationId,
+        string name);
+    Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameOrderedByDateAscAsync(Guid storageAccountId, string remoteLocationId,
+        string name);
 }

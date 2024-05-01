@@ -23,6 +23,8 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
     private const string _fieldsParameter = $"fields=files({_fileQueryfields})";
     private const string _filesFolderWithSpecificParentUrl = $"{_baseFileQueryUntrashedUrl} and mimeType='{_mimeTypeFolder}'" +
         "and '{0}' in parents";
+    private const string _filesWithSubstringInNameSpecificParentOrderedByDateUrl
+        = _baseFileQueryUrl + "&orderBy=modifiedTime&q=trashed=false and name contains '{1}' and '{0}' in parents";
     private const string _fileDetailUrl = $"{_baseFileDetailUrl}?fields=" + _fileQueryfields;
     private const string _findFileWithNameAndParentUrl = _baseFileQueryUntrashedUrl + " and name='{1}' and '{0}' in parents";
     private const string _findFileWithSubstringInNameAndParentUrl
@@ -239,5 +241,13 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Delete, url));
 
         return ExecuteRequestAsync(storageAccountId, messageFactory);
+    }
+
+    public Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameOrderedByDateAscAsync(Guid storageAccountId,
+        string remoteLocationId, string name)
+    {
+        var filter = string.Format(_filesWithSubstringInNameSpecificParentOrderedByDateUrl, remoteLocationId, name);
+
+        return GetFilesWithFilter(storageAccountId, filter);
     }
 }

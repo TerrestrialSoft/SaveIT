@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 using SaveIt.App.Domain.Auth;
+using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Errors;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -10,9 +11,15 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
     IExternalStorageService _externalStorageService, IGameRepository _gameRepository) : IGameService
 {
     private const string _lockFileName = ".lockfile";
+    private const string _configFileName = ".config";
     private const string _savePrefix = "save_";
     private const string _saveFileNameTemplate = _savePrefix + "{0}.zip";
     private const string _dateTimeFormat = "yyyy-MM-dd_HH-mm-ss";
+    private const int _keepGameSaveCount = 10;
+    private static readonly ConfigFileModel DefaultConfigFile = new()
+    {
+        KeepGameSavesCount = _keepGameSaveCount
+    };
 
     public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId)
     {
@@ -236,8 +243,50 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return uploadResult;
         }
 
+        await EnsureStoredGameSaveCountAsync(gameSave);
         var unlockResult = await UnlockRepositoryAsync(gameSaveId);
+
         return unlockResult;
+    }
+
+    private async Task<Result> EnsureStoredGameSaveCountAsync(GameSave gameSave)
+    {
+        var configFileResult = await GetConfigFileOrDefaultAsync(gameSave.Id);
+
+        if (configFileResult.IsFailed)
+        {
+            return configFileResult.ToResult();
+        }
+
+        var configFile = configFileResult.Value;
+
+        var gameSavesResult = await _externalStorageService.GetFilesWithSubstringInNameOrderedByDateAscAsync(gameSave.StorageAccountId,
+            gameSave.RemoteLocationId, _savePrefix);
+
+        if (gameSavesResult.IsFailed)
+        {
+            return gameSavesResult.ToResult();
+        }
+
+        var gameSaves = gameSavesResult.Value;
+
+        if (gameSaves.Count() <= configFile.KeepGameSavesCount)
+        {
+            return Result.Ok();
+        }
+
+        var gameSavesToDelete = gameSaves.Take(gameSaves.Count() - configFile.KeepGameSavesCount);
+
+        foreach (var file in gameSavesToDelete)
+        {
+            var deleteResult = await _externalStorageService.DeleteFileAsync(gameSave.StorageAccountId, file.Id!);
+            if (deleteResult.IsFailed)
+            {
+                return deleteResult;
+            }
+        }
+
+        return Result.Ok();
     }
 
     public Task<Result<IEnumerable<FileItemModel>>> GetGameSaveVersionsAsync(Guid storageAccountId, string remoteLocationId)
@@ -332,9 +381,14 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
             fileName, stream);
 
-        return uploadResult.IsSuccess
-            ? await UnlockRepositoryAsync(gameSaveId)
-            : uploadResult;
+        if (uploadResult.IsFailed)
+        {
+            return uploadResult;
+        }   
+
+        await EnsureStoredGameSaveCountAsync(gameSave);
+
+        return await UnlockRepositoryAsync(gameSaveId);
     }
 
     private async Task<Result<FileItemModel?>> GetLockFileMetadataAsync(Guid storageAccountId, string remoteLocationId)
@@ -433,5 +487,104 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return lockFile is not null
             ? Result.Ok(lockFile.Status == LockFileStatus.Locked)
             : Result.Fail("Invalid lockfile content structure");
+    }
+
+    private async Task<Result> CreateDefaultConfigFileAsync(Guid gameSaveId)
+    {
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var configFile = DefaultConfigFile;
+
+        var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _configFileName, configFile,
+                       gameSave.RemoteLocationId);
+
+        return result;
+    }
+
+    public async Task<Result> UpdateConfigFileAsync(Guid gameSaveId, int keepGameSavesCount)
+    {
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var configFileResult = await GetConfigMetadataAsync(gameSave);
+
+        if (configFileResult.IsFailed)
+        {
+            return configFileResult.ToResult();
+        }
+
+        var configFile = configFileResult.Value;
+
+        var configFileModel = new ConfigFileModel
+        {
+            KeepGameSavesCount = keepGameSavesCount
+        };
+
+        if (configFile is null)
+        {
+            var createFileResult = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _configFileName,
+                configFileModel, gameSave.RemoteLocationId);
+
+            return createFileResult;
+        }
+
+        var result = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, configFile.Id!,
+            configFileModel);
+
+        return result;
+    }
+
+    private async Task<Result<FileItemModel?>> GetConfigMetadataAsync(GameSave gameSave)
+    {
+        var configFileResult = await _externalStorageService.GetFilesWithNameAsync(gameSave.StorageAccountId,
+            gameSave.RemoteLocationId, _configFileName);
+
+        if (configFileResult.IsFailed)
+        {
+            return configFileResult.ToResult();
+        }
+
+        var configFile = configFileResult.Value.FirstOrDefault();
+
+        return configFileResult.Value.Count() <= 1
+            ? Result.Ok(configFile)
+            : Result.Fail("Multiple config files found");
+    }
+
+    public async Task<Result<ConfigFileModel>> GetConfigFileOrDefaultAsync(Guid gameSaveId)
+    {
+        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
+        if (gameSave is null)
+        {
+            return Result.Fail("Game save not found");
+        }
+
+        var configFileMetadataResult = await GetConfigMetadataAsync(gameSave);
+
+        if (configFileMetadataResult.IsFailed)
+        {
+            return configFileMetadataResult.ToResult();
+        }
+
+        var configFileMetadata = configFileMetadataResult.Value;
+
+        if (configFileMetadata is null)
+        {
+            return Result.Ok(DefaultConfigFile);
+        }
+
+        var configFileResult = await _externalStorageService.DownloadJsonFileAsync<ConfigFileModel>(gameSave.StorageAccountId,
+            configFileMetadata.Id!);
+
+        return configFileResult.IsSuccess
+            ? Result.Ok(configFileResult.Value ?? DefaultConfigFile)
+            : configFileResult!;
     }
 }

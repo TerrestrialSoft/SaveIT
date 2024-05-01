@@ -1,5 +1,6 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
+using Microsoft.UI.Xaml.XamlTypeInfo;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -28,7 +29,6 @@ public partial class GameSaveSettings
     private GameSave _gameSave = new();
     private UploadGameSaveModel _uploadModel = new();
     private GameSaveVersionsCountModel _versionsModel = new();
-    private bool _updateInProgress = false;
     private bool _gameSaveExists = true;
     private Grid<FileItemModel> _grid = default!;
     private List<FileItemModel> files = default!;
@@ -40,10 +40,13 @@ public partial class GameSaveSettings
     private Modal _uploadFolderAsGameSaveModal = default!;
     private ConfirmDialog _confirmDialog = default!;
 
+    private bool _updateInProgress = false;
+    private bool _countUpdateInProgress = false;
+
     private async Task<GridDataProviderResult<FileItemModel>> GameSaveVersionsProvider(
         GridDataProviderRequest<FileItemModel> request)
     {
-        if (files is not null && files.Count != 0)
+        if (files is not null && files.Count > 0)
         {
             return await Task.FromResult(request.ApplyTo(files));
         }
@@ -54,7 +57,7 @@ public partial class GameSaveSettings
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
             StateHasChanged();
-            files.Clear();
+            files!.Clear();
             return await Task.FromResult(request.ApplyTo(files));
         }
 
@@ -81,6 +84,16 @@ public partial class GameSaveSettings
         }
 
         _gameSave = save;
+
+        var configFileResult = await GameService.GetConfigFileOrDefaultAsync(_gameSave.Id);
+
+        if (configFileResult.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, configFileResult.Errors[0].Message));
+            return;
+        }
+
+        _versionsModel.Count = configFileResult.Value.KeepGameSavesCount;
     }
 
     private async Task ShowDownloadSaveModalAsync(FileItemModel file)
@@ -104,6 +117,28 @@ public partial class GameSaveSettings
 
     private async Task ChangeVersionsCount()
     {
+        var dialogResult = await _confirmDialog.ShowDialogAsync("Update Keep Versions Count",
+                       "Are you sure you want update versions count kept in your repository." +
+                       "The next time a game save is uploaded, the oldest game saves will be removed so that their total " +
+                       "number does not exceed the selected number of game saves. ",
+                       "This action cannot be undone.",
+                       "Change",
+                       "Cancel");
+
+        if (!dialogResult)
+        {
+            return;
+        }
+
+        _countUpdateInProgress = true;
+        var result = await GameService.UpdateConfigFileAsync(_gameSave.Id, _versionsModel.Count);
+        _countUpdateInProgress = false;
+
+        var message = result.IsSuccess
+            ? new ToastMessage(ToastType.Success, "Save count updated successfully.")
+            : new ToastMessage(ToastType.Danger, result.Errors[0].Message);
+
+        ToastService.Notify(message);
     }
 
     private async Task UnlockRepositoryAsync()

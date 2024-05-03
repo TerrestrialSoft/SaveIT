@@ -19,10 +19,11 @@ public partial class LocalItemPickerModal
     [Parameter]
     public IEnumerable<string> AllowedExtensions { get; set; } = [];
 
-    private SelectedItemViewModel<LocalFileItemModel> _selectedFile = default!;
-
     [Parameter]
     public LocalFileItemModel? InitialSelectedFile { get; set; }
+
+    private SelectedItemViewModel<LocalFileItemModel> _selectedFile = default!;
+    private bool _isLoading = false;
 
     protected override void OnInitialized()
     {
@@ -66,6 +67,7 @@ public partial class LocalItemPickerModal
         _items.Clear();
         try
         {
+            _isLoading = true;
             if (ShowMode == LocalPickerMode.Folders || ShowMode == LocalPickerMode.Both)
             {
                 var directories = Directory.GetDirectories(_selectedFile.Item.FullPath);
@@ -86,6 +88,7 @@ public partial class LocalItemPickerModal
 
                 _items.AddRange(filteredFiles);
             }
+            _isLoading = false;
         }
         catch (Exception)
         {

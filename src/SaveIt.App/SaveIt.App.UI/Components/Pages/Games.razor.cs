@@ -20,7 +20,7 @@ public partial class Games
     private readonly string _searchText = "";
     private GameCardModel? _selectedGame;
     private NewGameModel _createGame = new();
-    private EditGameModel _editGame = new();
+    private readonly EditGameModel _editGame = new();
 
     protected override async Task OnInitializedAsync()
         => await RefreshGamesAsync();

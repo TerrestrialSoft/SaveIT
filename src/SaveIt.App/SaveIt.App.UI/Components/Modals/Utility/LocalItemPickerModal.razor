@@ -1,7 +1,7 @@
 ﻿<div class="m-2 min-size-content">
     <div class="d-flex align-items-center mb-3">
         <div class="me-4">
-            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory">
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory" Disabled="@_isLoading">
                 <Icon Name="IconName.ArrowLeft" />
             </Button>
         </div>
@@ -15,33 +15,42 @@
         </div>
     }
 
-    <div class="d-flex flex-wrap">
-        @foreach (var item in _items)
-        {
-            @if (item.Item.IsDirectory)
+    @if (_isLoading)
+    {
+        <div class="d-flex justify-content-center">
+            <Spinner Size="SpinnerSize.Large" Style=" width: 6rem; height: 6rem;" />
+        </div>
+    }
+    else
+    {
+        <div class="d-flex flex-wrap">
+            @foreach (var item in _items)
             {
-                <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
-                     @ondblclick="() => MoveToDirectory(item)"
-                     @onclick="() => SelectItem(item)">
-                    <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
-                    <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
-                        <p class="item-name">@item.Item.Name</p>
-                    </Tooltip>
-                </div>
+                @if (item.Item.IsDirectory)
+                {
+                    <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
+                         @ondblclick="() => MoveToDirectory(item)"
+                         @onclick="() => SelectItem(item)">
+                        <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
+                        <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                            <p class="item-name">@item.Item.Name</p>
+                        </Tooltip>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-column align-items-center m-2 @(item.IsSelected ? "selected-item" : "") item"
+                         @onclick="() => SelectItem(item)"
+                         @ondblclick="() => SelectAndPickAsync(item)">
+                        <img src="img/icons/file-icon.svg" alt="File" class="item-img" />
+                        <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                            <p class="item-name">@item.Item.Name</p>
+                        </Tooltip>
+                    </div>
+                }
             }
-            else
-            {
-                <div class="d-flex flex-column align-items-center m-2 @(item.IsSelected ? "selected-item" : "") item"
-                     @onclick="() => SelectItem(item)"
-                     @ondblclick="() => SelectAndPickAsync(item)">
-                    <img src="img/icons/file-icon.svg" alt="File" class="item-img" />
-                    <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
-                        <p class="item-name">@item.Item.Name</p>
-                    </Tooltip>
-                </div>
-            }
-        }
-    </div>
+        </div>
+    }
 
     <div class="d-flex mt-3 justify-content-end">
         @if(AllowedExtensions.Any())
@@ -51,6 +60,6 @@
                 @string.Join(",", AllowedExtensions)
             </div>
         }
-        <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3">Select</Button>
+        <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3" Disabled="@_isLoading">Select</Button>
     </div>
 </div>

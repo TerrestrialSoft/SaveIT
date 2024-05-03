@@ -1,3 +1,4 @@
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Errors;
@@ -31,6 +32,8 @@ public partial class RemoteRepositoryPickerModal
     public RemoteFileItemModel? InitialSelectedItem { get; set; }
 
     private SelectedItemViewModel<RemoteFileItemModel> _selectedItem = default!;
+
+    private ConfirmDialog _confirmDialog = default!;
 
     public RemoteRepositoryPickerModal()
     {
@@ -208,6 +211,15 @@ public partial class RemoteRepositoryPickerModal
     private async Task DeleteFileAsync()
     {
         if (_selectedItem.Item.ParentId == RemoteFileItemModel.DefaultId)
+        {
+            return;
+        }
+
+        var confirmResult = await _confirmDialog.ShowDeleteDialogAsync($"Delete {_selectedItem.Item.Name}",
+            "Are you sure you want to delete this file?",
+            "This action cannot be undone.");
+        
+        if(!confirmResult)
         {
             return;
         }

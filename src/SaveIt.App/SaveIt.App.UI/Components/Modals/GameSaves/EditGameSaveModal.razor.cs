@@ -10,7 +10,7 @@ public partial class EditGameSaveModal
     public const string Title = "Edit Game Save";
 
     [Inject]
-    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+    private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required Modal ModalCurrent { get; set; }
@@ -33,6 +33,8 @@ public partial class EditGameSaveModal
     [Parameter, EditorRequired]
     public required EventCallback<GameSave> OnGameSaveUpdated { get; set; }
 
+    private bool _isSaving = false;
+
     private void SelectedGameChanged(Guid? id)
     {
         Model.GameId = id;
@@ -40,6 +42,7 @@ public partial class EditGameSaveModal
 
     private async Task UpdateGameSaveAsync()
     {
+        _isSaving = true;
         GameSave.GameId = Model.GameId!.Value;
         GameSave.Name = Model.GameSave.Name;
         GameSave.LocalGameSavePath = Model.GameSave.LocalGameSaveFile!.FullPath;
@@ -50,6 +53,8 @@ public partial class EditGameSaveModal
         await GameSaveRepository.UpdateAsync(GameSave);
 
         var gs = await GameSaveRepository.GetWithChildrenAsync(GameSave.Id);
+
+        _isSaving = false;
 
         if (gs is null)
         {

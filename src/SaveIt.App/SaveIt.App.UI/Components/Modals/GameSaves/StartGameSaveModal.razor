@@ -33,7 +33,12 @@
                 else
                 {
                     <div class="text-center mt-5">
-                        <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                        <Button Color="ButtonColor.Primary"
+                            Size="Size.Large"
+                            Class="w-50 p-3 mt-2"
+                            @onclick="CloseAsync">
+                            Close
+                        </Button>
                     </div>
                 }
                 break;
@@ -44,8 +49,21 @@
                     <b>@_errorMessage</b>
                 </div>
                 <div class="d-flex justify-content-between mt-5">
-                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="LockRepositoryAsync"> Retry </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Outline="true"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="CloseAsync">
+                        Close
+                    </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="LockRepositoryAsync"
+                        Loading="@_lockingRepository"
+                        Disabled="@_lockingRepository">
+                        Retry
+                    </Button>
                 </div>
                 break;
             case StartGameScreenState.PlayingGame:
@@ -61,7 +79,12 @@
                 }
 
                 <div class="text-center mt-5">
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-50 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Class="w-50 p-3 mt-2"
+                        @onclick="CloseAsync">
+                        Close
+                    </Button>
                 </div>
                 break;
             case StartGameScreenState.HostingGame:
@@ -77,7 +100,7 @@
                     <Alert Color="AlertColor.Primary"> @_errorMessage </Alert>
                 }
 
-                @if(_loading)
+                @if(_finishingGame)
                 {
                     <div class="text-center mt-3">
                         <Spinner Type="SpinnerType.Border" Size="SpinnerSize.ExtraLarge" Style="width: 6rem; height: 6rem;" />
@@ -85,8 +108,21 @@
                 }
 
                 <div class="d-flex justify-content-between mt-5">
-                    <Button Color="ButtonColor.Danger" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="DiscardProgressAndCloseAsync"> Discard </Button>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAndCloseAsync"> Upload & Close </Button>
+                    <Button Color="ButtonColor.Danger"
+                        Outline="true"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="DiscardProgressAndCloseAsync"
+                        Disabled="_finishingGame">
+                        Discard
+                    </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="UploadSaveAndCloseAsync"
+                        Disabled="_finishingGame">
+                        Upload & Close
+                    </Button>
                 </div>
                 break;
             case StartGameScreenState.UploadFailed:
@@ -97,8 +133,21 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-5">
-                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="UploadSaveAndCloseAsync"> Retry </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Outline="true"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="CloseAsync">
+                        Close
+                    </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="UploadSaveAndCloseAsync"
+                        Disabled="_finishingGame"
+                        Loading="@_finishingGame">
+                        Retry
+                    </Button>
                 </div>
                 break;
             case StartGameScreenState.DownloadFailed:
@@ -109,8 +158,20 @@
                 </div>
 
                 <div class="d-flex justify-content-between mt-5">
-                    <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="CloseAsync"> Close </Button>
-                    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="w-25 p-3 mt-2" @onclick="PrepareSaveAsync"> Retry </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Outline="true"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="CloseAsync">
+                        Close
+                    </Button>
+                    <Button Color="ButtonColor.Primary"
+                        Size="Size.Large"
+                        Class="w-25 p-3 mt-2"
+                        @onclick="PrepareSaveAsync"
+                        Disabled="@_preparingSave">
+                        Retry
+                    </Button>
                 </div>
                 break;
         }

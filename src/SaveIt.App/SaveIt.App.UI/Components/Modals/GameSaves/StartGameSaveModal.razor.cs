@@ -14,13 +14,13 @@ public partial class StartGameSaveModal
     public const string Title = "Play Game";
 
     [Inject]
-    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+    private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
     [Inject]
-    public IGameService GameService { get; set; } = default!;
+    private IGameService GameService { get; set; } = default!;
 
     [Inject]
-    public ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required Guid SaveId { get; set; }
@@ -34,16 +34,17 @@ public partial class StartGameSaveModal
     [Parameter, EditorRequired]
     public required EventCallback<GameSave> OnGameSaveUpdate { get; set; }
 
-
     private GameSave _gameSave = default!;
     private StartGameScreenState _screenState = StartGameScreenState.Loading;
     private LockFileModel? _lockFile;
     private string? _errorMessage;
-    private bool _loading = false;
+    private bool _finishingGame = false;
+    private bool _lockingRepository = false;
+    private bool _preparingSave = false;
 
     protected override async Task OnInitializedAsync()
     {
-        _loading = false;
+        _finishingGame = false;
         _errorMessage = null;
         _lockFile = null;
         _screenState = StartGameScreenState.Loading;
@@ -54,11 +55,13 @@ public partial class StartGameSaveModal
 
     private async Task LockRepositoryAsync()
     {
+        _lockingRepository = true;
         var result = await GameService.LockRepositoryAsync(SaveId);
 
         if (result.IsSuccess)
         {
             await PrepareSaveAsync();
+            _lockingRepository = false;
             return;
         }
 
@@ -67,22 +70,25 @@ public partial class StartGameSaveModal
             var error = errors.First();
             _lockFile = error.LockFile;
             _screenState = StartGameScreenState.SaveInUse;
-
+            _lockingRepository = false;
             return;
         }
 
         if (result.HasError<GameErrors.GameSaveAlreadyLocked>())
         {
             await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
+            _lockingRepository = false;
             return;
         }
 
         _screenState = StartGameScreenState.LockFailed;
         _errorMessage = result.Errors[0].Message;
+        _lockingRepository = false;
     }
 
     private async Task PrepareSaveAsync()
     {
+        _preparingSave = true;
         _errorMessage = null;
         _screenState = StartGameScreenState.DownloadingSave;
         StateHasChanged();
@@ -92,11 +98,13 @@ public partial class StartGameSaveModal
         {
             _screenState = StartGameScreenState.DownloadFailed;
             _errorMessage = result.Errors[0].Message;
+            _preparingSave = false;
             return;
         }
 
         _screenState = StartGameScreenState.HostingGame;
         await OnGameSaveUpdate.InvokeAsync(_gameSave);
+        _preparingSave = false;
         await StartGameAndContinueWithAsync(StartGameScreenState.HostingGame);
     }
 
@@ -134,7 +142,7 @@ public partial class StartGameSaveModal
 
     private async Task DiscardProgressAndCloseAsync()
     {
-        _loading = true;
+        _finishingGame = true;
 
         var result = await GameService.UnlockRepositoryAsync(SaveId);
         if (result.IsFailed)
@@ -150,24 +158,24 @@ public partial class StartGameSaveModal
             ToastService.Notify(new ToastMessage(ToastType.Danger, errorMessage));
         }
 
-        _loading = false;
+        _finishingGame = false;
         await CloseAsync();
     }
 
     private async Task UploadSaveAndCloseAsync()
     {
-        _loading = true;
+        _finishingGame = true;
         var result = await GameService.UploadGameSaveAsync(SaveId);
 
         if (result.IsSuccess)
         {
-            _loading = false;
+            _finishingGame = false;
             ToastService.Notify(new ToastMessage(ToastType.Success, "Game Save successfully uploaded"));
             await CloseAsync();
             return;
         }
 
-        _loading = false;
+        _finishingGame = false;
         _errorMessage = result.Errors[0].Message;
         _screenState = StartGameScreenState.UploadFailed;
     }

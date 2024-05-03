@@ -11,10 +11,10 @@ public partial class UploadGameSaveModal
     public const string Title = "Upload Folder as Game Save";
 
     [Inject]
-    public IGameService GameService { get; set; } = default!;
+    private IGameService GameService { get; set; } = default!;
 
     [Inject]
-    public ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public Modal ModalCurrent { get; set; } = default!;

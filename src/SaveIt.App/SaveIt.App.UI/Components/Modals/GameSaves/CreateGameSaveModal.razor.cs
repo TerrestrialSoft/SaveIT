@@ -3,13 +3,12 @@ using Microsoft.AspNetCore.Components;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Models.GameSaves;
+using Windows.Devices.PointOfService;
 
 namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class CreateGameSaveModal
 {
     public const string Title = "Create Game Save";
-    [Inject]
-    protected ToastService ToastService { get; set; } = default!;
 
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
@@ -42,6 +41,7 @@ public partial class CreateGameSaveModal
     public Guid? InitialGameId { get; set; }
 
     private List<Game> _games = [];
+    private bool _isSaving = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -62,6 +62,7 @@ public partial class CreateGameSaveModal
 
     private async Task ValidSubmitAsync()
     {
+        _isSaving = true;
         var gameSave = new GameSave()
         {
             Id = Guid.NewGuid(),
@@ -74,8 +75,9 @@ public partial class CreateGameSaveModal
         };
 
         await GameSaveRepository.CreateAsync(gameSave);
-
         gameSave = await GameSaveRepository.GetWithChildrenAsync(gameSave.Id);
+
+        _isSaving = false;
         await OnGameSaveCreated.InvokeAsync(gameSave);
     }
 }

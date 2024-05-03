@@ -11,10 +11,10 @@ public partial class ShareGameSaveModal
     public const string Title = "Share Game Save";
 
     [Inject]
-    public ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Inject]
-    public IExternalStorageService ExternalStorageService { get; set; } = default!;
+    private IExternalStorageService ExternalStorageService { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required GameSave GameSave { get; set; }

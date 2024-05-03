@@ -20,6 +20,8 @@
             <Button Color="ButtonColor.Primary"
                     Size="Size.Large"
                     Type="ButtonType.Submit"
+                    Disabled="@_isSaving"
+                    Loading="@_isSaving"
                     TabIndex="8">
                 Create Game Save
             </Button>

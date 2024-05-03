@@ -15,7 +15,7 @@ public partial class DownloadGameSaveModal
     private IGameService GameService { get; set; } = default!;
 
     [Inject]
-    public ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required Guid StorageAccountId { get; set; }
@@ -39,10 +39,13 @@ public partial class DownloadGameSaveModal
 
     private bool _isDownloading = false;
     private bool _isRepositoryLocked = false;
+    private bool _initializing = false;
 
     protected override async Task OnInitializedAsync()
     {
+        _initializing = true;
         var isLockedResult = await GameService.IsRepositoryLockedAsync(GameSaveId);
+        _initializing = false;
 
         if (isLockedResult.IsFailed)
         {

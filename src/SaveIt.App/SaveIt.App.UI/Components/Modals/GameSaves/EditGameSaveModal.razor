@@ -27,7 +27,9 @@
                     Size="Size.Large"
                     Type="ButtonType.Submit"
                     Class="ms-3"
-                    TabIndex="8">
+                    TabIndex="8"
+                    Loading="@_isSaving"
+                    Disabled="@_isSaving">
                 Update
             </Button>
         </div>

@@ -1,6 +1,5 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
-using Microsoft.UI.Xaml.XamlTypeInfo;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Models;
 using SaveIt.App.Domain.Repositories;
@@ -12,26 +11,26 @@ namespace SaveIt.App.UI.Components.Pages;
 public partial class GameSaveSettings
 {
     [Inject]
-    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+    private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
     [Inject]
-    public IGameService GameService { get; set; } = default!;
+    private IGameService GameService { get; set; } = default!;
 
     [Inject]
-    public ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Inject]
-    public PreloadService PreloadService { get; set; } = default!;
+    private PreloadService PreloadService { get; set; } = default!;
 
     [Parameter]
     public string? GameSaveIdString { get; set; }
 
     private GameSave _gameSave = new();
-    private UploadGameSaveModel _uploadModel = new();
-    private GameSaveVersionsCountModel _versionsModel = new();
+    private readonly UploadGameSaveModel _uploadModel = new();
+    private readonly GameSaveVersionsCountModel _versionsModel = new();
     private bool _gameSaveExists = true;
     private Grid<FileItemModel> _grid = default!;
-    private List<FileItemModel> files = default!;
+    private List<FileItemModel> _files = default!;
     private FileItemModel _currentFile = default!;
 
     private Modal _uploadFolderPickerModal = default!;
@@ -40,15 +39,14 @@ public partial class GameSaveSettings
     private Modal _uploadFolderAsGameSaveModal = default!;
     private ConfirmDialog _confirmDialog = default!;
 
-    private bool _updateInProgress = false;
     private bool _countUpdateInProgress = false;
 
     private async Task<GridDataProviderResult<FileItemModel>> GameSaveVersionsProvider(
         GridDataProviderRequest<FileItemModel> request)
     {
-        if (files is not null && files.Count > 0)
+        if (_files is not null && _files.Count > 0)
         {
-            return await Task.FromResult(request.ApplyTo(files));
+            return await Task.FromResult(request.ApplyTo(_files));
         }
 
         var result = await GameService.GetGameSaveVersionsAsync(_gameSave.StorageAccountId, _gameSave.RemoteLocationId);
@@ -57,14 +55,14 @@ public partial class GameSaveSettings
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
             StateHasChanged();
-            files!.Clear();
-            return await Task.FromResult(request.ApplyTo(files));
+            _files!.Clear();
+            return await Task.FromResult(request.ApplyTo(_files));
         }
 
-        files = result.Value.ToList();
+        _files = result.Value.ToList();
         StateHasChanged();
 
-        return await Task.FromResult(request.ApplyTo(files));
+        return await Task.FromResult(request.ApplyTo(_files));
     }
 
     protected override async Task OnInitializedAsync()
@@ -174,7 +172,13 @@ public partial class GameSaveSettings
             { nameof(UploadGameSaveModal.ModalCurrent), _uploadFolderAsGameSaveModal },
             { nameof(UploadGameSaveModal.ModalLocalItemPicker), _uploadFolderPickerModal },
             { nameof(UploadGameSaveModal.GameSaveId), _gameSave.Id },
-            { nameof(UploadGameSaveModal.Model), _uploadModel }
+            { nameof(UploadGameSaveModal.Model), _uploadModel },
+            { nameof(UploadGameSaveModal.GameSaveUploaded), EventCallback.Factory.Create(this, async () =>
+                {
+                    _files.Clear();
+                    await _grid.RefreshDataAsync();
+                }) 
+            }
         };
 
         await _uploadFolderAsGameSaveModal.ShowAsync<UploadGameSaveModal>(UploadGameSaveModal.Title, parameters: parameters);

@@ -28,6 +28,9 @@ public partial class UploadGameSaveModal
     [Parameter, EditorRequired]
     public UploadGameSaveModel Model { get; set; } = default!;
 
+    [Parameter, EditorRequired]
+    public EventCallback GameSaveUploaded { get; set; }
+
     private bool _isUploading = false;
 
     private async Task UploadGameSaveAsync()
@@ -45,6 +48,7 @@ public partial class UploadGameSaveModal
             return;
         }
 
+        await GameSaveUploaded.InvokeAsync();
         ToastService.Notify(new ToastMessage(ToastType.Success, "Folder uploaded successfully"));
         Model = new UploadGameSaveModel();
         _isUploading = false;

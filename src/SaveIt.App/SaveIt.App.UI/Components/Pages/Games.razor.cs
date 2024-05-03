@@ -36,9 +36,7 @@ public partial class Games
             .ToList();
 
     private void GameCardClicked(Game g)
-    {
-        GameCardUpdated(g);
-    }
+        => GameCardUpdated(g);
 
     private Task ShowNewCreateNewGameModal()
     {

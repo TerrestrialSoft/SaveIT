@@ -16,18 +16,21 @@ public partial class GameSaves
     private const string GameSaveSettingsUrl = "/game-saves/{0}";
 
     [Inject]
-    public IGameSaveRepository GameSaveRepository { get; set; } = default!;
+    private IGameSaveRepository GameSaveRepository { get; set; } = default!;
 
     [Inject]
-    public ToastService ToastMessageService { get; set; } = default!;
+    private ToastService ToastMessageService { get; set; } = default!;
 
     [Inject]
-    public NavigationManager NavManager { get; set; } = default!;
+    private NavigationManager NavManager { get; set; } = default!;
+
+    [Inject]
+    private PreloadService PreloadService { get; set; } = default!;
 
     private Grid<GameSaveViewModel> _grid = default!;
     private List<GameSaveViewModel> _gameSaves = default!;
-    private NewGameSaveModel _createGameSave = new();
-    private NewGameModel _createGame = new();
+    private readonly NewGameSaveModel _createGameSave = new();
+    private readonly NewGameModel _createGame = new();
     private GameSave _currentGameSave = new();
 
     private Modal _createGameModal = default!;
@@ -193,7 +196,10 @@ public partial class GameSaves
             return;
         }
 
+        PreloadService.Show();
         await GameSaveRepository.DeleteAsync(gameSave.Id);
+        PreloadService.Hide();
+
         _gameSaves.Clear();
         await _grid.RefreshDataAsync();
         ToastMessageService.Notify(new(ToastType.Success, "Game save deleted successfully."));
@@ -211,7 +217,7 @@ public partial class GameSaves
         await _shareGameSaveModal.ShowAsync<ShareGameSaveModal>(ShareGameSaveModal.Title, parameters: parameters);
     }
 
-    private void ShowAdvancedGameSaveSettingsModal(GameSave gameSave)
+    private void ShowAdvancedGameSaveSettings(GameSave gameSave)
     {
         var url = string.Format(GameSaveSettingsUrl, gameSave.Id);
         NavManager.NavigateTo(url);

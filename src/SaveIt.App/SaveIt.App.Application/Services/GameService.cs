@@ -489,22 +489,6 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Fail("Invalid lockfile content structure");
     }
 
-    private async Task<Result> CreateDefaultConfigFileAsync(Guid gameSaveId)
-    {
-        var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
-        if (gameSave is null)
-        {
-            return Result.Fail("Game save not found");
-        }
-
-        var configFile = DefaultConfigFile;
-
-        var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _configFileName, configFile,
-                       gameSave.RemoteLocationId);
-
-        return result;
-    }
-
     public async Task<Result> UpdateConfigFileAsync(Guid gameSaveId, int keepGameSavesCount)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);

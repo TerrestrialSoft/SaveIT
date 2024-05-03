@@ -1,5 +1,6 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
+using SaveIt.App.Application.Services;
 using SaveIt.App.Domain.Entities;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.UI.Models;
@@ -11,7 +12,7 @@ public partial class CreateGameModal
     public const string Title = "Create New Game";
 
     [Inject]
-    protected ToastService ToastService { get; set; } = default!;
+    private ToastService ToastService { get; set; } = default!;
 
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;
@@ -40,8 +41,12 @@ public partial class CreateGameModal
     [Parameter, EditorRequired]
     public EventCallback<Game> OnGameCreated { get; set; }
 
-    private async Task CreateNewGameAsync()
+    private bool _isSaving = false;
+
+    private async Task CreateGameAsync()
     {
+        _isSaving = true;
+
         var game = new Game()
         {
             Id = Guid.NewGuid(),
@@ -79,6 +84,8 @@ public partial class CreateGameModal
         await GameSaveRepository.CreateAsync(gameSave);
 
         game.GameSaves = [gameSave];
+
+        _isSaving = false;
 
         ToastService.Notify(new(ToastType.Success, "Game created successfully"));
 

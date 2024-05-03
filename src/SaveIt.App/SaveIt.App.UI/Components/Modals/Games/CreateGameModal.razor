@@ -1,4 +1,4 @@
-﻿<EditForm Model="CreateNewGameModel" OnValidSubmit="CreateNewGameAsync" autocomplete="off">
+﻿<EditForm Model="CreateNewGameModel" OnValidSubmit="CreateGameAsync" autocomplete="off">
     <FluentValidationValidator />
     <div>
         <EditGame ModalLocalItemPicker="ModalLocalItemPicker" ModalCurrent="ModalCurrent" Model="CreateNewGameModel.Game"/>
@@ -16,7 +16,9 @@
             <Button Color="ButtonColor.Primary"
                 Size="Size.Large"
                 Type="ButtonType.Submit"
-                TabIndex="8">
+                TabIndex="8"
+                Loading="_isSaving"
+                Disabled="_isSaving">
                 Create Game
             </Button>
         </div>

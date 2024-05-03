@@ -35,9 +35,11 @@ public partial class EditGameModal
 
     private Task CancelUpdateAsync() => OnClose.InvokeAsync();
 
+    private bool _saving = false;
 
     private async Task ValidSubmitAsync()
     {
+        _saving = true;
         Game.Name = Model.GameModel.Name;
         Game.Username = Model.GameModel.Username;
         Game.GameExecutablePath = Model.GameModel.GameExecutableFile?.FullPath;
@@ -46,6 +48,7 @@ public partial class EditGameModal
         {
             await GameRepository.UpdateAsync(Game);
             await OnSave.InvokeAsync();
+            _saving = false;
             return;
         }
 
@@ -75,6 +78,7 @@ public partial class EditGameModal
         }
 
         await GameRepository.UpdateAsync(Game);
+        _saving = false;
         await OnSave.InvokeAsync();
     }
 }

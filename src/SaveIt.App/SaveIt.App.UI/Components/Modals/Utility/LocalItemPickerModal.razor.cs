@@ -69,7 +69,15 @@ public partial class LocalItemPickerModal
             return;
         }
 
-        StateHasChanged();
+        UpdateSelectedPath();
+    }
+
+    private void UpdateSelectedPath()
+    {
+        if (_selectedFile.Item.DirectoryPath == _localFilePathModel.Path)
+        {
+            return;
+        }
 
         if (Directory.Exists(_localFilePathModel.Path))
         {

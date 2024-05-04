@@ -10,6 +10,7 @@
                 <InputText @bind-Value="_localFilePathModel.Path"
                     @onkeydown="OnPathKeyPressed"
                     @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)"
+                    @onfocusout="UpdateSelectedPath"
                     Class="fs-5 w-100" />
             </EditForm>
         </div>

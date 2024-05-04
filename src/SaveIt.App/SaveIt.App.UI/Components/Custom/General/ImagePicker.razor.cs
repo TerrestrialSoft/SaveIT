@@ -12,7 +12,7 @@ public partial class ImagePicker
     public required EventCallback<ImageModel?> OnImageChanged { get; set; }
 
     [Parameter]
-    public ImageModel? ImageSrc { get; set; }
+    public ImageModel? ImageSource { get; set; }
 
     [Parameter]
     public string? HelpText { get; set; }
@@ -46,7 +46,7 @@ public partial class ImagePicker
 
     private async Task RemoveImage()
     {
-        ImageSrc = null;
+        ImageSource = null;
         await OnImageChanged.InvokeAsync(null);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace SaveIt.App.UI.Components;
+﻿namespace SaveIt.App.UI.Assets;
 public static class CustomIcons
 {
     public const string Edit = "fa-solid fa-pen";

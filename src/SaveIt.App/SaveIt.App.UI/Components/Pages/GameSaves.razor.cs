@@ -44,7 +44,6 @@ public partial class GameSaves
 
     private ConfirmDialog _confirmDialog = default!;
 
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!NavManager.TryGetQueryParameter<string>("operation", out var operation) || operation is null)

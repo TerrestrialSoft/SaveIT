@@ -1,6 +1,7 @@
 ﻿using SaveIt.Server.UI.Models;
 using SaveIt.Server.UI.Results;
 using SaveIt.Server.UI.Services.Auth;
+using System.Net;
 using System.Web;
 
 namespace SaveIt.Server.UI.Api;
@@ -52,7 +53,7 @@ public static class ApiEndpoints
 
             return result.IsSuccess
                 ? Microsoft.AspNetCore.Http.Results.Ok(result.Value)
-                : Microsoft.AspNetCore.Http.Results.NoContent();
+                : Microsoft.AspNetCore.Http.Results.StatusCode((int)HttpStatusCode.RequestTimeout);
         });
 
         apiGroup.MapPost("refresh", async (RefreshTokenRequestModel model, CancellationToken token,

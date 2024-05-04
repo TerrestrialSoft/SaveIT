@@ -38,7 +38,7 @@ public partial class UploadGameSaveModal
         _isUploading = true;
         StateHasChanged();
 
-        var result = await GameService.UploadFolderAsGameSaveAsync(GameSaveId, Model.File!.FullPath);
+        var result = await GameService.UploadFolderAsGameSaveAsync(GameSaveId, Model.File!.FullPath, CancellationToken);
 
         if (result.IsFailed)
         {

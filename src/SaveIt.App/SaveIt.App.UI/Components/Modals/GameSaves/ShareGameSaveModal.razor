@@ -1,4 +1,6 @@
-﻿<div class="min-size-modal">
+﻿@inherits CancellableComponent
+
+<div class="min-size-modal">
     <EditForm Model="@_model" OnValidSubmit="@OnValidSubmitAsync">
         <FluentValidationValidator />
 

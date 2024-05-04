@@ -44,7 +44,7 @@ public partial class DownloadGameSaveModal
     protected override async Task OnInitializedAsync()
     {
         _initializing = true;
-        var isLockedResult = await GameService.IsRepositoryLockedAsync(GameSaveId);
+        var isLockedResult = await GameService.IsRepositoryLockedAsync(GameSaveId, CancellationToken);
         _initializing = false;
 
         if (isLockedResult.IsFailed)
@@ -66,9 +66,9 @@ public partial class DownloadGameSaveModal
         StateHasChanged();
 
         var result = _model.SetAsActiveGameSave
-            ? await GameService.PrepareSpecificGameSaveAsync(GameSaveId, FileToDownload.Id!)
+            ? await GameService.PrepareSpecificGameSaveAsync(GameSaveId, FileToDownload.Id!, CancellationToken)
             : await GameService.DownloadGameSaveToSpecificLocationAsync(GameSaveId,
-                FileToDownload.Id!, _model.LocalGameSaveFile!.FullPath);
+                FileToDownload.Id!, _model.LocalGameSaveFile!.FullPath, CancellationToken);
 
         if (result.IsFailed)
         {

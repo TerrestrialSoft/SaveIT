@@ -1,4 +1,6 @@
-﻿<div>
+﻿@inherits CancellableComponent
+
+<div>
     <EditForm Model="@Model" OnValidSubmit="UploadGameSaveAsync">
         <FluentValidationValidator />
         <div class="d-flex flex-column m-1 p-1 align-items-center">

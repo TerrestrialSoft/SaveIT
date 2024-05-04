@@ -1,9 +1,16 @@
 using Microsoft.AspNetCore.Components;
+using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Enums;
 
 namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class StorageAuthorizationModal
 {
+    [Inject]
+    private IAuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     [Parameter, EditorRequired]
     public required EventCallback OnClose { get; set; }
 
@@ -33,7 +40,7 @@ public partial class StorageAuthorizationModal
         _authState = AuthorizationScreenState.AuthorizationInProgress;
 
         var requestId = Guid.NewGuid();
-        var url = await _authService.GetAuthorizationUrlAsync(requestId, CancellationToken);
+        var url = await AuthService.GetAuthorizationUrlAsync(requestId, CancellationToken);
 
         if (url.IsFailed)
         {
@@ -41,8 +48,8 @@ public partial class StorageAuthorizationModal
             return;
         }
 
-        _navigationManager.NavigateTo(url.Value.ToString());
-        var authorizationResult = await _authService.WaitForAuthorizationAsync(requestId, CancellationToken);
+        NavigationManager.NavigateTo(url.Value.ToString());
+        var authorizationResult = await AuthService.WaitForAuthorizationAsync(requestId, CancellationToken);
 
         _authState = authorizationResult.IsFailed
             ? AuthorizationScreenState.AuthorizeProviderError

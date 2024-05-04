@@ -23,7 +23,7 @@ public partial class StartGameSaveModal
     private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
-    public required Guid SaveId { get; set; }
+    public required Guid GameSaveId { get; set; }
 
     [Parameter, EditorRequired]
     public required string DefaultGameName { get; set; }
@@ -48,7 +48,7 @@ public partial class StartGameSaveModal
         _errorMessage = null;
         _lockFile = null;
         _screenState = StartGameScreenState.Loading;
-        _gameSave = (await GameSaveRepository.GetWithChildrenAsync(SaveId))!;
+        _gameSave = (await GameSaveRepository.GetWithChildrenAsync(GameSaveId))!;
 
         await LockRepositoryAsync();
     }
@@ -56,7 +56,7 @@ public partial class StartGameSaveModal
     private async Task LockRepositoryAsync()
     {
         _lockingRepository = true;
-        var result = await GameService.LockRepositoryAsync(SaveId);
+        var result = await GameService.LockRepositoryAsync(GameSaveId, CancellationToken);
 
         if (result.IsSuccess)
         {
@@ -92,7 +92,7 @@ public partial class StartGameSaveModal
         _errorMessage = null;
         _screenState = StartGameScreenState.DownloadingSave;
         StateHasChanged();
-        var result = await GameService.PrepareGameSaveAsync(SaveId);
+        var result = await GameService.PrepareGameSaveAsync(GameSaveId, CancellationToken);
 
         if (result.IsFailed)
         {
@@ -144,7 +144,7 @@ public partial class StartGameSaveModal
     {
         _finishingGame = true;
 
-        var result = await GameService.UnlockRepositoryAsync(SaveId);
+        var result = await GameService.UnlockRepositoryAsync(GameSaveId, CancellationToken);
         if (result.IsFailed)
         {
             string? errorMessage = null;
@@ -165,7 +165,7 @@ public partial class StartGameSaveModal
     private async Task UploadSaveAndCloseAsync()
     {
         _finishingGame = true;
-        var result = await GameService.UploadGameSaveAsync(SaveId);
+        var result = await GameService.UploadGameSaveAsync(GameSaveId, CancellationToken);
 
         if (result.IsSuccess)
         {

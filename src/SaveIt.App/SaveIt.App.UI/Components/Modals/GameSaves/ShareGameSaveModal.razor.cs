@@ -44,7 +44,7 @@ public partial class ShareGameSaveModal
 
         StateHasChanged();
 
-        var result = await ExternalStorageService.GetSharedWithUsersForFile(StorageAccountId, RemoteFileId);
+        var result = await ExternalStorageService.GetSharedWithUsersForFile(StorageAccountId, RemoteFileId, CancellationToken);
 
         if (result.IsFailed)
         {
@@ -65,7 +65,8 @@ public partial class ShareGameSaveModal
         _shareInProgress = true;
         _error = null;
 
-        var result = await ExternalStorageService.ShareFileWithUserAsync(StorageAccountId, RemoteFileId, _model.Email);
+        var result = await ExternalStorageService.ShareFileWithUserAsync(StorageAccountId, RemoteFileId, _model.Email,
+            CancellationToken);
 
 
         if (result.IsFailed)
@@ -109,7 +110,8 @@ public partial class ShareGameSaveModal
         _unshareInProgress = true;
         StateHasChanged();
 
-        var result = await ExternalStorageService.StopSharingFileWithUserAsync(StorageAccountId, RemoteFileId, user.PermissionId);
+        var result = await ExternalStorageService.StopSharingFileWithUserAsync(StorageAccountId, RemoteFileId, user.PermissionId,
+            CancellationToken);
 
         if (result.IsFailed)
         {

@@ -10,10 +10,10 @@ using SaveIt.App.UI.Models;
 namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class RemoteRepositoryPickerModal
 {
+    private const string RepositoryName = "SaveIt";
     private readonly List<SelectedItemViewModel<RemoteFileItemModel>> _items = [];
     private string? _error = null;
     private string? _warning = null;
-
     private bool _isLoading = true;
 
     [Inject]
@@ -52,7 +52,7 @@ public partial class RemoteRepositoryPickerModal
         try
         {
             var fileId = InitialSelectedItem?.Id ?? RemoteFileItemModel.DefaultId;
-            var folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId);
+            var folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId, CancellationToken);
 
             if (folderResult.IsFailed)
             {
@@ -65,7 +65,7 @@ public partial class RemoteRepositoryPickerModal
 
                 _warning = "Requested folder was not found. Redirecting to the root folder.";
                 fileId = RemoteFileItemModel.DefaultId;
-                folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId);
+                folderResult = await StorageService.GetFileAsync(SelectedStorageAccountId, fileId, CancellationToken);
 
                 if (folderResult.IsFailed)
                 {
@@ -104,7 +104,8 @@ public partial class RemoteRepositoryPickerModal
         string? error = null;
         try
         {
-            var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+            var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.Id,
+                CancellationToken);
 
             if (itemsResult.IsFailed)
             {
@@ -182,7 +183,8 @@ public partial class RemoteRepositoryPickerModal
     private async Task ChangeToParentDirectory()
     {
         StartLoading();
-        var fileResult = await StorageService.GetFileAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId);
+        var fileResult = await StorageService.GetFileAsync(SelectedStorageAccountId, _selectedItem.Item.ParentId,
+            CancellationToken);
 
         if (fileResult.IsFailed)
         {
@@ -197,7 +199,8 @@ public partial class RemoteRepositoryPickerModal
     private async Task CreateRepositoryAsync()
     {
         StartLoading();
-        var result = await StorageService.CreateFolderAsync(SelectedStorageAccountId, "SaveIt", _selectedItem.Item.Id);
+        var result = await StorageService.CreateFolderAsync(SelectedStorageAccountId, RepositoryName, _selectedItem.Item.Id,
+            CancellationToken);
 
         if (result.IsFailed)
         {
@@ -225,7 +228,7 @@ public partial class RemoteRepositoryPickerModal
         }
 
         StartLoading();
-        var result = await StorageService.DeleteFileAsync(SelectedStorageAccountId, _selectedItem.Item.Id);
+        var result = await StorageService.DeleteFileAsync(SelectedStorageAccountId, _selectedItem.Item.Id, CancellationToken);
 
         if (result.IsFailed)
         {

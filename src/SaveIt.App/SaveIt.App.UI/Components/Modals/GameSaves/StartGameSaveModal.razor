@@ -1,4 +1,6 @@
-﻿<div class="d-flex flex-column align-content-center text-center mt-2 custom-modal">
+﻿@inherits CancellableComponent
+
+<div class="d-flex flex-column align-content-center text-center mt-2 custom-modal">
     <h1>@(_gameSave?.Game?.Name ?? DefaultGameName)</h1>
     <div class="fs-4 m-2 p-2">State: <b class="@GetStateColorClass(_screenState)">@_screenState.GetName()</b></div>
     <div class="m-4 p-4 d-flex flex-column justify-content-between flex-grow-1">

@@ -108,7 +108,7 @@ public partial class GameCard
 
         var parameters = new Dictionary<string, object>
         {
-            { nameof(StartGameSaveModal.SaveId), selectedSave.Id},
+            { nameof(StartGameSaveModal.GameSaveId), selectedSave.Id},
             { nameof(StartGameSaveModal.DefaultGameName), Game.Name },
             { nameof(StartGameSaveModal.OnClose), EventCallback.Factory.Create(this, async () =>
                 {

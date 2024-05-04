@@ -29,7 +29,7 @@ public partial class EditGame
             { nameof(LocalItemPickerModal.InitialSelectedFile), Model.GameExecutableFile! },
             { nameof(LocalItemPickerModal.PickerMode), LocalItemPickerModal.LocalPickerMode.Files },
             { nameof(LocalItemPickerModal.ShowMode), LocalItemPickerModal.LocalPickerMode.Both},
-            { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".exe" } },
+            { nameof(LocalItemPickerModal.AllowedExtensions), new List<string>(){ ".lnk", ".exe" } },
             { nameof(LocalItemPickerModal.OnItemSelected),
                 EventCallback.Factory.Create<LocalFileItemModel>(this, async (file) =>
                 {

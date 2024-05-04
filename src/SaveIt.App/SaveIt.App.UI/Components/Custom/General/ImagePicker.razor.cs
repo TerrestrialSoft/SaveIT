@@ -27,19 +27,22 @@ public partial class ImagePicker
 
         if (e.File.Size > _maxFileSize)
         {
-            _error = "File size is too large";
+            _error = "File size is too large. Maximum size is 5 MB.";
             return;
         }
 
-        await e.File.OpenReadStream(_maxFileSize)
-            .CopyToAsync(memoryStream);
-        byte[] bytes = memoryStream.ToArray();
+        using var readStream = e.File.OpenReadStream(_maxFileSize);
+        await readStream.CopyToAsync(memoryStream);
 
-        string data = "data:image/png;base64," + Convert.ToBase64String(bytes);
+        var content = Convert.ToBase64String(memoryStream.ToArray());
+        var data = GetDataUri(e.File.ContentType, content);
 
         ImageModel imageModel = new(e.File.Name, data);
         await OnImageChanged.InvokeAsync(imageModel);
     }
+
+    private static string GetDataUri(string contentType, string content)
+        => $"data:{contentType};base64,{content}";
 
     private async Task RemoveImage()
     {

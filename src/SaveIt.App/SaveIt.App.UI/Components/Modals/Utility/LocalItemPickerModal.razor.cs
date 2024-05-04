@@ -1,11 +1,13 @@
+using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using SaveIt.App.UI.Models;
 
 namespace SaveIt.App.UI.Components.Modals.Utility;
 public partial class LocalItemPickerModal
 {
-    private readonly List<SelectedItemViewModel<LocalFileItemModel>> _items = [];
-    private string? _error;
+    [Inject]
+    private ToastService ToastService { get; set; } = default!;
 
     [Parameter, EditorRequired]
     public required EventCallback<LocalFileItemModel> OnItemSelected { get; set; }
@@ -22,8 +24,12 @@ public partial class LocalItemPickerModal
     [Parameter]
     public LocalFileItemModel? InitialSelectedFile { get; set; }
 
+    private readonly List<SelectedItemViewModel<LocalFileItemModel>> _items = [];
+    private readonly LocalFilePathModel _localFilePathModel = new();
     private SelectedItemViewModel<LocalFileItemModel> _selectedFile = default!;
     private bool _isLoading = false;
+    private string? _error;
+    private string? _information;
 
     protected override void OnInitialized()
     {
@@ -31,29 +37,16 @@ public partial class LocalItemPickerModal
         {
             if (InitialSelectedFile is not null)
             {
-                var folder = Path.GetDirectoryName(InitialSelectedFile.FullPath);
-                _selectedFile = new(new LocalFileItemModel
-                {
-                    Name = Path.GetFileName(folder)!,
-                    Path = Directory.GetParent(folder!)?.FullName ?? "",
-                    IsDirectory = true
-                });
-                return;
+                _selectedFile = new(InitialSelectedFile, !InitialSelectedFile.IsDirectory);
             }
 
             if (_selectedFile is null)
             {
                 var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-
-                _selectedFile = new(new LocalFileItemModel
-                {
-                    Name = Path.GetFileName(folder)!,
-                    Path = Directory.GetParent(folder)?.FullName ?? "",
-                    IsDirectory = true
-                });
+                _selectedFile = GetFolderItem(folder);
             }
 
-            RedrawItems();
+            RedrawItems(true);
         }
         catch (Exception)
         {
@@ -61,34 +54,89 @@ public partial class LocalItemPickerModal
         }
     }
 
-    private void RedrawItems()
+    private static SelectedItemViewModel<LocalFileItemModel> GetFolderItem(string path)
+        => new(new LocalFileItemModel
+        {
+            Name = Path.GetFileName(path)!,
+            Path = Directory.GetParent(path)?.FullName ?? "",
+            IsDirectory = true
+        });
+
+    private void OnPathKeyPressed(KeyboardEventArgs e)
     {
+        if (e.Key != "Enter" && e.Key != "NumpadEnter")
+        {
+            return;
+        }
+
+        StateHasChanged();
+
+        if (Directory.Exists(_localFilePathModel.Path))
+        {
+            _selectedFile = GetFolderItem(_localFilePathModel.Path);
+        }
+        else if (File.Exists(_localFilePathModel.Path))
+        {
+            _selectedFile = GetFileItem(_localFilePathModel.Path);
+        }
+        else
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, "Invalid path"));
+            _localFilePathModel.Path = _selectedFile.Item.DirectoryPath;
+            return;
+        }
+
+        RedrawItems();
+    }
+
+    private void RedrawItems(bool firstRedraw = false)
+    {
+        _information = null;
+        _localFilePathModel.Path = _selectedFile.Item.DirectoryPath;
         _error = null;
         _items.Clear();
         try
         {
             _isLoading = true;
+            var info = "No items found in this folder.";
             if (ShowMode == LocalPickerMode.Folders || ShowMode == LocalPickerMode.Both)
             {
-                var directories = Directory.GetDirectories(_selectedFile.Item.FullPath);
-
-                _items.AddRange(directories.Select(x => GetFileItem(x, _selectedFile.Item.FullPath, true)));
+                var directories = Directory.GetDirectories(_selectedFile.Item.DirectoryPath);
+                _items.AddRange(directories.Select(GetFolderItem));
             }
 
             if (ShowMode == LocalPickerMode.Files || ShowMode == LocalPickerMode.Both)
             {
-                var files = Directory.GetFiles(_selectedFile.Item.FullPath);
-
+                var files = Directory.GetFiles(_selectedFile.Item.DirectoryPath);
                 var enableFiltering = AllowedExtensions.Any();
 
                 var filteredFiles = files
                     .Where(x => !enableFiltering || AllowedExtensions.Any(y =>
                         string.Equals(y, Path.GetExtension(x), StringComparison.InvariantCultureIgnoreCase)))
-                    .Select(x => GetFileItem(x, _selectedFile.Item.FullPath));
+                    .Select(x => GetFileItem(x));
+
+                if (files.Length > 0 && !filteredFiles.Any())
+                {
+                    info = "No items found with the specified filter.";
+                }
 
                 _items.AddRange(filteredFiles);
+
+                if (firstRedraw && files.Length > 0)
+                {
+                    var index = _items.FindIndex(x => x.Item.FullPath == _selectedFile.Item.FullPath);
+                    if (index != -1)
+                    {
+                        _items[index] = _selectedFile;
+                    }
+                }
             }
             _isLoading = false;
+
+            if (_items.Count == 0)
+            {
+                _information = info;
+            }
         }
         catch (Exception)
         {
@@ -97,13 +145,11 @@ public partial class LocalItemPickerModal
         }
     }
 
-    private static SelectedItemViewModel<LocalFileItemModel> GetFileItem(string filePath, string parentPath,
-        bool isDirectory = false)
+    private static SelectedItemViewModel<LocalFileItemModel> GetFileItem(string filePath)
         => new(new LocalFileItemModel()
         {
             Name = Path.GetFileName(filePath)!,
-            Path = parentPath,
-            IsDirectory = isDirectory
+            Path = Path.GetDirectoryName(filePath)!
         });
 
     private void MoveToDirectory(SelectedItemViewModel<LocalFileItemModel> model)
@@ -136,7 +182,7 @@ public partial class LocalItemPickerModal
             return;
         }
 
-        _selectedFile = GetFileItem(parent, parentPath, true);
+        _selectedFile = GetFolderItem(parentPath);
         RedrawItems();
     }
 

@@ -5,13 +5,23 @@
                 <Icon Name="IconName.ArrowLeft" />
             </Button>
         </div>
-        <div class="fs-5">@_selectedFile.Item.FullPath</div>
+        <div class="flex-grow-1">
+            <EditForm Model="_localFilePathModel" autocomplete="off">
+                <InputText @bind-Value="_localFilePathModel.Path" @onkeydown="OnPathKeyPressed" @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)" Class="fs-5 w-100" />
+            </EditForm>
+        </div>
     </div>
 
     @if (_error is not null)
     {
         <div>
             <Alert Color="AlertColor.Warning">@_error</Alert>
+        </div>
+    }
+    else if (_information is not null)
+    {
+        <div>
+            <Alert Color="AlertColor.Info">@_information</Alert>
         </div>
     }
 
@@ -23,7 +33,7 @@
     }
     else
     {
-        <div class="d-flex flex-wrap">
+        <div class="d-flex flex-wrap" autofocus>
             @foreach (var item in _items)
             {
                 @if (item.Item.IsDirectory)

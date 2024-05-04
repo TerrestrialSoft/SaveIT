@@ -5,7 +5,7 @@ namespace SaveIt.App.Domain.Auth;
 
 public interface ISaveItApiService
 {
-    Task<Uri> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken);
-    Task<OAuthCompleteTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken);
-    Task<Result<string>> RefreshAccessTokenAsync(string refreshToken);
+    Task<Uri> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken = default);
+    Task<OAuthCompleteTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken = default);
+    Task<Result<string>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
 }

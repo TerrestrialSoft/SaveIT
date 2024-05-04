@@ -9,7 +9,7 @@ namespace SaveIt.App.Application.Services;
 public class AuthService(ISaveItApiService _saveItClient, IStorageAccountRepository _accountRepository,
     IAccountSecretsRepository _secretsService, IExternalStorageService _externalStorage) : IAuthService
 {
-    public async Task<Result<Uri>> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken)
+    public async Task<Result<Uri>> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -22,7 +22,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         }
     }
 
-    public async Task<Result> WaitForAuthorizationAsync(Guid requestId, CancellationToken cancellationToken)
+    public async Task<Result> WaitForAuthorizationAsync(Guid requestId, CancellationToken cancellationToken = default)
     {
         var tokenResult = await GetTokenAsync(requestId, cancellationToken);
 

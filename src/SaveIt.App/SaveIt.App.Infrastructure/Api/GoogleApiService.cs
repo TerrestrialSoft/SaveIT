@@ -38,33 +38,35 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
     private const string _filePermissionsUrl = $"{_baseFileDetailUrl}/permissions";
     private const string _fileDeletePermissionsUrl = _baseFileDetailUrl + "/permissions/{1}";
 
-    public async Task<Result<string>> GetProfileEmailAsync(string accessToken)
+    public async Task<Result<string>> GetProfileEmailAsync(string accessToken, CancellationToken cancellationToken = default)
     {
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-        var response = await _httpClient.GetAsync(_profileUrl);
+        var response = await _httpClient.GetAsync(_profileUrl, cancellationToken);
         
         if (!response.IsSuccessStatusCode)
         {
             return Result.Fail("Error ocurred during communication with external server");
         }
 
-        var content = await response.Content.ReadFromJsonAsync<GoogleProfile>();
+        var content = await response.Content.ReadFromJsonAsync<GoogleProfile>(cancellationToken);
 
         return content is not null
             ? content.User.Email
             : Result.Fail("Error ocurred during communication with external server");
     }
 
-    public Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId)
+    public Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId,
+        CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_filesFolderWithSpecificParentUrl, parentId);
 
-        return GetFilesWithFilter(storageAccountId, filter);
+        return GetFilesWithFilter(storageAccountId, filter, cancellationToken);
     }
 
-    private async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithFilter(Guid storageAccountId, string filter)
+    private async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithFilter(Guid storageAccountId, string filter,
+        CancellationToken cancellationToken = default)
     {
-        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter, cancellationToken);
 
         if(contentResult.IsFailed)
         {
@@ -76,19 +78,21 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
         return Result.Ok(files);
     }
 
-    public async Task<Result<FileItemModel>> GetFileAsync(Guid storageAccountId, string? fileId = null)
+    public async Task<Result<FileItemModel>> GetFileAsync(Guid storageAccountId, string? fileId = null,
+        CancellationToken cancellationToken = default)
     {
         fileId ??= GoogleFileModel.RootParentId;
 
         var filter = string.Format(_fileDetailUrl, fileId);
-        var contentResult = await GetAsync<GoogleFileModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileModel>(storageAccountId, filter, cancellationToken);
 
         return contentResult.IsSuccess
             ? Result.Ok(contentResult.Value.ToFileItem())
             : Result.Fail(contentResult.Errors);
     }
 
-    public async Task<Result> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null)
+    public async Task<Result> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null,
+        CancellationToken cancellationToken = default)
     {
         var folderMetadata = new GoogleFileCreateModel
         {
@@ -102,26 +106,26 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
             Content = new StringContent(JsonSerializer.Serialize(folderMetadata))
         });
 
-        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory);
+        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory, cancellationToken);
 
         return result.ToResult();
     }
 
-    public async Task<Result> DeleteFileAsync(Guid storageAccountId, string id)
+    public async Task<Result> DeleteFileAsync(Guid storageAccountId, string id, CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_baseFileDetailUrl, id);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Delete, filter));
 
-        var result = await ExecuteRequestAsync(storageAccountId, messageFactory);
+        var result = await ExecuteRequestAsync(storageAccountId, messageFactory, cancellationToken);
 
         return result;
     }
 
     public async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithNameAsync(Guid storageAccountId, string remoteLocationId,
-        string name)
+        string name, CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_findFileWithNameAndParentUrl, remoteLocationId, name);
-        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter, cancellationToken);
 
         return contentResult.IsSuccess
             ? Result.Ok(contentResult.Value.Files.Select(x => x.ToFileItem()))
@@ -129,22 +133,23 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
     }
 
     public async Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameAsync(Guid storageAccountId,
-        string remoteLocationId, string name)
+        string remoteLocationId, string name, CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_findFileWithSubstringInNameAndParentUrl, remoteLocationId, name);
-        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter, cancellationToken);
 
         return contentResult.IsSuccess
             ? Result.Ok(contentResult.Value.Files.Select(x => x.ToFileItem()))
             : contentResult.ToResult();
     }
 
-    public async Task<Result<T?>> DownloadJsonFileAsync<T>(Guid storageAccountId, string fileId)
+    public async Task<Result<T?>> DownloadJsonFileAsync<T>(Guid storageAccountId, string fileId,
+        CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_fileDownloadUrl, fileId);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
 
-        var result = await DownloadContentAsStringAsync(storageAccountId, messageFactory);
+        var result = await DownloadContentAsStringAsync(storageAccountId, messageFactory, cancellationToken);
 
         if (result.IsFailed)
         {
@@ -156,20 +161,23 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
         return Result.Ok(content);
     }
 
-    public Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null)
-        => _googleApiUploadService.CreateFileSimpleAsync(storageAccountId, fileName, fileContent, parentId);
+    public Task<Result> CreateFileAsync(Guid storageAccountId, string fileName, object fileContent, string? parentId = null,
+        CancellationToken cancellationToken = default)
+        => _googleApiUploadService.CreateFileSimpleAsync(storageAccountId, fileName, fileContent, parentId, cancellationToken);
 
-    public Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent)
-        => _googleApiUploadService.UpdateFileSimpleAsync(storageAccountId, id, fileContent);
+    public Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent,
+        CancellationToken cancellationToken = default) 
+        => _googleApiUploadService.UpdateFileSimpleAsync(storageAccountId, id, fileContent, cancellationToken);
 
-    public Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value)
-        => _googleApiUploadService.UploadFileAsync(storageAccountId, parentId, fileName, value);
+    public Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value,
+        CancellationToken cancellationToken = default)
+        => _googleApiUploadService.UploadFileAsync(storageAccountId, parentId, fileName, value, cancellationToken);
 
     public async Task<Result<FileItemModel?>> GetNewestFileWithSubstringInNameAsync(Guid storageAccountId,
-        string remoteLocationId, string substring)
+        string remoteLocationId, string substring, CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_findLastModifiedFileWithNameAndParentUrl, remoteLocationId, substring);
-        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter);
+        var contentResult = await GetAsync<GoogleFileListModel>(storageAccountId, filter, cancellationToken);
 
         if (contentResult.IsFailed)
         {
@@ -183,15 +191,17 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
         return Result.Ok(file);
     }
 
-    public async Task<Result<Stream>> DownloadFileAsync(Guid storageAccountId, string fileId)
+    public async Task<Result<Stream>> DownloadFileAsync(Guid storageAccountId, string fileId,
+        CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_fileDownloadUrl, fileId);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, filter));
 
-        return await DownloadContentAsStreamAsync(storageAccountId, messageFactory);
+        return await DownloadContentAsStreamAsync(storageAccountId, messageFactory, cancellationToken);
     }
 
-    public async Task<Result> ShareFileWithUserAsync(Guid storageAccountId, string fileId, string email)
+    public async Task<Result> ShareFileWithUserAsync(Guid storageAccountId, string fileId, string email,
+        CancellationToken cancellationToken = default)
     {
         var url = string.Format(_filePermissionsUrl, fileId);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Post, url)
@@ -204,15 +214,16 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
             }))
         });
 
-        var result = await ExecuteRequestAsync(storageAccountId, messageFactory);
+        var result = await ExecuteRequestAsync(storageAccountId, messageFactory, cancellationToken);
 
         return result;
     }
 
-    public async Task<Result<IEnumerable<ShareWithModel>>> GetSharedWithUsersForFile(Guid storageAccountId, string fileId)
+    public async Task<Result<IEnumerable<ShareWithModel>>> GetSharedWithUsersForFile(Guid storageAccountId, string fileId,
+        CancellationToken cancellationToken = default)
     {
         var url = string.Format(_filePermissionsUrlList, fileId);
-        var contentResult = await GetAsync<GooglePermissionListModel>(storageAccountId, url);
+        var contentResult = await GetAsync<GooglePermissionListModel>(storageAccountId, url, cancellationToken);
 
         if (contentResult.IsFailed)
         {
@@ -235,19 +246,20 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
         return Result.Ok(result);
     }
 
-    public Task<Result> StopSharingFileWithUserAsync(Guid storageAccountId, string remoteFileId, string permissionId)
+    public Task<Result> StopSharingFileWithUserAsync(Guid storageAccountId, string remoteFileId, string permissionId,
+        CancellationToken cancellationToken = default)
     {
         var url = string.Format(_fileDeletePermissionsUrl, remoteFileId, permissionId);
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Delete, url));
 
-        return ExecuteRequestAsync(storageAccountId, messageFactory);
+        return ExecuteRequestAsync(storageAccountId, messageFactory, cancellationToken);
     }
 
     public Task<Result<IEnumerable<FileItemModel>>> GetFilesWithSubstringInNameOrderedByDateAscAsync(Guid storageAccountId,
-        string remoteLocationId, string name)
+        string remoteLocationId, string name, CancellationToken cancellationToken = default)
     {
         var filter = string.Format(_filesWithSubstringInNameSpecificParentOrderedByDateUrl, remoteLocationId, name);
 
-        return GetFilesWithFilter(storageAccountId, filter);
+        return GetFilesWithFilter(storageAccountId, filter, cancellationToken);
     }
 }

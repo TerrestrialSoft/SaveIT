@@ -15,22 +15,24 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
     protected readonly ISaveItApiService _saveItService = saveItService;
     protected readonly IStorageAccountRepository _storageAccountsRepository = storageAccountsRepository;
 
-    protected async Task<Result> ExecuteRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestFactory)
+    protected async Task<Result> ExecuteRequestAsync(Guid storageAccountId, Func<HttpRequestMessage> requestFactory,
+        CancellationToken cancellationToken = default)
     {
-        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
         return responseResult.ToResult();
     }
 
-    protected async Task<Result<T>> ExecuteRequestAsync<T>(Guid storageAccountId, Func<HttpRequestMessage> requestFactory)
+    protected async Task<Result<T>> ExecuteRequestAsync<T>(Guid storageAccountId, Func<HttpRequestMessage> requestFactory,
+        CancellationToken cancellationToken = default)
     {
-        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
 
         if (responseResult.IsFailed)
         {
             return responseResult.ToResult();
         }
 
-        var content = await responseResult.Value.Content.ReadFromJsonAsync<T>();
+        var content = await responseResult.Value.Content.ReadFromJsonAsync<T>(cancellationToken);
 
         return content is not null
             ? content
@@ -38,16 +40,16 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
     }
 
     protected async Task<Result<string>> DownloadContentAsStringAsync(Guid storageAccountId,
-        Func<HttpRequestMessage> requestFactory)
+        Func<HttpRequestMessage> requestFactory, CancellationToken cancellationToken = default)
     {
-        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
 
         if (responseResult.IsFailed)
         {
             return responseResult.ToResult();
         }
 
-        var content = await responseResult.Value.Content.ReadAsStringAsync();
+        var content = await responseResult.Value.Content.ReadAsStringAsync(cancellationToken);
 
         return content is not null
             ? content
@@ -55,16 +57,16 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
     }
 
     protected async Task<Result<Stream>> DownloadContentAsStreamAsync(Guid storageAccountId,
-        Func<HttpRequestMessage> requestFactory)
+        Func<HttpRequestMessage> requestFactory, CancellationToken cancellationToken = default)
     {
-        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
 
         if (responseResult.IsFailed)
         {
             return responseResult.ToResult();
         }
 
-        var content = await responseResult.Value.Content.ReadAsStreamAsync();
+        var content = await responseResult.Value.Content.ReadAsStreamAsync(cancellationToken);
 
         return content is not null
             ? content
@@ -72,9 +74,9 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
     }
 
     protected async Task<Result<string>> ExecuteRequestForHeaderAsync(Guid storageAccountId, string headerName,
-        Func<HttpRequestMessage> requestFactory)
+        Func<HttpRequestMessage> requestFactory, CancellationToken cancellationToken = default)
     {
-        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+        var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
 
         if (responseResult.IsFailed)
         {
@@ -92,7 +94,8 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
             : Result.Fail("Requested header is empty.");
     }
 
-    protected async Task<Result> ExecuteResumableRequest(Guid storageAccountId, HttpMethod method, string url, Stream content)
+    protected async Task<Result> ExecuteResumableRequest(Guid storageAccountId, HttpMethod method, string url, Stream content,
+        CancellationToken cancellationToken = default)
     {
         bool continueUpload = true;
         int processedBytes = 0;
@@ -100,9 +103,9 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
         while (continueUpload)
         {
             content.Seek(processedBytes, SeekOrigin.Begin);
-            var requestFactory = GetStreamMessage(content);
+            var requestFactory = GetStreamHttpMessage(content);
 
-            var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory);
+            var responseResult = await GetSuccessResponseMessage(storageAccountId, requestFactory, cancellationToken);
             
             if (responseResult.IsFailed)
             {
@@ -130,7 +133,7 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
 
         return Result.Ok();
 
-        Func<HttpRequestMessage> GetStreamMessage(Stream stream)
+        Func<HttpRequestMessage> GetStreamHttpMessage(Stream stream)
             => new(() => new HttpRequestMessage(method, url)
             {
                 Content = new StreamContent(stream),
@@ -138,17 +141,17 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
     }
 
     private async Task<Result<HttpResponseMessage>> GetSuccessResponseMessage(Guid storageAccountId,
-        Func<HttpRequestMessage> requestFactory)
+        Func<HttpRequestMessage> requestFactory, CancellationToken cancellationToken = default)
     {
         var token = await _accountSecretsRepo.GetAccessTokenAsync(storageAccountId);
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         var requestMessage = requestFactory();
-        var response = await _httpClient.SendAsync(requestMessage);
+        var response = await _httpClient.SendAsync(requestMessage, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
-            var result = await RetryRequestAsync(storageAccountId, requestFactory);
+            var result = await RetryRequestAsync(storageAccountId, requestFactory, cancellationToken);
 
             if (result.IsFailed)
             {
@@ -158,25 +161,23 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
             response = result.Value;
         }
 
-        if(response.StatusCode == HttpStatusCode.NotFound)
+        if (response.IsSuccessStatusCode)
         {
-            return Result.Fail(ApiErrors.NotFound());
+            return response;
         }
 
-        if(response.StatusCode == HttpStatusCode.PermanentRedirect)
+        return response.StatusCode switch
         {
-            return Result.Fail(ApiErrors.IncompleteUpload());
-        }
-
-        return response.IsSuccessStatusCode
-            ? response
-            : Result.Fail("Error ocurred during communication with external server");
+            HttpStatusCode.NotFound => Result.Fail(ApiErrors.NotFound()),
+            HttpStatusCode.PermanentRedirect => Result.Fail(ApiErrors.IncompleteUpload()),
+            _ => Result.Fail("Error ocurred during communication with external server")
+        };
     }
 
     private async Task<Result<HttpResponseMessage>> RetryRequestAsync(Guid storageAccountId,
-        Func<HttpRequestMessage> requestMessage)
+        Func<HttpRequestMessage> requestMessage, CancellationToken cancellationToken = default)
     {
-        var refreshResult = await TryRefreshTokenAsync(storageAccountId);
+        var refreshResult = await TryRefreshTokenAsync(storageAccountId, cancellationToken);
 
         if (refreshResult.IsFailed)
         {
@@ -185,12 +186,13 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
 
         _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", refreshResult.Value);
 
-        var result = await _httpClient.SendAsync(requestMessage());
+        var message = requestMessage();
+        var result = await _httpClient.SendAsync(message, cancellationToken);
 
         return Result.Ok(result);
     }
 
-    private async Task<Result<string>> TryRefreshTokenAsync(Guid storageAccountId)
+    private async Task<Result<string>> TryRefreshTokenAsync(Guid storageAccountId, CancellationToken cancellationToken = default)
     {
         var refreshToken = await _accountSecretsRepo.GetRefreshTokenAsync(storageAccountId);
 
@@ -202,7 +204,7 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
         string accessToken;
         try
         {
-            var accessTokenResult = await _saveItService.RefreshAccessTokenAsync(refreshToken);
+            var accessTokenResult = await _saveItService.RefreshAccessTokenAsync(refreshToken, cancellationToken);
 
             if (accessTokenResult.IsSuccess)
             {
@@ -230,9 +232,9 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
             : storeResult;
     }
 
-    protected Task<Result<T>> GetAsync<T>(Guid storageAccountId, string url)
+    protected Task<Result<T>> GetAsync<T>(Guid storageAccountId, string url, CancellationToken cancellationToken = default)
     {
         var messageFactory = new Func<HttpRequestMessage>(() => new HttpRequestMessage(HttpMethod.Get, url));
-        return ExecuteRequestAsync<T>(storageAccountId, messageFactory);
+        return ExecuteRequestAsync<T>(storageAccountId, messageFactory, cancellationToken);
     }
 }

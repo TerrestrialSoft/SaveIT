@@ -21,7 +21,7 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
     private const string _headerLocation = "Location";
 
     public async Task<Result> CreateFileSimpleAsync(Guid storageAccountId, string fileName, object fileContent,
-        string? parentId = null)
+        string? parentId = null, CancellationToken cancellationToken = default)
     {
         var fileMetadata = new GoogleFileCreateModel
         {
@@ -50,12 +50,13 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
             Content = content,
         });
 
-        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory);
+        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory, cancellationToken);
 
         return result.ToResult();
     }
 
-    public async Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent)
+    public async Task<Result> UpdateFileSimpleAsync(Guid storageAccountId, string id, object fileContent,
+        CancellationToken cancellationToken = default)
     {
         var url = string.Format($"{_fileDetailUrl}?{_uploadTypeMedia}", id);
 
@@ -68,21 +69,24 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
             Content = content,
         });
 
-        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory);
+        var result = await ExecuteRequestAsync<GoogleFileModel>(storageAccountId, messageFactory, cancellationToken);
 
         return result.ToResult();
     }
 
-    public async Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value)
+    public async Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value,
+        CancellationToken cancellationToken = default)
     {
         var resumableUploadResult = await PrepareResumableUpload(storageAccountId, parentId, fileName);
 
         return resumableUploadResult.IsSuccess
-            ? await ExecuteResumableRequest(storageAccountId, HttpMethod.Put, resumableUploadResult.Value, value)
+            ? await ExecuteResumableRequest(storageAccountId, HttpMethod.Put, resumableUploadResult.Value, value,
+                cancellationToken)
             : resumableUploadResult.ToResult();
     }
 
-    private async Task<Result<string>> PrepareResumableUpload(Guid storageAccountId, string parentId, string fileName)
+    private async Task<Result<string>> PrepareResumableUpload(Guid storageAccountId, string parentId, string fileName,
+        CancellationToken cancellationToken = default)
     {
         var fileMetadata = new GoogleFileCreateModel
         {
@@ -102,6 +106,6 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
             Headers = { { "X-Upload-Content-Type", _mimeTypeZip } }
         });
 
-        return await ExecuteRequestForHeaderAsync(storageAccountId, _headerLocation, messageFactory);
+        return await ExecuteRequestForHeaderAsync(storageAccountId, _headerLocation, messageFactory, cancellationToken);
     }
 }

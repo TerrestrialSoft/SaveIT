@@ -16,7 +16,7 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
 
     private readonly HttpClient _httpClient = httpClient;
 
-    public async Task<Uri> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken)
+    public async Task<Uri> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(_authUrl, new { requestId }, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -27,32 +27,31 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
         return new Uri(content.Url);
     }
 
-    public async Task<OAuthCompleteTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
+    public async Task<OAuthCompleteTokenModel> GetTokenAsync(Guid requestId, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(_tokensUrl, new { requestId }, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         var token = await response.Content.ReadFromJsonAsync<OAuthCompleteTokenModel>(cancellationToken);
         ArgumentNullException.ThrowIfNull(token);
-        
         return token;
     }
 
-    public async Task<Result<string>> RefreshAccessTokenAsync(string refreshToken)
+    public async Task<Result<string>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
         var dictionary = new Dictionary<string, string>
         {
             { "RefreshToken", refreshToken }
         };
 
-        var response = await _httpClient.PostAsJsonAsync(_refreshUrl, dictionary);
+        var response = await _httpClient.PostAsJsonAsync(_refreshUrl, dictionary, cancellationToken);
 
         if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
         {
             return Result.Fail(ApiErrors.InvalidAuthorization());
         }
 
-        var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenModel>();
+        var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenModel>(cancellationToken);
 
         ArgumentNullException.ThrowIfNull(token);
 

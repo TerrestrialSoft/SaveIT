@@ -9,11 +9,3 @@ label {
 .column div {
     margin: 5px;
 }
-
-.btn-authorize-new {
-    cursor: pointer;
-}
-
-    .btn-authorize-new:hover {
-        color: #0d6efd;
-    }

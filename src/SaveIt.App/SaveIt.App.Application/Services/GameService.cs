@@ -21,7 +21,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         KeepGameSavesCount = _keepGameSaveCount
     };
 
-    public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId)
+    public async Task<Result<LockFileModel?>> LockRepositoryAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -29,7 +29,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            cancellationToken);
 
         if (lockFileResult.IsFailed)
         {
@@ -42,16 +43,16 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         if (lockFileModel is null)
         {
-            lockFile = GetLockFile(gameSave.Game.Id, gameSave.Game.Username);
+            lockFile = GetLockFileModel(gameSave.Game.Id, gameSave.Game.Username);
 
             var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _lockFileName, lockFile,
-                gameSave.RemoteLocationId);
+                gameSave.RemoteLocationId, cancellationToken);
 
             return result;
         }
 
         var lockfileResult = await _externalStorageService
-            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!);
+            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileModel.Id!, cancellationToken);
 
         if (lockfileResult.IsFailed)
         {
@@ -72,10 +73,10 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
                 : Result.Fail(GameErrors.GameSaveInUse(lockFile));
         }
 
-        lockFile = GetLockFile(gameSave.Game.Id, gameSave.Game.Username);
+        lockFile = GetLockFileModel(gameSave.Game.Id, gameSave.Game.Username);
 
         var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockFileModel.Id!,
-            lockFile);
+            lockFile, cancellationToken: cancellationToken);
 
         if(updateResult.IsFailed)
         {
@@ -87,7 +88,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         return Result.Ok(lockFile)!;
 
-        static LockFileModel GetLockFile(Guid userId, string username) => new()
+        static LockFileModel GetLockFileModel(Guid userId, string username) => new()
         {
             Status = LockFileStatus.Locked,
             LockDetails = new LockDetailsModel()
@@ -99,7 +100,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         };
     }
 
-    public async Task<Result> PrepareGameSaveAsync(Guid gameSaveId)
+    public async Task<Result> PrepareGameSaveAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -108,7 +109,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         var fileDownloadResult = await _externalStorageService.GetNewestFileWithSubstringInNameAsync(gameSave.StorageAccountId,
-            gameSave.RemoteLocationId, _savePrefix);
+            gameSave.RemoteLocationId, _savePrefix, cancellationToken);
 
         if (fileDownloadResult.IsFailed)
         {
@@ -121,14 +122,14 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         var downloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId,
-            fileDownloadResult.Value.Id!);
+            fileDownloadResult.Value.Id!, cancellationToken: cancellationToken);
 
         return downloadResult.IsSuccess
             ? _fileService.DecompressFile(gameSave.LocalGameSavePath, downloadResult.Value)
             : downloadResult.ToResult();
     }
 
-    public async Task<Result> StartGameAsync(Guid gameId)
+    public async Task<Result> StartGameAsync(Guid gameId, CancellationToken cancellationToken = default)
     {
         var game = await _gameRepository.GetAsync(gameId);
 
@@ -142,7 +143,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Ok();
     }
 
-    public async Task<Result> UnlockRepositoryAsync(Guid gameSaveId)
+    public async Task<Result> UnlockRepositoryAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -150,7 +151,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockfileResult = await GetLockFileContentWithIdAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockfileResult = await GetLockFileContentWithIdAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            cancellationToken);
 
         if (lockfileResult.IsFailed)
         {
@@ -181,7 +183,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         };
 
         var updateResult = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, lockfileId!,
-            lockfileContent);
+            lockfileContent, cancellationToken: cancellationToken);
 
         if (updateResult.IsFailed)
         {
@@ -194,7 +196,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return Result.Ok();
     }
 
-    public async Task<Result> UploadGameSaveAsync(Guid gameSaveId)
+    public async Task<Result> UploadGameSaveAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -202,7 +204,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockfileResult = await GetLockFileContentAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockfileResult = await GetLockFileContentAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            cancellationToken);
 
         if (lockfileResult.IsFailed)
         {
@@ -236,22 +239,22 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         string fileName = string.Format(_saveFileNameTemplate, DateTime.UtcNow.ToString(_dateTimeFormat));
 
         var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
-            fileName, stream);
+            fileName, stream, cancellationToken);
         
         if(uploadResult.IsFailed)
         {
             return uploadResult;
         }
 
-        await EnsureStoredGameSaveCountAsync(gameSave);
-        var unlockResult = await UnlockRepositoryAsync(gameSaveId);
+        await EnsureStoredGameSaveCountAsync(gameSave, cancellationToken);
+        var unlockResult = await UnlockRepositoryAsync(gameSaveId, cancellationToken);
 
         return unlockResult;
     }
 
-    private async Task<Result> EnsureStoredGameSaveCountAsync(GameSave gameSave)
+    private async Task<Result> EnsureStoredGameSaveCountAsync(GameSave gameSave, CancellationToken cancellationToken = default)
     {
-        var configFileResult = await GetConfigFileOrDefaultAsync(gameSave.Id);
+        var configFileResult = await GetConfigFileOrDefaultAsync(gameSave.Id, cancellationToken);
 
         if (configFileResult.IsFailed)
         {
@@ -260,8 +263,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         var configFile = configFileResult.Value;
 
-        var gameSavesResult = await _externalStorageService.GetFilesWithSubstringInNameOrderedByDateAscAsync(gameSave.StorageAccountId,
-            gameSave.RemoteLocationId, _savePrefix);
+        var gameSavesResult = await _externalStorageService.GetFilesWithSubstringInNameOrderedByDateAscAsync(
+            gameSave.StorageAccountId, gameSave.RemoteLocationId, _savePrefix, cancellationToken);
 
         if (gameSavesResult.IsFailed)
         {
@@ -279,7 +282,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         foreach (var file in gameSavesToDelete)
         {
-            var deleteResult = await _externalStorageService.DeleteFileAsync(gameSave.StorageAccountId, file.Id!);
+            var deleteResult = await _externalStorageService.DeleteFileAsync(gameSave.StorageAccountId, file.Id!,
+                cancellationToken);
             if (deleteResult.IsFailed)
             {
                 return deleteResult;
@@ -289,10 +293,13 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return Result.Ok();
     }
 
-    public Task<Result<IEnumerable<FileItemModel>>> GetGameSaveVersionsAsync(Guid storageAccountId, string remoteLocationId)
-        => _externalStorageService.GetFilesWithSubstringInNameAsync(storageAccountId, remoteLocationId, _savePrefix);
+    public Task<Result<IEnumerable<FileItemModel>>> GetGameSaveVersionsAsync(Guid storageAccountId, string remoteLocationId,
+        CancellationToken cancellationToken = default)
+        => _externalStorageService.GetFilesWithSubstringInNameAsync(storageAccountId, remoteLocationId, _savePrefix,
+            cancellationToken);
 
-    public async Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId)
+    public async Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId,
+        CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetAsync(gameSaveId);
         if (gameSave is null)
@@ -300,7 +307,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var result = await LockRepositoryAsync(gameSaveId);
+        var result = await LockRepositoryAsync(gameSaveId, cancellationToken);
 
         if (result.IsFailed)
         {
@@ -309,7 +316,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
                 : Result.Fail("Unable to lock repository.");
         }
 
-        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId);
+        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId,
+            cancellationToken);
 
         if (fileDownloadResult.IsFailed)
         {
@@ -324,7 +332,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
     }
 
     public async Task<Result> DownloadGameSaveToSpecificLocationAsync(Guid gameSaveId, string remoteLocationId,
-        string destinationPath)
+        string destinationPath, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetAsync(gameSaveId);
         if (gameSave is null)
@@ -332,14 +340,16 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var fileInfoResult = await _externalStorageService.GetFileAsync(gameSave.StorageAccountId, remoteLocationId);
+        var fileInfoResult = await _externalStorageService.GetFileAsync(gameSave.StorageAccountId, remoteLocationId,
+            cancellationToken);
 
         if (fileInfoResult.IsFailed)
         {
             return fileInfoResult.ToResult();
         }
 
-        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId);
+        var fileDownloadResult = await _externalStorageService.DownloadFileAsync(gameSave.StorageAccountId, remoteLocationId,
+            cancellationToken);
 
         if (fileDownloadResult.IsFailed)
         {
@@ -353,7 +363,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
            : Result.Fail("File not found");
     }
 
-    public async Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath)
+    public async Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath,
+        CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -361,7 +372,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockResult = await LockRepositoryAsync(gameSaveId);
+        var lockResult = await LockRepositoryAsync(gameSaveId, cancellationToken);
 
         if (lockResult.IsFailed)
         {
@@ -379,22 +390,23 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         string fileName = string.Format(_saveFileNameTemplate, DateTime.UtcNow.ToString(_dateTimeFormat));
 
         var uploadResult = await _externalStorageService.UploadFileAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
-            fileName, stream);
+            fileName, stream, cancellationToken);
 
         if (uploadResult.IsFailed)
         {
             return uploadResult;
         }   
 
-        await EnsureStoredGameSaveCountAsync(gameSave);
+        await EnsureStoredGameSaveCountAsync(gameSave, cancellationToken);
 
-        return await UnlockRepositoryAsync(gameSaveId);
+        return await UnlockRepositoryAsync(gameSaveId, cancellationToken);
     }
 
-    private async Task<Result<FileItemModel?>> GetLockFileMetadataAsync(Guid storageAccountId, string remoteLocationId)
+    private async Task<Result<FileItemModel?>> GetLockFileMetadataAsync(Guid storageAccountId, string remoteLocationId,
+        CancellationToken cancellationToken = default)
     {
         var lockFilesResult = await _externalStorageService.GetFilesWithNameAsync(storageAccountId, remoteLocationId,
-            _lockFileName);
+            _lockFileName, cancellationToken);
 
         if (lockFilesResult.IsFailed)
         {
@@ -408,9 +420,10 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         return Result.Ok(result);
     }
 
-    private async Task<Result<LockFileModel?>> GetLockFileContentAsync(Guid storageAccountId, string remoteLocationId)
+    private async Task<Result<LockFileModel?>> GetLockFileContentAsync(Guid storageAccountId, string remoteLocationId,
+        CancellationToken cancellationToken = default)
     {
-        var result = await GetLockFileContentWithIdAsync(storageAccountId, remoteLocationId);
+        var result = await GetLockFileContentWithIdAsync(storageAccountId, remoteLocationId, cancellationToken);
 
         return result.IsSuccess
             ? result.Value.Item2
@@ -418,9 +431,9 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
     }
 
     private async Task<Result<(string?, LockFileModel?)>> GetLockFileContentWithIdAsync(Guid storageAccountId,
-        string remoteLocationId)
+        string remoteLocationId, CancellationToken cancellationToken = default)
     {
-        var lockFileResult = await GetLockFileMetadataAsync(storageAccountId, remoteLocationId);
+        var lockFileResult = await GetLockFileMetadataAsync(storageAccountId, remoteLocationId, cancellationToken);
 
         if (lockFileResult.IsFailed)
         {
@@ -440,7 +453,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         fileId = lockFileModel.Id;
 
         var lockfileResult = await _externalStorageService
-            .DownloadJsonFileAsync<LockFileModel>(storageAccountId, fileId!);
+            .DownloadJsonFileAsync<LockFileModel>(storageAccountId, fileId!, cancellationToken);
 
         if (lockfileResult.IsFailed)
         {
@@ -454,7 +467,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Fail("Invalid lockfile content structure"))!;
     }
 
-    public async Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId)
+    public async Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -462,7 +475,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId);
+        var lockFileResult = await GetLockFileMetadataAsync(gameSave.StorageAccountId, gameSave.RemoteLocationId,
+            cancellationToken);
 
         if (lockFileResult.IsFailed)
         {
@@ -475,7 +489,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         var lockfileResult = await _externalStorageService
-            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileResult.Value.Id!);
+            .DownloadJsonFileAsync<LockFileModel>(gameSave.StorageAccountId, lockFileResult.Value.Id!,
+            cancellationToken: cancellationToken);
 
         if (lockfileResult.IsFailed)
         {
@@ -489,7 +504,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Fail("Invalid lockfile content structure");
     }
 
-    public async Task<Result> UpdateConfigFileAsync(Guid gameSaveId, int keepGameSavesCount)
+    public async Task<Result> UpdateConfigFileAsync(Guid gameSaveId, int keepGameSavesCount,
+        CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -497,7 +513,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var configFileResult = await GetConfigMetadataAsync(gameSave);
+        var configFileResult = await GetConfigMetadataAsync(gameSave, cancellationToken);
 
         if (configFileResult.IsFailed)
         {
@@ -514,21 +530,22 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         if (configFile is null)
         {
             var createFileResult = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _configFileName,
-                configFileModel, gameSave.RemoteLocationId);
+                configFileModel, gameSave.RemoteLocationId, cancellationToken);
 
             return createFileResult;
         }
 
         var result = await _externalStorageService.UpdateFileSimpleAsync(gameSave.StorageAccountId, configFile.Id!,
-            configFileModel);
+            configFileModel, cancellationToken: cancellationToken);
 
         return result;
     }
 
-    private async Task<Result<FileItemModel?>> GetConfigMetadataAsync(GameSave gameSave)
+    private async Task<Result<FileItemModel?>> GetConfigMetadataAsync(GameSave gameSave, 
+       CancellationToken cancellationToken = default)
     {
         var configFileResult = await _externalStorageService.GetFilesWithNameAsync(gameSave.StorageAccountId,
-            gameSave.RemoteLocationId, _configFileName);
+            gameSave.RemoteLocationId, _configFileName, cancellationToken);
 
         if (configFileResult.IsFailed)
         {
@@ -542,7 +559,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Fail("Multiple config files found");
     }
 
-    public async Task<Result<ConfigFileModel>> GetConfigFileOrDefaultAsync(Guid gameSaveId)
+    public async Task<Result<ConfigFileModel>> GetConfigFileOrDefaultAsync(Guid gameSaveId,
+        CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -550,7 +568,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Fail("Game save not found");
         }
 
-        var configFileMetadataResult = await GetConfigMetadataAsync(gameSave);
+        var configFileMetadataResult = await GetConfigMetadataAsync(gameSave, cancellationToken);
 
         if (configFileMetadataResult.IsFailed)
         {
@@ -565,7 +583,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         var configFileResult = await _externalStorageService.DownloadJsonFileAsync<ConfigFileModel>(gameSave.StorageAccountId,
-            configFileMetadata.Id!);
+            configFileMetadata.Id!, cancellationToken: cancellationToken);
 
         return configFileResult.IsSuccess
             ? Result.Ok(configFileResult.Value ?? DefaultConfigFile)

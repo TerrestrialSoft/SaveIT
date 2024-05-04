@@ -1,5 +1,7 @@
 ﻿@page "/game-saves/{GameSaveIdString}"
 
+@inherits CancellableComponent
+
 @if (_gameSaveExists)
 {
     <h3>@_gameSave.Name Settings</h3>

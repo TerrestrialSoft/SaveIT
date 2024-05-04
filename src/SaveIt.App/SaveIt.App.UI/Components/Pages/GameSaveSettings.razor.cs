@@ -49,7 +49,8 @@ public partial class GameSaveSettings
             return await Task.FromResult(request.ApplyTo(_files));
         }
 
-        var result = await GameService.GetGameSaveVersionsAsync(_gameSave.StorageAccountId, _gameSave.RemoteLocationId);
+        var result = await GameService.GetGameSaveVersionsAsync(_gameSave.StorageAccountId, _gameSave.RemoteLocationId,
+            CancellationToken);
 
         if (result.IsFailed)
         {
@@ -83,7 +84,7 @@ public partial class GameSaveSettings
 
         _gameSave = save;
 
-        var configFileResult = await GameService.GetConfigFileOrDefaultAsync(_gameSave.Id);
+        var configFileResult = await GameService.GetConfigFileOrDefaultAsync(_gameSave.Id, CancellationToken);
 
         if (configFileResult.IsFailed)
         {
@@ -129,7 +130,7 @@ public partial class GameSaveSettings
         }
 
         _countUpdateInProgress = true;
-        var result = await GameService.UpdateConfigFileAsync(_gameSave.Id, _versionsModel.Count);
+        var result = await GameService.UpdateConfigFileAsync(_gameSave.Id, _versionsModel.Count, CancellationToken);
         _countUpdateInProgress = false;
 
         var message = result.IsSuccess
@@ -153,7 +154,7 @@ public partial class GameSaveSettings
         }
 
         PreloadService.Show();
-        var result = await GameService.UnlockRepositoryAsync(_gameSave.Id);
+        var result = await GameService.UnlockRepositoryAsync(_gameSave.Id, CancellationToken);
         PreloadService.Hide();
         
         if (result.IsFailed)

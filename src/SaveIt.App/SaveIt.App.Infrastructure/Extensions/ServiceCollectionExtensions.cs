@@ -50,6 +50,17 @@ public static class ServiceCollectionExtensions
                .HandleTransientHttpError()
                .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt))));
 
+        services.AddHttpClient<ISaveItApiTokenRetrievalService, SaveItApiTokenRetrievalService>((serviceProvider, client) =>
+        {
+            var apiOptions = serviceProvider.GetRequiredService<IOptions<SaveItApiOptions>>();
+            client.BaseAddress = new Uri(apiOptions.Value.Url);
+        })
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+        .AddPolicyHandler(_ => HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .Or<HttpRequestException>()
+                .WaitAndRetryAsync(3, _ => TimeSpan.FromSeconds(5)));
+
         return services;
     }
 

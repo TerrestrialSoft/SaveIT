@@ -32,6 +32,7 @@ public partial class StorageAuthorizationModal
 
     private void BackToProviderSelection()
     {
+        ResetToken();
         _authState = AuthorizationScreenState.SelectProvider;
     }
 

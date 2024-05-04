@@ -34,4 +34,14 @@ public class CancellableComponent : ComponentBase, IDisposable
     {
         Dispose(false);
     }
+
+    protected void ResetToken()
+    {
+        if (_tokenSource is not null)
+        {
+            _tokenSource.Cancel();
+            _tokenSource.Dispose();
+            _tokenSource = new();
+        }
+    }
 }

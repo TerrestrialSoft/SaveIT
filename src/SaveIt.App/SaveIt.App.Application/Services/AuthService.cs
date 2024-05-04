@@ -1,13 +1,14 @@
 ﻿using SaveIt.App.Domain.Auth;
 using SaveIt.App.Domain.Models;
-using Polly;
 using FluentResults;
 using SaveIt.App.Domain.Repositories;
 using SaveIt.App.Domain.Enums;
 
 namespace SaveIt.App.Application.Services;
 public class AuthService(ISaveItApiService _saveItClient, IStorageAccountRepository _accountRepository,
-    IAccountSecretsRepository _secretsService, IExternalStorageService _externalStorage) : IAuthService
+    IAccountSecretsRepository _secretsService, IExternalStorageService _externalStorage,
+    ISaveItApiTokenRetrievalService _saveItTokenClient)
+    : IAuthService
 {
     public async Task<Result<Uri>> GetAuthorizationUrlAsync(Guid requestId, CancellationToken cancellationToken = default)
     {
@@ -31,7 +32,7 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
             return tokenResult.ToResult();
         }
 
-        var emailResult = await GetUserEmailAsync(tokenResult.Value.AccessToken);
+        var emailResult = await GetUserEmailAsync(tokenResult.Value.AccessToken, cancellationToken);
 
         if (emailResult.IsFailed)
         {
@@ -77,39 +78,27 @@ public class AuthService(ISaveItApiService _saveItClient, IStorageAccountReposit
         return Result.Ok();
     }
 
-    private async Task<Result<string>> GetUserEmailAsync(string accessToken)
+    private async Task<Result<string>> GetUserEmailAsync(string accessToken, CancellationToken cancellationToken = default)
     {
-        var result = await _externalStorage.GetProfileEmailAsync(accessToken);
+        var result = await _externalStorage.GetProfileEmailAsync(accessToken, cancellationToken);
         return result;
     }
 
-    private async Task<Result<OAuthCompleteTokenModel>> GetTokenAsync(Guid requestId, CancellationToken cancellationToken)
+    private async Task<Result<OAuthCompleteTokenModel>> GetTokenAsync(Guid requestId,
+        CancellationToken cancellationToken = default)
     {
-        var retryPipeline = new ResiliencePipelineBuilder<OAuthCompleteTokenModel?>()
-        .AddRetry(new()
-        {
-            MaxRetryAttempts = 3,
-            BackoffType = DelayBackoffType.Constant,
-            Delay = TimeSpan.FromSeconds(300),
-            ShouldHandle = new PredicateBuilder<OAuthCompleteTokenModel?>()
-                .Handle<HttpRequestException>(),
-        })
-        .Build();
-
-        OAuthCompleteTokenModel? token = null;
-
+        OAuthCompleteTokenModel? tokenModel;
         try
         {
-            token = await retryPipeline.ExecuteAsync(async token => await _saveItClient.GetTokenAsync(requestId, token),
-                cancellationToken);
+            tokenModel = await _saveItTokenClient.GetTokenAsync(requestId, cancellationToken);
         }
-        catch (Exception)
+        catch (Exception ex) when (ex is HttpRequestException or ArgumentNullException)
         {
             return Result.Fail("Error occured during contacting the server");
         }
 
-        return token is not null
-            ? Result.Ok(token)
+        return tokenModel is not null
+            ? Result.Ok(tokenModel)
             : Result.Fail("Invalid token");
     }
 }

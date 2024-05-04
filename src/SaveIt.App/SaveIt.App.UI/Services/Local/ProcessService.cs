@@ -9,7 +9,12 @@ public class ProcessService : IProcessService
     {
 		try
 		{
-			Process.Start(path);
+			ProcessStartInfo startInfo = new()
+			{
+                FileName = path,
+                UseShellExecute = true
+            };
+			Process.Start(startInfo);
 		}
 		catch (Exception)
 		{

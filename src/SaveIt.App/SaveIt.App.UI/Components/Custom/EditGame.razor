@@ -6,7 +6,7 @@
                 <RequiredMark />
                 <Help Text="Enter the name of the game you want to create a profile for." />
             </label>
-            <InputText @bind-Value="Model.Name" placeholder="Game Name" class="w-75 form-control" tabindex="0" />
+            <InputText @bind-Value="Model.Name" placeholder="Game Name" class="w-75 form-control" />
             <ValidationMessage For="() => Model.Name" />
         </div>
         <div class="m-1 mt-2 p-1">
@@ -15,7 +15,7 @@
                 <RequiredMark />
                 <Help Text="Enter your username under which you want to appear within this application when saving game progress for this particular game." />
             </label>
-            <InputText @bind-Value="Model.Username" placeholder="Username" class="w-75 form-control" tabindex="1" />
+            <InputText @bind-Value="Model.Username" placeholder="Username" class="w-75 form-control" />
             <ValidationMessage For="() => Model.Username" />
         </div>
     </div>
@@ -23,7 +23,6 @@
         <div class="m-1 p-1">
             <ImagePicker ImageSource="@Model.Image"
                          OnImageChanged="ImageChanged"
-                         TabIndex="2"
                          HelpText="Select the image that will be displayed for this game." />
         </div>
         <div>
@@ -32,7 +31,6 @@
                         SelectedFile="@Model.GameExecutableFile"
                         OnPickerClicked="ShowLocalExecutablePickerModal"
                         OnPathCleared="ClearLocalExecutablePath"
-                        TabIndex="3"
                         HelpText="Select the location of the game exe file used to run the game." />
         </div>
     </div>

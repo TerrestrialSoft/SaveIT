@@ -8,8 +8,7 @@
             </label>
             <InputText @bind-Value="Model.Name"
                        placeholder="Game Save Name"
-                       class="form-control w-75"
-                       tabindex="4" />
+                       class="form-control w-75"/>
 
             <ValidationMessage For="() => Model.Name" />
         </div>
@@ -24,8 +23,7 @@
                 <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
                              Value="@Model.StorageAccountId"
                              ValueExpression="@(() => Model.StorageAccountId)"
-                             class="p-2 w-75 form-control form-select"
-                             tabindex="5">
+                             class="p-2 w-75 form-control form-select">
                     @foreach (var account in _storageAccounts)
                     {
                         <option value="@account.Id" class="p-1">@account.Email (@account.Type.ToString())</option>
@@ -40,8 +38,7 @@
                 <Button Color="ButtonColor.Primary"
                         Class="ms-4 mt-1 me-3"
                         Outline=true
-                        @onclick="ShowAuthorizeStorageModal"
-                        TabIndex="5">
+                        @onclick="ShowAuthorizeStorageModal">
                     Authorize new account
                 </Button>
             }
@@ -58,7 +55,6 @@
                         SelectedFile="@Model.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"
-                        TabIndex="6"
                         HelpText="Select the game save folder that is saved on your local device." />
             <div class="ms-4">
                 <ValidationMessage For="() => Model.LocalGameSaveFile" />
@@ -72,7 +68,6 @@
                         SelectedFile="@Model.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
                         OnPathCleared="ClearRemoteGameSavePath"
-                        TabIndex="7"
                         HelpText="Select a folder on your cloud storage where your game save and other application work files will be saved." />
             <div class="ms-4">
                 <ValidationMessage For="() => Model.RemoteGameSaveFile" />

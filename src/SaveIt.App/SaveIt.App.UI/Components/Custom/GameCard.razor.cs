@@ -51,8 +51,9 @@ public partial class GameCard
     public required Modal ModalEditGame { get; set; }
 
     private ConfirmDialog _confirmDialog = default!;
-
     private GameSave? selectedSave;
+    private bool _isGameStarting = false;
+    private bool _isGameDeleting = false;
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -64,7 +65,8 @@ public partial class GameCard
         }
     }
 
-    private bool IsGameHosting() => Game.GameSaves?.Exists(x => x.IsHosting) ?? false;
+    private bool IsGameHosting()
+        => Game.GameSaves?.Exists(x => x.IsHosting) ?? false;
 
     private async Task StartDetailShowing()
     {
@@ -84,6 +86,7 @@ public partial class GameCard
             ToastService.Notify(new(ToastType.Danger, $"No save found for game {Game.Name}"));
             return;
         }
+        _isGameStarting = true;
 
         var accountId = Game.GameSaves!.First(x => x.Id == selectedSave.Id).StorageAccountId;
         var account = await StorageAccountRepository.GetAsync(accountId);
@@ -91,6 +94,7 @@ public partial class GameCard
         if(account is null)
         {
             ToastService.Notify(new(ToastType.Danger, $"Storage account not found"));
+            _isGameStarting = false;
             return;
         }
 
@@ -98,6 +102,7 @@ public partial class GameCard
         {
             ToastService.Notify(new(ToastType.Danger, $"Storage account not authorized",
                 "Navigate to Storage accounts page and authorize the account."));
+            _isGameStarting = false;
             return;
         }
 
@@ -118,6 +123,7 @@ public partial class GameCard
             }
         };
 
+        _isGameStarting = false;
         await ModalStartGame.ShowAsync<StartGameSaveModal>(StartGameSaveModal.Title, parameters: parameters);
     }
 
@@ -131,8 +137,11 @@ public partial class GameCard
         {
             return;
         }
-
+        
+        _isGameDeleting = true;
         await GameRepository.DeleteAsync(Game.Id, true);
+        _isGameDeleting = false;
+
         ToastService.Notify(new(ToastType.Success, $"Game deleted successfully."));
         await OnCardUpdated.InvokeAsync(Game);
     }

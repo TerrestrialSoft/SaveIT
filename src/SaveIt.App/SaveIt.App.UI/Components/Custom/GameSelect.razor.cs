@@ -42,7 +42,7 @@ public partial class GameSelect
         return OnSelectedGameChanged.InvokeAsync(_selectedGameId);
     }
 
-    private async Task ShowCreateGameSaveModal()
+    private async Task TriggerOnCreateGameRequestedAsync()
     {
         if(IsOnCreateGameRequestSet)
         {

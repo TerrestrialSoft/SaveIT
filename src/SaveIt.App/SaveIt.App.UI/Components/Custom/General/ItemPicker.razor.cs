@@ -32,12 +32,10 @@ public partial class ItemPicker<TItem> where TItem : NamedModel
     [Parameter]
     public string? HelpText { get; set; }
 
-    private async Task ShowModal()
-    {
-        await OnPickerClicked.InvokeAsync();
-    }
+    private Task ShowModalAsync()
+        => OnPickerClicked.InvokeAsync();
 
-    private Task ClearPath()
+    private Task ClearPathAsync()
     {
         SelectedFile = default;
         return OnPathCleared.InvokeAsync();

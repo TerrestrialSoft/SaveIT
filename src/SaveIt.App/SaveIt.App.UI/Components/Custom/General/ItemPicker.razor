@@ -21,7 +21,7 @@
                 Outline="true"
                 Class="ms-4 me-3"
                 Disabled="@IsDisabled"
-                @onclick="ShowModal"
+                @onclick="ShowModalAsync"
                 TabIndex="@TabIndex">
             Select Location
         </Button>
@@ -30,7 +30,7 @@
         {
             <div class="d-flex align-items-center p-1 ms-4">
                 <div class="text-muted me-2" style="word-break: break-all;">@SelectedFile.FullPath</div>
-                <div @onclick="ClearPath"><Icon Name="IconName.Trash3Fill" Color="IconColor.Danger" Size="IconSize.x5" /></div>
+                <div @onclick="ClearPathAsync"><Icon Name="IconName.Trash3Fill" Color="IconColor.Danger" Size="IconSize.x5" /></div>
             </div>
         }
     </div>

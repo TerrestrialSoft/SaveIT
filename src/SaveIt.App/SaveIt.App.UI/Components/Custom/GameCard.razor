@@ -20,6 +20,8 @@
                         Outline="true"
                         Size="Size.Small"
                         @onclick="DeleteGameAsync"
+                        Loading="_isGameDeleting"
+                        Disabled="_isGameDeleting"
                         TooltipTitle="Delete">
                             <Icon CustomIconName="@CustomIcons.Delete" />
                     </Button>
@@ -85,7 +87,8 @@
                 </Button>
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
-                        Disabled="@(selectedSave is null)"
+                        Loading="_isGameStarting"
+                        Disabled="selectedSave is null || _isGameStarting"
                         @onclick="StartGameAsync">
                     <Icon CustomIconName="@CustomIcons.Play" Class="me-1" />
                     Start

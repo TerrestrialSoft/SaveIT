@@ -20,19 +20,19 @@
                 @if (IsOnCreateGameRequestSet)
                 {
                     <div>
-                        or <b @onclick="ShowCreateGameSaveModal" class="btn-create-new">create brand new game</b> along with the game save.
+                        or <b @onclick="TriggerOnCreateGameRequestedAsync" class="btn-create-new">create brand new game</b> along with the game save.
                     </div>
                 }
             }
-        else if (IsOnCreateGameRequestSet)
-        {
-            <Button Color="ButtonColor.Primary"
-                    Class="ms-4 mt-1 me-3"
-                    Outline=true
-                    @onclick="ShowCreateGameSaveModal"
-                    TabIndex="5">
-                Create Game
-            </Button>
-        }
+            else if (IsOnCreateGameRequestSet)
+            {
+                <Button Color="ButtonColor.Primary"
+                        Class="ms-4 mt-1 me-3"
+                        Outline=true
+                        @onclick="TriggerOnCreateGameRequestedAsync"
+                        TabIndex="5">
+                    Create Game
+                </Button>
+            }
         </div>
 </div>

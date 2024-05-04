@@ -7,7 +7,10 @@
         </div>
         <div class="flex-grow-1">
             <EditForm Model="_localFilePathModel" autocomplete="off">
-                <InputText @bind-Value="_localFilePathModel.Path" @onkeydown="OnPathKeyPressed" @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)" Class="fs-5 w-100" />
+                <InputText @bind-Value="_localFilePathModel.Path"
+                    @onkeydown="OnPathKeyPressed"
+                    @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)"
+                    Class="fs-5 w-100" />
             </EditForm>
         </div>
     </div>
@@ -67,7 +70,7 @@
         {
             <div class="me-5">
                 <b>Allowed extensions:</b><br />
-                @string.Join(",", AllowedExtensions)
+                @string.Join(", ", AllowedExtensions)
             </div>
         }
         <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3" Disabled="@_isLoading">Select</Button>

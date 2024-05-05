@@ -58,18 +58,38 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blazor.Bootstrap" Version="2.2.0" />
+        <PackageReference Include="Blazor.Bootstrap" Version="2.2.1" />
         <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="8.0.4" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.20" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.20" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.20" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.21" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.21" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.21" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\SaveIt.App.Infrastructure\SaveIt.App.Infrastructure.csproj" />
       <ProjectReference Include="..\SaveIt.App.Persistence\SaveIt.App.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
     </ItemGroup>
 
 </Project>

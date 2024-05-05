@@ -3,6 +3,7 @@ using Flurl;
 using Microsoft.Extensions.Options;
 using SaveIt.Server.UI.Models;
 using SaveIt.Server.UI.Options;
+using SaveIt.Server.UI.Results;
 using System.Text.Json;
 using System.Web;
 
@@ -23,7 +24,14 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
 
     public AuthorizationModel RegisterAuthorizationRequest(Guid requestId, string serverUrl)
     {
-        var token = _oAuthProvider.GetSecurityToken();
+        if (requestId == Guid.Empty)
+        {
+            throw new ArgumentException("Value not set", nameof(requestId));
+        }
+
+        ArgumentException.ThrowIfNullOrEmpty(serverUrl);
+
+        var token = _oAuthProvider.GetStateParameter();
         var state = new StateModel(token, requestId);
         
         _tokenStorage.SetToken(requestId, new StoredRequest(state));
@@ -45,9 +53,14 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
         return new(builder.Uri, state);
     }
 
-    public async Task<Result> GetTokensAsync(string code, string urlEncodedState, string serverUrl,
+    public async Task<Result> ObtainAndSaveTokens(string authorizationCode, string urlEncodedState, string serverUrl,
         CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(urlEncodedState))
+        {
+            return Result.Fail("State is empty.");
+        }
+
         var decodedState = HttpUtility.UrlDecode(urlEncodedState);
         var state = JsonSerializer.Deserialize<StateModel>(decodedState);
         
@@ -70,20 +83,20 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
         {
             { "client_id", _clientConfig.ClientId },
             { "client_secret", _clientConfig.ClientSecret },
-            { "code", code },
+            { "code", authorizationCode },
             { "grant_type", "authorization_code" },
             { "redirect_uri", redirectUri },
         };
 
         var response = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
 
-        var responseResult = response.ToResult();
+        var responseResult = response.ToFluentResult();
 
         if (responseResult.IsFailed)
         {
             _logger.LogError("Error occured during communication with identity provider. {ReasonPhrase}",
                 response.ReasonPhrase);
-            return responseResult.ToResult();
+            return responseResult;
         }
 
         var token = await response.Content.ReadFromJsonAsync<OAuthCompleteTokenResponseModel>(
@@ -114,7 +127,8 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
     public Task<Result<OAuthCompleteTokenResponseModel>> RetrieveTokensAsync(Guid requestId, CancellationToken cancellationToken)
         => _tokenStorage.WaitForTokenAsync(requestId, cancellationToken);
 
-    public async Task<Result<OAuthAccessTokenResponseModel>> RefreshAccessTokenAsync(string refreshToken, CancellationToken cancellationToken)
+    public async Task<Result<OAuthAccessTokenResponseModel>> RefreshAccessTokenAsync(string refreshToken,
+        CancellationToken cancellationToken)
     {
         var content = new Dictionary<string, string>()
         {
@@ -126,13 +140,13 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
 
         var response = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);
 
-        var responseResult = response.ToResult();
+        var responseResult = response.ToFluentResult();
 
         if (responseResult.IsFailed)
         {
             _logger.LogError("Error occured during refreshing the access token. {ReasonPhrase}",
                 response.ReasonPhrase);
-            return responseResult.ToResult();
+            return responseResult;
         }
 
         var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenResponseModel>(cancellationToken: cancellationToken);

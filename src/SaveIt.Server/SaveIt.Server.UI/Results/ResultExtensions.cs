@@ -6,7 +6,7 @@ namespace SaveIt.Server.UI.Results;
 
 public static class ResultExtensions
 {
-    public static Result ToResult(this HttpResponseMessage message)
+    public static Result ToFluentResult(this HttpResponseMessage message)
     {
         if (message.IsSuccessStatusCode)
         {

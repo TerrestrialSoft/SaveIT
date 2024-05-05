@@ -33,7 +33,7 @@ public static class ApiEndpoints
             }
 
             var serverUrl = GetServerUrl(context.Request);
-            var result = await authService.GetTokensAsync(code, state, serverUrl, cancellationToken);
+            var result = await authService.ObtainAndSaveTokens(code, state, serverUrl, cancellationToken);
 
             var path = _successAuth;
 

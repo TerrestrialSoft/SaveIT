@@ -4,18 +4,22 @@ namespace SaveIt.Server.UI.Services;
 
 public class OAuthStateProvider : IOAuthStateProvider
 {
-    // Length can be in [43; 128] characters
-    private const int _stateParameterLength = 128;
+    /// <summary>
+    /// Parameter with the length of the state parameter. Length can be from 43 to 128 characters.
+    /// </summary>
+    public const int StateParameterLength = 64;
 
-    public string GetSecurityToken()
+    public string GetStateParameter()
     {
         using var rng = RandomNumberGenerator.Create();
-        var bytes = new byte[_stateParameterLength];
+        var bytes = new byte[StateParameterLength];
 
         rng.GetBytes(bytes);
 
-        return BitConverter.ToString(bytes)
+        var result =  BitConverter.ToString(bytes)
             .Replace("-", "")
             .ToLower();
+
+        return result;
     }
 }

@@ -13,9 +13,9 @@ public class TokenStorage(IMemoryCache _cache, IOptions<TokenCachingOptions> _to
     private readonly TimeSpan _tokenRetrieveDelaySeconds = TimeSpan
         .FromSeconds(_tokenCachingOptions.Value.TokenRetrieveDelaySeconds);
     private readonly TimeSpan _cacheEntryLifeTimeMinutes = TimeSpan
-        .FromMinutes(_tokenCachingOptions.Value.CacheEntryLifeTimeMinutes);
+        .FromSeconds(_tokenCachingOptions.Value.CacheEntryLifeTimeSeconds);
     private readonly TimeSpan _maxTokenRetrieveTimeMinutes = TimeSpan
-        .FromMinutes(_tokenCachingOptions.Value.MaxTokenRetrieveTimeMinutes);
+        .FromSeconds(_tokenCachingOptions.Value.MaxTokenRetrieveTimeSeconds);
 
     private const string _cacheEntryTemplate = "AuthTokenRequest:{0}";
 
@@ -25,10 +25,11 @@ public class TokenStorage(IMemoryCache _cache, IOptions<TokenCachingOptions> _to
     public bool TryGetToken(Guid key, out StoredRequest? value)
         => _cache.TryGetValue(GetCacheKey(key), out value);
 
-    private static string GetCacheKey(Guid key)
+    public static string GetCacheKey(Guid key)
         => string.Format(_cacheEntryTemplate, key);
 
-    public async Task<Result<OAuthCompleteTokenResponseModel>> WaitForTokenAsync(Guid key, CancellationToken cancellationToken)
+    public async Task<Result<OAuthCompleteTokenResponseModel>> WaitForTokenAsync(Guid key,
+        CancellationToken cancellationToken = default)
     {
         var maxTokenRetrieveTime = DateTime.UtcNow.Add(_maxTokenRetrieveTimeMinutes);
 

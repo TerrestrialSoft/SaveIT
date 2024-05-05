@@ -11,7 +11,7 @@ namespace SaveIt.App.Infrastructure.Api;
 public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
 {
     private const string _authUrl = "google";
-    private const string _refreshUrl = "refresh";
+    private const string _refreshUrl = _authUrl + "/refresh";
 
     private readonly HttpClient _httpClient = httpClient;
 

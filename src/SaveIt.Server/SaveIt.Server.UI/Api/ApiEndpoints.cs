@@ -15,7 +15,24 @@ public static class ApiEndpoints
     {
         var apiGroup = app.MapGroup("api/auth");
 
-        apiGroup.MapPost("google", (RequestModel model, HttpContext context, IGoogleAuthService authService) =>
+        apiGroup.AddGoogleEndpoints();
+
+        apiGroup.MapPost("retrieve", async (RequestModel model, CancellationToken token,
+            IGoogleAuthService authService) =>
+        {
+            var result = await authService.RetrieveTokensAsync(model.RequestId, token);
+
+            return result.IsSuccess
+                ? Microsoft.AspNetCore.Http.Results.Ok(result.Value)
+                : Microsoft.AspNetCore.Http.Results.StatusCode((int)HttpStatusCode.RequestTimeout);
+        });
+    }
+
+    private static void AddGoogleEndpoints(this IEndpointRouteBuilder builder)
+    {
+        var googleGroup = builder.MapGroup("google");
+
+        googleGroup.MapPost("", (RequestModel model, HttpContext context, IGoogleAuthService authService) =>
         {
             var serverUrl = GetServerUrl(context.Request);
             var authorization = authService.RegisterAuthorizationRequest(model.RequestId, serverUrl);
@@ -23,7 +40,7 @@ public static class ApiEndpoints
             return Microsoft.AspNetCore.Http.Results.Ok(new AuthorizationUrlResponseModel(authorization.Uri.ToString()));
         });
 
-        apiGroup.MapGet("google/callback", async (string state, string? code, string? error, HttpContext context,
+        googleGroup.MapGet("callback", async (string state, string? code, string? error, HttpContext context,
             CancellationToken cancellationToken, IGoogleAuthService authService, ILogger<GoogleAuthService> _logger) =>
         {
             if (!string.IsNullOrEmpty(error) || string.IsNullOrEmpty(code))
@@ -46,17 +63,7 @@ public static class ApiEndpoints
             return Microsoft.AspNetCore.Http.Results.Redirect(path);
         });
 
-        apiGroup.MapPost("retrieve", async (RequestModel model, CancellationToken token,
-            IGoogleAuthService authService) =>
-        {
-            var result = await authService.RetrieveTokensAsync(model.RequestId, token);
-
-            return result.IsSuccess
-                ? Microsoft.AspNetCore.Http.Results.Ok(result.Value)
-                : Microsoft.AspNetCore.Http.Results.StatusCode((int)HttpStatusCode.RequestTimeout);
-        });
-
-        apiGroup.MapPost("refresh", async (RefreshTokenRequestModel model, CancellationToken token,
+        googleGroup.MapPost("refresh", async (RefreshTokenRequestModel model, CancellationToken token,
                        IGoogleAuthService authService) =>
         {
             var result = await authService.RefreshAccessTokenAsync(model.RefreshToken, token);

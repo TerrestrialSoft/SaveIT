@@ -72,24 +72,4 @@
       <ProjectReference Include="..\SaveIt.App.Persistence\SaveIt.App.Persistence.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="C:\Users\kubik\.nuget\packages\microsoft.windowsappsdk\1.5.240311000\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
-    </ItemGroup>
-
 </Project>

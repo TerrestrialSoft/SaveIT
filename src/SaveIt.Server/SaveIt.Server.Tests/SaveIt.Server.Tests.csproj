@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SaveIt.Server.UI\SaveIt.Server.UI.csproj" />
+    <ProjectReference Include="..\SaveIt.Server.UI\SaveIt.Server.UI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

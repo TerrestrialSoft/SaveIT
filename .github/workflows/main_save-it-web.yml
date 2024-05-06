@@ -6,9 +6,6 @@ name: SaveIT Server Deploy
 on:
   workflow_dispatch:
 
-env:
-  BASE_PATH: .\src\SaveIt.Server
-
 jobs:
   build:
     runs-on: windows-latest
@@ -23,13 +20,13 @@ jobs:
           include-prerelease: true
 
       - name: Build server
-        run: dotnet build $BASE_PATH\SaveIt.Server.UI\SaveIt.Server.UI.csproj --configuration Release
-
-      - name: Publish server
-        run: dotnet publish $BASE_PATH\SaveIt.Server.UI\SaveIt.Server.UI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet build .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj --configuration Release
 
       - name: Test server
-        run: dotnet test $BASE_PATH\SaveIt.Server.Tests\SaveIt.Server.Tests.csproj --no-build --verbosity normal
+        run: dotnet test .\src\SaveIt.Server\SaveIt.Server.Tests\SaveIt.Server.Tests.csproj --no-build --verbosity normal
+
+      - name: Publish server
+        run: dotnet publish .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3

@@ -32,7 +32,6 @@ public partial class GameSaves
     private readonly NewGameSaveModel _createGameSave = new();
     private readonly NewGameModel _createGame = new();
     private GameSave _currentGameSave = new();
-
     private Modal _createGameModal = default!;
     private Modal _localItemPickerModal = default!;
     private Modal _remoteItemPickerModal = default!;
@@ -105,13 +104,15 @@ public partial class GameSaves
     private async Task ShowCreateGameSaveModalAsync(Guid? gameId = null)
     {
         _currentModal = _createNewGameSaveModal;
+        _createGameSave.GameId ??= gameId;
+
         var parameters = new Dictionary<string, object>
         {
             { nameof(CreateGameSaveModal.ModalCurrent), _currentModal },
             { nameof(CreateGameSaveModal.ModalLocalItemPicker), _localItemPickerModal },
             { nameof(CreateGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(CreateGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
-            { nameof(CreateGameSaveModal.InitialGameId), gameId! },
+            { nameof(CreateGameSaveModal.InitialGameId), _createGameSave.GameId! },
             { nameof(CreateGameSaveModal.GameSaveModel), _createGameSave},
             { nameof(CreateGameSaveModal.OnCreateGameRequested), EventCallback.Factory.Create(this, async () =>
                 {
@@ -220,5 +221,13 @@ public partial class GameSaves
     {
         var url = string.Format(GameSaveSettingsUrl, gameSave.Id);
         NavManager.NavigateTo(url);
+    }
+
+    private void ClearParameters()
+    {
+        if (NavManager.TryGetQueryParameter<string>("operation", out var _))
+        {
+            NavManager.NavigateTo("/game-saves");
+        }
     }
 }

@@ -67,7 +67,7 @@
 <Modal @ref="_localItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowModalAsync" IsVerticallyCentered="true" />
 <Modal @ref="_remoteItemPickerModal" Size="ModalSize.ExtraLarge" OnHidden="ShowModalAsync" IsVerticallyCentered="true" />
 <Modal @ref="_authorizeStorageModal" Size="ModalSize.Large" OnHidden="ShowModalAsync" IsVerticallyCentered="true" />
-<Modal @ref="_createNewGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
-<Modal @ref="_editGameSaveModal" Size="ModalSize.ExtraLarge" IsVerticallyCentered="true" />
+<Modal @ref="_createNewGameSaveModal" Size="ModalSize.ExtraLarge" OnHidden="ClearParameters" IsVerticallyCentered="true" />
+<Modal @ref="_editGameSaveModal" Size="ModalSize.ExtraLarge" OnHidden="ClearParameters" IsVerticallyCentered="true" />
 <Modal @ref="_shareGameSaveModal" Size="ModalSize.Large" IsVerticallyCentered="true" />
 <ConfirmDialog @ref="_confirmDialog" />

@@ -19,7 +19,7 @@ jobs:
           dotnet-version: '8.x'
 
       - name: Build server
-        run: dotnet build ./src/SaveIt.Server/ -c Release
+        run: dotnet build ./src/SaveIt.Server/SaveIt.Server.UI/SaveIt.Server.UI.csproj -c Release
 
       - name: Publish server
         run: dotnet publish .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp

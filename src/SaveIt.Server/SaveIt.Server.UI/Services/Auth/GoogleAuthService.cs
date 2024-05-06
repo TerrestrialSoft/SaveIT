@@ -48,6 +48,7 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             { "scope", "https://www.googleapis.com/auth/drive" },
             { "response_type", "code" },
             { "access_type", "offline" },
+            { "prompt", "consent" }
         });
 
         return new(builder.Uri, state);
@@ -85,7 +86,7 @@ public class GoogleAuthService(IOAuthStateProvider oAuthProvider,
             { "client_secret", _clientConfig.ClientSecret },
             { "code", authorizationCode },
             { "grant_type", "authorization_code" },
-            { "redirect_uri", redirectUri },
+            { "redirect_uri", redirectUri }
         };
 
         var response = await _client.PostAsync("", new FormUrlEncodedContent(content), cancellationToken);

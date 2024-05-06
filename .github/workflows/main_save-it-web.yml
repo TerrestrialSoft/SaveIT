@@ -17,13 +17,12 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.x'
-          include-prerelease: true
 
       - name: Build server
-        run: dotnet build .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj --configuration Release
+        run: dotnet build ./src/SaveIt.Server/**/*.csproj --configuration Release
 
       - name: Test server
-        run: dotnet test .\src\SaveIt.Server\SaveIt.Server.Tests\SaveIt.Server.Tests.csproj --verbosity normal
+        run: dotnet test ./src/SaveIt.Server/**/*.Tests.csproj
 
       - name: Publish server
         run: dotnet publish .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp

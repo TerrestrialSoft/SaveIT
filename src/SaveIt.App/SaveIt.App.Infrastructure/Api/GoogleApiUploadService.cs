@@ -23,7 +23,7 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
     public async Task<Result> CreateFileSimpleAsync(Guid storageAccountId, string fileName, object fileContent,
         string? parentId = null, CancellationToken cancellationToken = default)
     {
-        var fileMetadata = new GoogleFileCreateModel
+        var fileMetadata = new GoogleFileCreateMultipartModel
         {
             Name = fileName,
             MimeType = _mimeTypeFile,
@@ -77,7 +77,7 @@ public class GoogleApiUploadService(HttpClient _httpClient, IAccountSecretsRepos
     public async Task<Result> UploadFileAsync(Guid storageAccountId, string parentId, string fileName, MemoryStream value,
         CancellationToken cancellationToken = default)
     {
-        var resumableUploadResult = await PrepareResumableUpload(storageAccountId, parentId, fileName);
+        var resumableUploadResult = await PrepareResumableUpload(storageAccountId, parentId, fileName, cancellationToken);
 
         return resumableUploadResult.IsSuccess
             ? await ExecuteResumableRequest(storageAccountId, HttpMethod.Put, resumableUploadResult.Value, value,

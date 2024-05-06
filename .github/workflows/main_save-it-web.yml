@@ -21,11 +21,11 @@ jobs:
       - name: Build server
         run: dotnet build ./src/SaveIt.Server/ -c Release
 
-      - name: Test server
-        run: dotnet test ./src/SaveIt.Server
-
       - name: Publish server
         run: dotnet publish .\src\SaveIt.Server\SaveIt.Server.UI\SaveIt.Server.UI.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Test server
+        run: dotnet test ./src/SaveIt.Server
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4

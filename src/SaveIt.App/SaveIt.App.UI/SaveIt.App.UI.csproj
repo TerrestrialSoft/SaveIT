@@ -25,7 +25,15 @@
         <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     </PropertyGroup>
 
-    <ItemGroup>
+    <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
+      <AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+      <PackageCertificateThumbprint>9BB7052AE56A00FD17476B57E87EC016A6AC8BA9</PackageCertificateThumbprint>
+    </PropertyGroup>
+      <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(RuntimeIdentifierOverride)' != ''">
+      <RuntimeIdentifier>$(RuntimeIdentifierOverride)</RuntimeIdentifier>
+    </PropertyGroup>
+
+  <ItemGroup>
         <!-- App Icon -->
         <MauiIcon Include="Resources\AppIcon\saveit_icon.svg" />
 

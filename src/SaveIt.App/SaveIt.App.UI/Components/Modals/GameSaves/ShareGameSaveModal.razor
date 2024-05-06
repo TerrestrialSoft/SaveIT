@@ -15,13 +15,11 @@
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Type="ButtonType.Submit"
+                        Loading="@_shareInProgress"
+                        LoadingText="Sharing..."
                         Disabled="_shareInProgress">
                     Share
                 </Button>
-            </div>
-            <div class="content-placeholder">
-                &nbsp;
-                <Spinner Size="SpinnerSize.Small" Color="SpinnerColor.Primary" Visible="@_shareInProgress" />
             </div>
         </div>
         <div class="text-center">

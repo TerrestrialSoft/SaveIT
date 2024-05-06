@@ -50,7 +50,7 @@ public partial class ShareGameSaveModal
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
             StateHasChanged();
-            users!.Clear();
+            users = [];
             return await Task.FromResult(request.ApplyTo(users));
         }
 
@@ -63,11 +63,11 @@ public partial class ShareGameSaveModal
     private async Task OnValidSubmitAsync()
     {
         _shareInProgress = true;
+        StateHasChanged();
         _error = null;
 
         var result = await ExternalStorageService.ShareFileWithUserAsync(StorageAccountId, RemoteFileId, _model.Email,
             CancellationToken);
-
 
         if (result.IsFailed)
         {

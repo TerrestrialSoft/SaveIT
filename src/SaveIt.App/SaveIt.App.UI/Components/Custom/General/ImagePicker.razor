@@ -15,8 +15,8 @@
             </div>
             
             <div class="ms-4">
-                <label for="file-input" class="btn btn-outline-primary me-3">Select image</label>
-                <InputFile id="file-input" OnChange="LoadFile" accept="image/png,image/jpg,image/jpeg" class="d-none" tabindex="@TabIndex" />
+                <label for="file-input" class="btn btn-outline-primary me-3" tabindex="0">Select image</label>
+                <InputFile id="file-input" OnChange="LoadFile" accept="image/png,image/jpg,image/jpeg" class="d-none" />
                 
                 @if(ImageSource is not null)
                 {

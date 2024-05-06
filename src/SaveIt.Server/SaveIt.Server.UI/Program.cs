@@ -9,6 +9,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddServices(builder.Configuration);
 
+builder.Services.AddApplicationInsightsTelemetry();
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())

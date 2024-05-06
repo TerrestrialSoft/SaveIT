@@ -1,12 +1,9 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - save-it-web
+name: SaveIT Server Deploy
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -16,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up .NET Core
+      - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: '8.x'
@@ -28,12 +25,15 @@ jobs:
       - name: dotnet publish
         run: dotnet publish .\src\SaveIt.Server -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
           path: ${{env.DOTNET_ROOT}}/myapp
-
+  
   deploy:
     runs-on: windows-latest
     needs: build

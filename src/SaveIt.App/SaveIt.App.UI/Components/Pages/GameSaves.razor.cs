@@ -32,6 +32,7 @@ public partial class GameSaves
     private readonly NewGameSaveModel _createGameSave = new();
     private readonly NewGameModel _createGame = new();
     private GameSave _currentGameSave = new();
+    private NewGameSaveModel _currentGameSaveModel = new();
     private Modal _createGameModal = default!;
     private Modal _localItemPickerModal = default!;
     private Modal _remoteItemPickerModal = default!;
@@ -160,8 +161,11 @@ public partial class GameSaves
     private async Task ShowEditGameSaveModalAsync(GameSave gameSave)
     {
         _currentModal = _editGameSaveModal;
-        _currentGameSave = gameSave;
-        var model = _currentGameSave.ToNewGameSaveModel();
+        if(_currentGameSave.Id == Guid.Empty)
+        {
+            _currentGameSave = gameSave;
+            _currentGameSaveModel = gameSave.ToNewGameSaveModel();
+        }
         var parameters = new Dictionary<string, object>
         {
             { nameof(EditGameSaveModal.ModalCurrent), _currentModal },
@@ -169,7 +173,7 @@ public partial class GameSaves
             { nameof(EditGameSaveModal.ModalRemoteItemPicker), _remoteItemPickerModal },
             { nameof(EditGameSaveModal.ModalAuthorizeStorage), _authorizeStorageModal },
             { nameof(EditGameSaveModal.GameSave), _currentGameSave },
-            { nameof(EditGameSaveModal.Model), model },
+            { nameof(EditGameSaveModal.Model), _currentGameSaveModel },
             { nameof(EditGameSaveModal.OnGameSaveUpdated),
                 EventCallback.Factory.Create<GameSave>(this, async (gs) =>
                 {
@@ -177,6 +181,8 @@ public partial class GameSaves
                     var index = _gameSaves.FindIndex(x => x.GameSave.Id == gs.Id);
                     _gameSaves[index] = gs.ToViewModel()!;
                     await _grid.RefreshDataAsync();
+                    _currentGameSave = new();
+                    _currentGameSaveModel = new();
                     ToastMessageService.Notify(new(ToastType.Success, "Game save updated successfully."));
                 })
             },

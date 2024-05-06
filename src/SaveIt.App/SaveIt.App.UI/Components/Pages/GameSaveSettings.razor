@@ -31,15 +31,11 @@
                                     Size="Size.Medium"
                                     Type="ButtonType.Submit"
                                     Loading="@_countUpdateInProgress"
+                                    LoadingText="Saving..."
                                     Disabled="_countUpdateInProgress">
                                 Update
                             </Button>
-                        </div>
-                        <div class="content-placeholder">
-                            &nbsp;
-                            <Spinner Size="SpinnerSize.Small" Color="SpinnerColor.Primary" Visible="@_countUpdateInProgress" />
-                        </div>
-                    
+                        </div>                    
                     </div>
                     <div class="text-center">
                         <ValidationMessage For="@(() => _versionsModel.Count)" />

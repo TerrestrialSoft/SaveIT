@@ -130,6 +130,7 @@ public partial class GameSaveSettings
         }
 
         _countUpdateInProgress = true;
+        StateHasChanged();
         var result = await GameService.UpdateConfigFileAsync(_gameSave.Id, _versionsModel.Count, CancellationToken);
         _countUpdateInProgress = false;
 

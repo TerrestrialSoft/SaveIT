@@ -22,7 +22,7 @@ jobs:
         run: dotnet build ./src/SaveIt.Server/ -c Release
 
       - name: Test server
-        run: dotnet test ./src/SaveIt.Server --no-build
+        run: dotnet test ./src/SaveIt.Server --no-build -c Release
         
       - name: Publish server
         run: dotnet publish ./src/SaveIt.Server/SaveIt.Server.UI/SaveIt.Server.UI.csproj -c Release -o '${{ env.DOTNET_ROOT }}/myapp'

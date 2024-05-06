@@ -27,7 +27,10 @@ public partial class GameSaveSettings
 
     private GameSave _gameSave = new();
     private readonly UploadGameSaveModel _uploadModel = new();
-    private readonly GameSaveVersionsCountModel _versionsModel = new();
+    private readonly GameSaveVersionsCountModel _versionsModel = new()
+    {
+        Count = 10
+    };
     private bool _gameSaveExists = true;
     private Grid<FileItemModel> _grid = default!;
     private List<FileItemModel> _files = default!;
@@ -55,8 +58,8 @@ public partial class GameSaveSettings
         if (result.IsFailed)
         {
             ToastService.Notify(new ToastMessage(ToastType.Danger, result.Errors[0].Message));
+            _files = [];
             StateHasChanged();
-            _files!.Clear();
             return await Task.FromResult(request.ApplyTo(_files));
         }
 

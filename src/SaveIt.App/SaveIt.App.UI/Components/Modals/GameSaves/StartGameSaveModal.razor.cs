@@ -56,6 +56,7 @@ public partial class StartGameSaveModal
     private async Task LockRepositoryAsync()
     {
         _lockingRepository = true;
+        StateHasChanged();
         var result = await GameService.LockRepositoryAsync(GameSaveId, CancellationToken);
 
         if (result.IsSuccess)
@@ -143,6 +144,7 @@ public partial class StartGameSaveModal
     private async Task DiscardProgressAndCloseAsync()
     {
         _finishingGame = true;
+        StateHasChanged();
 
         var result = await GameService.UnlockRepositoryAsync(GameSaveId, CancellationToken);
         if (result.IsFailed)
@@ -165,6 +167,7 @@ public partial class StartGameSaveModal
     private async Task UploadSaveAndCloseAsync()
     {
         _finishingGame = true;
+        StateHasChanged();
         var result = await GameService.UploadGameSaveAsync(GameSaveId, CancellationToken);
 
         if (result.IsSuccess)

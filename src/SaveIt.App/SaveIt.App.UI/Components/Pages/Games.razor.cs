@@ -36,7 +36,7 @@ public partial class Games
             .ToList();
 
     private void GameCardClicked(Game g)
-        => GameCardUpdated(g);
+        => GameCardUpdatedAsync(g);
 
     private Task ShowNewCreateNewGameModal()
     {
@@ -61,8 +61,13 @@ public partial class Games
         await _createGameModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
     }
 
-    private void GameCardUpdated(Game game)
+    private async Task GameCardUpdatedAsync(Game? game)
     {
+        if(game is null)
+        {
+            await RefreshGamesAsync();
+            return;
+        }
         _selectedGame = new GameCardModel(game);
         _allGames[_allGames.FindIndex(g => g.Game.Id == game.Id)] = _selectedGame;
         _filteredGames[_filteredGames.FindIndex(g => g.Game.Id == game.Id)] = _selectedGame;
@@ -71,7 +76,7 @@ public partial class Games
     private async Task GameCardDataUpdatedAsync(Game game)
     {
         game = (await gameRepository.GetWithChildrenAsync(game.Id))!;
-        GameCardUpdated(game);
+        await GameCardUpdatedAsync(game);
     }
 
     private void GameCardMinimized()

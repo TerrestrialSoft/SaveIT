@@ -6,6 +6,7 @@ public record GoogleFileCreateModel
     [JsonPropertyName("name")]
     public required string Name { get; init; }
 
+    [JsonPropertyName("mimeType")]
     public required string MimeType { get; init; }
 
     [JsonPropertyName("parents")]

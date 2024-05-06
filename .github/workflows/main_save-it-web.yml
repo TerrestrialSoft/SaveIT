@@ -20,13 +20,9 @@ jobs:
 
       - name: Build server
         run: dotnet build ./src/SaveIt.Server/SaveIt.Server.UI/SaveIt.Server.UI.csproj -c Release
-
+        
       - name: Publish server
-        uses: dotnet/publish@v2
-        with:
-          project: ./src/SaveIt.Server/SaveIt.Server.UI/SaveIt.Server.UI.csproj
-          configuration: Release
-          output: ${{ env.DOTNET_ROOT }}/myapp
+        run: dotnet publish ./src/SaveIt.Server/SaveIt.Server.UI/SaveIt.Server.UI.csproj -c Release -o '${{ env.DOTNET_ROOT }}/myapp'
 
       - name: Test server
         run: dotnet test ./src/SaveIt.Server

@@ -38,12 +38,17 @@ internal class AccountSecretsRepository : IAccountSecretsRepository
         }
     }
 
-    public async Task<Result> StoreTokensAsync(Guid accountId, string accessToken, string refreshToken)
+    public async Task<Result> StoreTokensAsync(Guid accountId, string accessToken, string? refreshToken)
     {
         try
         {
             await SetValueAsync(AccessTokenKey, accountId, accessToken);
-            await SetValueAsync(RefreshToken, accountId, refreshToken);
+
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                await SetValueAsync(RefreshToken, accountId, refreshToken);
+            }
+
             return Result.Ok();
         }
         catch (Exception)

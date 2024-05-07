@@ -35,7 +35,7 @@ public partial class Games
         => _filteredGames = _allGames.Where(g => g.Game.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
             .ToList();
 
-    private void GameCardClicked(Game g)
+    private Task GameCardClickedAsync(Game g)
         => GameCardUpdatedAsync(g);
 
     private Task ShowNewCreateNewGameModal()

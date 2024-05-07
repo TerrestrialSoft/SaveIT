@@ -14,16 +14,23 @@
             <div class="ms-4">
                 <ValidationMessage For="() => Model.File" />
             </div>
-
-            @if (_isUploading)
-            {
-                <Spinner Size="SpinnerSize.Large" />
-            }
         </div>
         
         <div class="d-flex justify-content-around mt-4">
-            <Button Color="ButtonColor.Primary" Outline="true" Size="Size.Large" @onclick="HideModalAsync">Cancel</Button>
-            <Button Color="ButtonColor.Primary" Size="Size.Large" Type="ButtonType.Submit" Disabled="_isUploading">Upload</Button>
+            <Button Color="ButtonColor.Primary"
+                Outline="true"
+                Size="Size.Large"
+                @onclick="HideModalAsync">
+                Cancel
+            </Button>
+            <Button Color="ButtonColor.Primary"
+                Size="Size.Large"
+                Type="ButtonType.Submit"
+                Disabled="_isUploading"
+                Loading="_isUploading"
+                LoadingText="Uploading...">
+                Upload
+            </Button>
         </div>
     </EditForm>
 </div>

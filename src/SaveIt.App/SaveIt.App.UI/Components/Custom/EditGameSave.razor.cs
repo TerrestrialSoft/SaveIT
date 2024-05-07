@@ -87,11 +87,10 @@ public partial class EditGameSave
                 {
                     Model.RemoteGameSaveFile = file;
 
-                    if (GameSave is not null)
-                    {
-                        GameSave.RemoteLocationId = file.Id;
-                        GameSave.RemoteLocationName = file.Name;
-                    }
+                    GameSave ??= new GameSave();
+
+                    GameSave.RemoteLocationId = file.Id;
+                    GameSave.RemoteLocationName = file.Name;
 
                     await ModalRemoteItemPicker.HideAsync();
                     await ModalCurrent.ShowAsync();
@@ -157,7 +156,7 @@ public partial class EditGameSave
 
     private void TrySetStorageAccount()
     {
-        if (_storageAccounts.Count != 0)
+        if (_storageAccounts.Count != 0 && Model.StorageAccountId is null)
         {
             Model.StorageAccountId = _storageAccounts[0].Id;
         }

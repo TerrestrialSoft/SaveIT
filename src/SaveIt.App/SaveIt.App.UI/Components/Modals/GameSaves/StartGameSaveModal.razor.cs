@@ -41,8 +41,9 @@ public partial class StartGameSaveModal
     private bool _finishingGame = false;
     private bool _lockingRepository = false;
     private bool _preparingSave = false;
+    private bool _fixingGameSaveConflict = false;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         _finishingGame = false;
         _errorMessage = null;
@@ -50,13 +51,31 @@ public partial class StartGameSaveModal
         _screenState = StartGameScreenState.Loading;
         _gameSave = (await GameSaveRepository.GetWithChildrenAsync(GameSaveId))!;
 
-        await LockRepositoryAsync();
+        await StartGameSaveAsync();
     }
 
-    private async Task LockRepositoryAsync()
+    private async Task StartGameSaveAsync()
     {
         _lockingRepository = true;
         StateHasChanged();
+
+        var isLockedResult = await GameService.IsRepositoryLockedAsync(GameSaveId, CancellationToken);
+
+        if (isLockedResult.IsFailed)
+        {
+            ToastService.Notify(new ToastMessage(ToastType.Danger, 
+                "Failed to check if the repository is locked."));
+            _lockingRepository = false;
+            return;
+        }
+
+        if (_gameSave.IsHosting && !isLockedResult.Value)
+        {
+            _screenState = StartGameScreenState.LocalGameSaveConflict;
+            _lockingRepository = false;
+            return;
+        }
+
         var result = await GameService.LockRepositoryAsync(GameSaveId, CancellationToken);
 
         if (result.IsSuccess)
@@ -85,6 +104,21 @@ public partial class StartGameSaveModal
         _screenState = StartGameScreenState.LockFailed;
         _errorMessage = result.Errors[0].Message;
         _lockingRepository = false;
+    }
+
+    private async Task FixGameSaveConflictAsync()
+    {
+        _fixingGameSaveConflict = true;
+        StateHasChanged();
+
+        _gameSave.IsHosting = false;
+        await GameSaveRepository.UpdateAsync(_gameSave);
+
+        _fixingGameSaveConflict = false;
+        
+        _screenState = StartGameScreenState.Loading;
+        StateHasChanged();
+        await StartGameSaveAsync();
     }
 
     private async Task PrepareSaveAsync()
@@ -146,7 +180,7 @@ public partial class StartGameSaveModal
         _finishingGame = true;
         StateHasChanged();
 
-        var result = await GameService.UnlockRepositoryAsync(GameSaveId, CancellationToken);
+        var result = await GameService.UnlockRepositoryAsync(GameSaveId, cancellationToken: CancellationToken);
         if (result.IsFailed)
         {
             string? errorMessage = null;
@@ -188,7 +222,7 @@ public partial class StartGameSaveModal
         {
             StartGameScreenState.SaveInUse => "text-warning",
             var v when v == StartGameScreenState.LockFailed || v == StartGameScreenState.UploadFailed
-                || v == StartGameScreenState.DownloadFailed => "text-danger",
+                || v == StartGameScreenState.DownloadFailed || v == StartGameScreenState.LocalGameSaveConflict => "text-danger",
             var v when v == StartGameScreenState.PlayingGame || v == StartGameScreenState.HostingGame => "text-success",
             StartGameScreenState.HostingGame => "text-success",
             _ => ""
@@ -221,6 +255,9 @@ public partial class StartGameSaveModal
         UploadFailed = 8,
 
         [Name("Download Failed")]
-        DownloadFailed = 9
+        DownloadFailed = 9,
+
+        [Name("Local Game Save conflict")]
+        LocalGameSaveConflict = 10
     }
 }

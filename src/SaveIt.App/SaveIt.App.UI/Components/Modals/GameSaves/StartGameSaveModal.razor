@@ -61,7 +61,7 @@
                     <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Class="w-25 p-3 mt-2"
-                        @onclick="LockRepositoryAsync"
+                        @onclick="StartGameSaveAsync"
                         Loading="@_lockingRepository"
                         Disabled="@_lockingRepository">
                         Retry
@@ -173,6 +173,34 @@
                         @onclick="PrepareSaveAsync"
                         Disabled="@_preparingSave">
                         Retry
+                    </Button>
+                </div>
+                break;
+            case StartGameScreenState.LocalGameSaveConflict:
+                <div class="fs-5">
+                    Repository was manually unlocked by some of the users. Current Local Game Save will be overriden by the latest cloud game save.
+                    <br />
+                    If you want to keep your Game Save stored you need to back it up manually. And you can upload it later.
+                    <br />
+                    Do youn want to continue?
+                </div>
+
+                <div class="d-flex justify-content-between mt-5">
+                    <Button Color="ButtonColor.Primary"
+                            Outline="true"
+                            Size="Size.Large"
+                            Class="w-25 p-3 mt-2"
+                            @onclick="CloseAsync">
+                        Close
+                    </Button>
+                    <Button Color="ButtonColor.Primary"
+                            Size="Size.Large"
+                            Class="w-25 p-3 mt-2"
+                            @onclick="FixGameSaveConflictAsync"
+                            Loading="@_fixingGameSaveConflict"
+                            LoadingText="Saving..."
+                            Disabled="@_fixingGameSaveConflict">
+                        Continue
                     </Button>
                 </div>
                 break;

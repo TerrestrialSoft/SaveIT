@@ -17,12 +17,13 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
     private const string _profileUrl = "about?fields=user";
     private const string _baseFilesUrl = "files";
     private const string _baseFileDetailUrl = _baseFilesUrl + "/{0}";
-    private const string _fileQueryfields = "id, name, parents, kind, mimeType";
-    private const string _baseFileQueryUrl = $"{_baseFilesUrl}?{_fieldsParameter}";
+    private const string _fileQueryfields = "id, name, parents, kind, mimeType, driveId, sharedWithMeTime";
+    private const string _baseFileQueryUrl = $"{_baseFilesUrl}?{_baseParameters}";
     private const string _baseFileQueryUntrashedUrl = $"{_baseFileQueryUrl}&q=trashed=false";
-    private const string _fieldsParameter = $"fields=files({_fileQueryfields})";
+    private const string _baseParameters = $"fields=files({_fileQueryfields})&supportsAllDrives=true";
     private const string _filesFolderWithSpecificParentUrl = $"{_baseFileQueryUntrashedUrl} and mimeType='{_mimeTypeFolder}'" +
-        "and '{0}' in parents";
+        "and ('{0}' in parents{1})";
+    private const string _sharedWithMeCondition = " or sharedWithMe = true";
     private const string _filesWithSubstringInNameSpecificParentOrderedByDateUrl
         = _baseFileQueryUrl + "&orderBy=modifiedTime&q=trashed=false and name contains '{1}' and '{0}' in parents";
     private const string _fileDetailUrl = $"{_baseFileDetailUrl}?fields=" + _fileQueryfields;
@@ -55,10 +56,10 @@ public class GoogleApiService(HttpClient httpClient, IAccountSecretsRepository a
             : Result.Fail("Error ocurred during communication with external server");
     }
 
-    public Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId,
+    public Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId, bool sharedWithMe,
         CancellationToken cancellationToken = default)
     {
-        var filter = string.Format(_filesFolderWithSpecificParentUrl, parentId);
+        var filter = string.Format(_filesFolderWithSpecificParentUrl, parentId, sharedWithMe ? _sharedWithMeCondition : "");
 
         return GetFilesWithFilter(storageAccountId, filter, cancellationToken);
     }

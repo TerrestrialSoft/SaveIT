@@ -1,7 +1,7 @@
 ﻿@page "/game-saves"
 
 <div class="d-flex m-3 justify-content-end">
-    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="() => ShowCreateGameSaveModalAsync()">
+    <Button Color="ButtonColor.Primary" Size="Size.Large" Class="p-2 ms-5" @onclick="() => ShowCreateGameSaveModalAsync(firstRender: true)">
         <Icon Name="IconName.PlusLg" /> Create new Game Save
     </Button>
 </div>
@@ -35,7 +35,7 @@
                     Size="IconSize.x5"
                     Color="IconColor.Warning"
                     Class="p-1"
-                    @onclick="() => ShowEditGameSaveModalAsync(context.GameSave)" />
+                    @onclick="() => ShowEditGameSaveModalAsync(context.GameSave, true)" />
             </Tooltip>
             <Tooltip Title="Share">
                 <Icon CustomIconName="@CustomIcons.ShareSolid"

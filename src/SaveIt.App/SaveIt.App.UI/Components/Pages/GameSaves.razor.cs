@@ -29,7 +29,7 @@ public partial class GameSaves
 
     private Grid<GameSaveViewModel> _grid = default!;
     private List<GameSaveViewModel> _gameSaves = default!;
-    private readonly NewGameSaveModel _createGameSave = new();
+    private NewGameSaveModel _createGameSave = new();
     private readonly NewGameModel _createGame = new();
     private GameSave _currentGameSave = new();
     private NewGameSaveModel _currentGameSaveModel = new();
@@ -102,10 +102,17 @@ public partial class GameSaves
         } 
     }
 
-    private async Task ShowCreateGameSaveModalAsync(Guid? gameId = null)
+    private async Task ShowCreateGameSaveModalAsync(Guid? gameId = null, bool firstRender = false)
     {
         _currentModal = _createNewGameSaveModal;
+
+        if (firstRender)
+        {
+            _createGameSave = new NewGameSaveModel();
+        }
+
         _createGameSave.GameId ??= gameId;
+
 
         var parameters = new Dictionary<string, object>
         {
@@ -158,14 +165,15 @@ public partial class GameSaves
         await _currentModal.ShowAsync<CreateGameModal>(CreateGameModal.Title, parameters: parameters);
     }
 
-    private async Task ShowEditGameSaveModalAsync(GameSave gameSave)
+    private async Task ShowEditGameSaveModalAsync(GameSave gameSave, bool firstRender = false)
     {
         _currentModal = _editGameSaveModal;
-        if(_currentGameSave.Id == Guid.Empty)
+        if(_currentGameSave.Id == Guid.Empty || firstRender)
         {
             _currentGameSave = gameSave;
             _currentGameSaveModel = gameSave.ToNewGameSaveModel();
         }
+
         var parameters = new Dictionary<string, object>
         {
             { nameof(EditGameSaveModal.ModalCurrent), _currentModal },

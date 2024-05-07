@@ -6,7 +6,7 @@ public interface IExternalStorageService
 {
     Task<Result<FileItemModel>> GetFileAsync(Guid storageAccountId, string? fileId = null,
         CancellationToken cancellationToken = default);
-    Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId,
+    Task<Result<IEnumerable<FileItemModel>>> GetFilesAsync(Guid storageAccountId, string parentId, bool sharedWithMe,
         CancellationToken cancellationToken = default);
     Task<Result<string>> GetProfileEmailAsync(string accessToken, CancellationToken cancellationToken = default);
     Task<Result> CreateFolderAsync(Guid storageAccountId, string name, string? parentId = null,

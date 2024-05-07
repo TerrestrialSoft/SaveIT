@@ -105,7 +105,8 @@ public partial class RemoteRepositoryPickerModal
         try
         {
             var itemsResult = await StorageService.GetFilesAsync(SelectedStorageAccountId, _selectedItem.Item.Id,
-                CancellationToken);
+                 _selectedItem.Item.ParentId == RemoteFileItemModel.DefaultId && !_selectedItem.Item.SharedWithMe,
+                 CancellationToken);
 
             if (itemsResult.IsFailed)
             {

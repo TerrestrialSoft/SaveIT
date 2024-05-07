@@ -10,6 +10,6 @@ public static class ModelExtensions
             ? FileItemType.Folder
             : FileItemType.File;
 
-        return new FileItemModel(file.Name, fileType, file.Parent, file.Id);
+        return new FileItemModel(file.Name, fileType, file.Parent, file.DriveId, file.SharedWithMe, file.Id);
     }
 }

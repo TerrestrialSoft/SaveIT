@@ -158,7 +158,7 @@ public partial class GameSaveSettings
         }
 
         PreloadService.Show();
-        var result = await GameService.UnlockRepositoryAsync(_gameSave.Id, CancellationToken);
+        var result = await GameService.UnlockRepositoryAsync(_gameSave.Id, true, CancellationToken);
         PreloadService.Hide();
         
         if (result.IsFailed)

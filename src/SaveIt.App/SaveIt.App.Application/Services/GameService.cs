@@ -143,7 +143,8 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             : Result.Ok();
     }
 
-    public async Task<Result> UnlockRepositoryAsync(Guid gameSaveId, CancellationToken cancellationToken = default)
+    public async Task<Result> UnlockRepositoryAsync(Guid gameSaveId, bool forceUnlock = false,
+        CancellationToken cancellationToken = default)
     {
         var gameSave = await _gameSaveRepository.GetWithChildrenAsync(gameSaveId);
         if (gameSave is null)
@@ -172,7 +173,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             return Result.Ok();
         }
 
-        if (lockfileContent.LockDetails!.LockedByUserId != gameSave.GameId)
+        if (lockfileContent.LockDetails!.LockedByUserId != gameSave.GameId && !forceUnlock)
         {
             return Result.Fail(GameErrors.GameLockedByAnotherUser(lockfileContent));
         }
@@ -247,7 +248,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
         }
 
         await EnsureStoredGameSaveCountAsync(gameSave, cancellationToken);
-        var unlockResult = await UnlockRepositoryAsync(gameSaveId, cancellationToken);
+        var unlockResult = await UnlockRepositoryAsync(gameSaveId, cancellationToken: cancellationToken);
 
         return unlockResult;
     }
@@ -399,7 +400,7 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
 
         await EnsureStoredGameSaveCountAsync(gameSave, cancellationToken);
 
-        return await UnlockRepositoryAsync(gameSaveId, cancellationToken);
+        return await UnlockRepositoryAsync(gameSaveId, cancellationToken: cancellationToken);
     }
 
     private async Task<Result<FileItemModel?>> GetLockFileMetadataAsync(Guid storageAccountId, string remoteLocationId,

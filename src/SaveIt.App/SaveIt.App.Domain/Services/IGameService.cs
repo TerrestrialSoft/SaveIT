@@ -13,7 +13,7 @@ public interface IGameService
     Task<Result> PrepareSpecificGameSaveAsync(Guid gameSaveId, string remoteLocationId,
         CancellationToken cancellationToken = default);
     Task<Result> StartGameAsync(Guid gameId, CancellationToken cancellationToken = default);
-    Task<Result> UnlockRepositoryAsync(Guid gameSaveId, CancellationToken cancellationToken = default);
+    Task<Result> UnlockRepositoryAsync(Guid gameSaveId, bool forceUnlock = false, CancellationToken cancellationToken = default);
     Task<Result> UploadFolderAsGameSaveAsync(Guid gameSaveId, string folderPath, CancellationToken cancellationToken = default);
     Task<Result> UploadGameSaveAsync(Guid gameSaveId, CancellationToken cancellationToken = default);
     Task<Result<bool>> IsRepositoryLockedAsync(Guid gameSaveId, CancellationToken cancellationToken = default);

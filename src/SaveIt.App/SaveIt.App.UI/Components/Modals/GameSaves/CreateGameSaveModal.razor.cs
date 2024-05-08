@@ -51,7 +51,7 @@ public partial class CreateGameSaveModal
             : _games.FirstOrDefault()?.Id;
     }
 
-    private Task ShowCreateGameSaveModalAsync()
+    private Task ShowCreateGameModalAsync()
         => OnCreateGameRequested.InvokeAsync();
 
     private void SelectedGameChanged(Guid? id)

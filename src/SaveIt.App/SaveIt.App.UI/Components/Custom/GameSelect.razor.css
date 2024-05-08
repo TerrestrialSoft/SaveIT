@@ -1,0 +1,7 @@
+﻿.btn-create-new {
+    cursor: pointer;
+}
+
+    .btn-create-new:hover {
+        color: #0d6efd;
+    }

@@ -44,7 +44,7 @@ public partial class GameSelect
 
     private async Task TriggerOnCreateGameRequestedAsync()
     {
-        if(IsOnCreateGameRequestSet)
+        if(!IsOnCreateGameRequestSet)
         {
             return;
         }

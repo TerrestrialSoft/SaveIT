@@ -82,6 +82,7 @@ public partial class CreateGameModal
         await GameRepository.CreateAsync(game);
         await GameSaveRepository.CreateAsync(gameSave);
 
+        gameSave.Game = game;
         game.GameSaves = [gameSave];
 
         _isSaving = false;

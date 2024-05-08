@@ -51,7 +51,7 @@ public partial class GameCard
     public required Modal ModalEditGame { get; set; }
 
     private ConfirmDialog _confirmDialog = default!;
-    private GameSave? selectedSave;
+    private Guid? selectedGameSaveId;
     private bool _isGameStarting = false;
     private bool _isGameDeleting = false;
 
@@ -59,9 +59,9 @@ public partial class GameCard
     {
         if (Game.GameSaves is not null && Game.GameSaves.Count > 0)
         {
-            selectedSave = selectedSave is not null
-                ? Game.GameSaves.Find(x => x.Id == selectedSave.Id)
-                : Game.GameSaves[0];
+            selectedGameSaveId = selectedGameSaveId is not null
+                ? Game.GameSaves.Find(x => x.Id == selectedGameSaveId)?.Id
+                : Game.GameSaves[0].Id;
         }
     }
 
@@ -81,14 +81,14 @@ public partial class GameCard
 
     private async Task StartGameAsync()
     {
-        if(selectedSave is null)
+        if(selectedGameSaveId is null)
         {
             ToastService.Notify(new(ToastType.Danger, $"No save found for game {Game.Name}"));
             return;
         }
         _isGameStarting = true;
 
-        var accountId = Game.GameSaves!.First(x => x.Id == selectedSave.Id).StorageAccountId;
+        var accountId = Game.GameSaves!.First(x => x.Id == selectedGameSaveId).StorageAccountId;
         var account = await StorageAccountRepository.GetAsync(accountId);
 
         if(account is null)
@@ -108,7 +108,7 @@ public partial class GameCard
 
         var parameters = new Dictionary<string, object>
         {
-            { nameof(StartGameSaveModal.GameSaveId), selectedSave.Id},
+            { nameof(StartGameSaveModal.GameSaveId), selectedGameSaveId},
             { nameof(StartGameSaveModal.DefaultGameName), Game.Name },
             { nameof(StartGameSaveModal.OnClose), EventCallback.Factory.Create(this, async () =>
                 {
@@ -186,12 +186,12 @@ public partial class GameCard
 
     private void EditGameSaveRedirect()
     {
-        if (selectedSave is null)
+        if (selectedGameSaveId is null)
         {
             return;
         }
 
-        var url = string.Format(GameSaves.EditOperationTemplate, selectedSave.Id);
+        var url = string.Format(GameSaves.EditOperationTemplate, selectedGameSaveId);
         NavigationManager.NavigateTo(url);
     }
 }

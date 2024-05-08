@@ -43,10 +43,10 @@
                 {
                     <div class="d-flex align-items-center">
                         <div class="ms-1 flex-grow-1">
-                            <InputSelect @bind-Value="selectedSave" class="p-2 form-control form-select">
+                            <InputSelect @bind-Value="selectedGameSaveId" class="p-2 form-control form-select">
                                 @foreach (var save in Game.GameSaves)
                                 {
-                                    <option value="@save" class="p-1">
+                                    <option value="@save.Id" class="p-1">
                                         @save.Name @(save.IsHosting ? " (Hosting)" : "")
                                     </option>
                                 }
@@ -88,7 +88,7 @@
                 <Button Color="ButtonColor.Primary"
                         Size="Size.Large"
                         Loading="_isGameStarting"
-                        Disabled="selectedSave is null || _isGameStarting"
+                        Disabled="selectedGameSaveId is null || _isGameStarting"
                         @onclick="StartGameAsync">
                     <Icon CustomIconName="@CustomIcons.Play" Class="me-1" />
                     Start

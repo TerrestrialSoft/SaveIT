@@ -189,7 +189,9 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
         var message = requestMessage();
         var result = await _httpClient.SendAsync(message, cancellationToken);
 
-        return Result.Ok(result);
+        return result.IsSuccessStatusCode
+            ? Result.Ok(result)
+            : Result.Fail("Error ocurred during communication with external server");
     }
 
     private async Task<Result<string>> TryRefreshTokenAsync(Guid storageAccountId, CancellationToken cancellationToken = default)
@@ -198,6 +200,7 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
 
         if (refreshToken is null)
         {
+            await _storageAccountsRepository.UnauthorizeAccountAsync(storageAccountId);
             return Result.Fail("Refresh token not found");
         }
 

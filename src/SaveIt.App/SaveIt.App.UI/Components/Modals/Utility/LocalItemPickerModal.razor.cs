@@ -173,7 +173,7 @@ public partial class LocalItemPickerModal
 
     private void ChangeToParentDirectory()
     {
-        var parent = _selectedFile.Item.Path;
+        var parent = _selectedFile.Item.DirectoryPath;
 
         if (string.IsNullOrEmpty(parent))
         {

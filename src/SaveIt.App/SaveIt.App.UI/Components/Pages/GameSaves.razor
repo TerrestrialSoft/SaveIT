@@ -34,28 +34,28 @@
                 <Icon CustomIconName="@CustomIcons.Edit"
                     Size="IconSize.x5"
                     Color="IconColor.Warning"
-                    Class="p-1"
+                    Class="p-1 clickable-icon"
                     @onclick="() => ShowEditGameSaveModalAsync(context.GameSave, true)" />
             </Tooltip>
             <Tooltip Title="Share">
                 <Icon CustomIconName="@CustomIcons.ShareSolid"
                     Size="IconSize.x5"
                     Color="IconColor.Primary"
-                    Class="p-1"
+                    Class="p-1 clickable-icon"
                     @onclick="() => ShowShareGameSaveModalAsync(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Advanced Settings">
                 <Icon CustomIconName="@CustomIcons.Settings"
                     Size="IconSize.x5"
                     Color="IconColor.Secondary"
-                    Class="p-1"
+                    Class="p-1 clickable-icon"
                     @onclick="() => ShowAdvancedGameSaveSettings(context.GameSave)" />
             </Tooltip>
             <Tooltip Title="Delete">
                 <Icon CustomIconName="@CustomIcons.Delete"
                     Size="IconSize.x5"
                     Color="IconColor.Danger"
-                    Class="p-1"
+                    Class="p-1 clickable-icon"
                     @onclick="() => DeleteGameSaveAsync(context.GameSave)" />
             </Tooltip>
         </GridColumn>

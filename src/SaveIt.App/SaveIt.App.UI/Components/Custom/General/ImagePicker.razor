@@ -22,7 +22,12 @@
                 {
                     <div class="d-flex align-items-center p-2">
                         <div class="text-muted me-2" style="word-break: break-all;">@ImageSource.Name</div>
-                        <div @onclick="RemoveImage"><Icon Name="IconName.Trash3Fill" Color="IconColor.Danger" Size="IconSize.x5" /></div>
+                        <div @onclick="RemoveImage">
+                            <Icon Name="IconName.Trash3Fill"
+                                Color="IconColor.Danger"
+                                Size="IconSize.x5"
+                                Class="clickable-icon" />
+                        </div>
                     </div>
                 }
 

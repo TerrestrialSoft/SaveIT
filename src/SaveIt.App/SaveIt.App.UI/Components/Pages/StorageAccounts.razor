@@ -35,7 +35,7 @@
                     <Icon CustomIconName="@CustomIcons.Refresh"
                           Size="IconSize.x5"
                           Color="IconColor.Warning"
-                          Class="p-1"
+                          Class="p-1 clickable-icon"
                           @onclick="() => RenewAuthorizationAsync(context)" />
                 </Tooltip>
             }
@@ -46,7 +46,7 @@
                     <Icon CustomIconName="@CustomIcons.Delete"
                           Size="IconSize.x5"
                           Color="IconColor.Danger"
-                          Class="p-1"
+                          Class="p-1 clickable-icon"
                           @onclick="() => DeleteStorageAccountAsync(context)" />
                 </Tooltip>
             }

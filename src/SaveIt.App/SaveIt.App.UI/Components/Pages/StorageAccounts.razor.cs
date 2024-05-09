@@ -13,6 +13,9 @@ public partial class StorageAccounts
     [Inject]
     private PreloadService PreloadService { get; set; } = default!;
 
+    [Inject]
+    private ToastService ToastService { get; set; } = default!;
+
     private Grid<StorageAccountModel> _grid = default!;
     private List<StorageAccountModel> _storageAccounts = default!;
 
@@ -59,6 +62,11 @@ public partial class StorageAccounts
 
     private async Task RenewAuthorizationAsync(StorageAccountModel account)
     {
+        if(account.IsAuthorized)
+        {
+            return;
+        }
+
         var parameters = new Dictionary<string, object>()
         {
             { nameof(StorageAuthorizationModal.StorageAccountType), account.Type },
@@ -77,6 +85,11 @@ public partial class StorageAccounts
 
     private async Task DeleteStorageAccountAsync(StorageAccountModel account)
     {
+        if(account.GameSavesCount != 0)
+        {
+            return;
+        }
+
         var dialogResult = await _confirmDialog.ShowDeleteDialogAsync($"Delete {account.Email} ({account.Type})",
             "Are you sure you want to delete this storage account?",
             "This action cannot be undone.");
@@ -90,8 +103,11 @@ public partial class StorageAccounts
 
         await StorageAccountRepository.DeleteAsync(account.Id);
         _storageAccounts.Remove(account);
-
         PreloadService.Hide();
+
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Successfully deleted Storage Account."));
+
+
         await _grid.RefreshDataAsync();
     }
 }

@@ -29,27 +29,22 @@
             }
         </GridColumn>
         <GridColumn TItem="StorageAccountModel" HeaderText="Actions" Filterable="false">
-            @if(!context.IsAuthorized)
-            {
-                <Tooltip Title="Renew authorization">
+
+                <Tooltip Title="@(!context.IsAuthorized ? "Renew authorization" : "Authorization is valid.")">
                     <Icon CustomIconName="@CustomIcons.Refresh"
                           Size="IconSize.x5"
-                          Color="IconColor.Warning"
+                          Color="!context.IsAuthorized ? IconColor.Warning : IconColor.Secondary"
                           Class="p-1 clickable-icon"
                           @onclick="() => RenewAuthorizationAsync(context)" />
                 </Tooltip>
-            }
 
-            @if(context.GameSavesCount == 0)
-            {
-                <Tooltip Title="Delete">
-                    <Icon CustomIconName="@CustomIcons.Delete"
-                          Size="IconSize.x5"
-                          Color="IconColor.Danger"
-                          Class="p-1 clickable-icon"
-                          @onclick="() => DeleteStorageAccountAsync(context)" />
-                </Tooltip>
-            }
+            <Tooltip Title="@(context.GameSavesCount == 0 ? "Delete" : "Storage Account is assigned to a Game Save.")">
+                <Icon CustomIconName="@CustomIcons.Delete"
+                        Size="IconSize.x5"
+                        Color="@(context.GameSavesCount == 0 ? IconColor.Danger : IconColor.Secondary)"
+                        Class="p-1 clickable-icon"
+                        @onclick="() => DeleteStorageAccountAsync(context)" />
+            </Tooltip>
         </GridColumn>
 
     </Grid>

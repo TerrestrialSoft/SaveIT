@@ -30,7 +30,7 @@
         </GridColumn>
         <GridColumn TItem="StorageAccountModel" HeaderText="Actions" Filterable="false">
 
-                <Tooltip Title="@(!context.IsAuthorized ? "Renew authorization" : "Authorization is valid.")">
+                <Tooltip Title="@(!context.IsAuthorized ? "Renew authorization" : "Unable to renew an authorization because it is valid.")">
                     <Icon CustomIconName="@CustomIcons.Refresh"
                           Size="IconSize.x5"
                           Color="!context.IsAuthorized ? IconColor.Warning : IconColor.Secondary"
@@ -38,7 +38,7 @@
                           @onclick="() => RenewAuthorizationAsync(context)" />
                 </Tooltip>
 
-            <Tooltip Title="@(context.GameSavesCount == 0 ? "Delete" : "Storage Account is assigned to a Game Save.")">
+            <Tooltip Title="@(context.GameSavesCount == 0 ? "Delete" : "Unable to delete Storage Account due to its assignment to a Game Save.")">
                 <Icon CustomIconName="@CustomIcons.Delete"
                         Size="IconSize.x5"
                         Color="@(context.GameSavesCount == 0 ? IconColor.Danger : IconColor.Secondary)"

@@ -14,7 +14,7 @@ public class ResultExtensionsTests
     [InlineData(HttpStatusCode.NotFound, false, typeof(ApiErrors.NotFoundError))]
     [InlineData(HttpStatusCode.InternalServerError, false, typeof(ApiErrors.InternalServerError))]
     [InlineData(HttpStatusCode.NotImplemented, false, null)]
-    public void ToResult_ShouldReturnCorrectResult(HttpStatusCode inputCode, bool isSuccessExpected, Type? expectedErrorType)
+    public void ToResult_ReturnsCorrectResult(HttpStatusCode inputCode, bool isSuccessExpected, Type? expectedErrorType)
     {
         // Arrange
         var response = new HttpResponseMessage(inputCode);

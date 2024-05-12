@@ -51,9 +51,10 @@ public class GoogleAuthServiceTests
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);
+        var requestId = Guid.Empty;
 
         // Act
-        void act() => service.RegisterAuthorizationRequest(Guid.Empty, ServerUrl);
+        void act() => service.RegisterAuthorizationRequest(requestId, ServerUrl);
 
         // Assert
         Assert.Throws<ArgumentException>(act);
@@ -69,9 +70,10 @@ public class GoogleAuthServiceTests
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);
+        var requestId = Guid.NewGuid();
 
         // Act
-        void act() => service.RegisterAuthorizationRequest(Guid.NewGuid(), string.Empty);
+        void act() => service.RegisterAuthorizationRequest(requestId, string.Empty);
 
         // Assert
         Assert.Throws<ArgumentException>(act);

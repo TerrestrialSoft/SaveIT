@@ -32,7 +32,7 @@ public class TokenStorageTests
         };
 
     [Fact]
-    public void SetToken_ShouldSetToken()
+    public void SetToken_SetsToken()
     {
         // Arrange
         var (cache, tokenCachingOptions, logger) = ArrangeDependencies();
@@ -49,7 +49,7 @@ public class TokenStorageTests
     }
 
     [Fact]
-    public void TryGetToken_ShouldReturnTrue_WhenTokenExists()
+    public void TryGetToken_TokenExists_ReturnsTrue()
     {
         // Arrange
         var (cache, tokenCachingOptions, logger) = ArrangeDependencies();
@@ -67,7 +67,7 @@ public class TokenStorageTests
     }
 
     [Fact]
-    public void TryGetToken_ShouldReturnFalse_WhenTokenDoesNotExist()
+    public void TryGetToken_TokenDoesNotExist_ReturnsFalse()
     {
         // Arrange
         var (cache, tokenCachingOptions, logger) = ArrangeDependencies();
@@ -83,7 +83,7 @@ public class TokenStorageTests
     }
 
     [Fact]
-    public async Task WaitForTokenAsync_ShouldReturnToken_WhenTokenExists()
+    public async Task WaitForTokenAsync_TokenExists_ReturnsToken()
     {
         // Arrange
         var (cache, tokenCachingOptions, logger) = ArrangeDependencies();
@@ -100,7 +100,7 @@ public class TokenStorageTests
     }
 
     [Fact]
-    public async Task WaitForTokenAsync_ShouldReturnFailedResult_WhenTokenNotExistsAfterMaxTime()
+    public async Task WaitForTokenAsync_TokenNotExistsAfterMaxTime_ReturnsFailedResult()
     {
         // Arrange
         var (cache, tokenCachingOptions, logger) = ArrangeDependencies(tokenRetrieveSeconds: 1);

@@ -42,7 +42,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public void RegisterAuthorizationRequest_ShouldThrowArgumentException_WhenRequestIdIsEmpty_()
+    public void RegisterAuthorizationRequest_RequestIdIsEmpty_ThrowsArgumentException()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -60,7 +60,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public void RegisterAuthorizationRequest_ShouldThrowArgumentException_WhenServerUrlIsNullOrEmpty_()
+    public void RegisterAuthorizationRequest_ServerUrlIsNullOrEmpty_ThrowsArgumentException()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -78,7 +78,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public void RegisterAuthorizationRequest_ShouldReturnAuthorizationModel_WhenServerUrlIsPresent()
+    public void RegisterAuthorizationRequest_ServerUrlIsPresent_ReturnsAuthorizationModel()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -102,7 +102,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldReturnFailedResult_WhenStateIsNullOrEmpty()
+    public async Task ObtainAndSaveTokens_StateIsNullOrEmpty_ReturnsFailedResult()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -120,7 +120,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldReturnFailedResult_WhenStateRequestIdIsNotPresent()
+    public async Task ObtainAndSaveTokens_StateRequestIdIsNotPresent_ReturnsFailedResult()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -141,7 +141,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldReturnFailedResult_WhenSecurityTokenMissmatch()
+    public async Task ObtainAndSaveTokens_SecurityTokenMissmatch_ReturnsFailedResult()
     {
         // Arrange
         var requestId = Guid.NewGuid();
@@ -172,7 +172,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldReturnFailedResult_WhenStoredRequestNotPresent()
+    public async Task ObtainAndSaveTokens_StoredRequestNotPresent_ReturnsFailedResult()
     {
         // Arrange
         var requestId = Guid.NewGuid();
@@ -197,7 +197,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldReturnFailedResult_WhenObtainingWasNotSuccessful()
+    public async Task ObtainAndSaveTokens_ObtainingWasNotSuccessful_ReturnsFailedResult()
     {
         // Arrange
         var requestId = Guid.NewGuid();
@@ -227,7 +227,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task ObtainAndSaveTokens_ShouldStoreTokens_WhenObtainingTokenWasSuccessful()
+    public async Task ObtainAndSaveTokens_ObtainingTokenWasSuccessful_StoreTokens()
     {
         // Arrange
         var requestId = Guid.NewGuid();
@@ -262,7 +262,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task RetrieveTokens_ShouldRetrieveTokens()
+    public async Task RetrieveTokens_ReturnTokens()
     {
         var (googleConfigOptions, logger) = ArrangeDependencies();
         var oAuthProvider = Substitute.For<IOAuthStateProvider>();
@@ -282,7 +282,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task RefreshAccessToken_ShouldReturnFailedResult_WhenUnsuccessfulResponse()
+    public async Task RefreshAccessToken_UnsuccessfulResponse_ReturnsFailedResult()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
@@ -303,7 +303,7 @@ public class GoogleAuthServiceTests
     }
 
     [Fact]
-    public async Task RefreshAccessToken_ShouldReturnToken_WhenSuccessfulResponse()
+    public async Task RefreshAccessToken_SuccessfulResponse_ReturnsToken()
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();

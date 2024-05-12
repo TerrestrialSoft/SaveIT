@@ -4,7 +4,7 @@ namespace SaveIt.Server.Tests.Services;
 public class OAuthStateProviderTests
 {
     [Fact]
-    public void GetSecurityToken_ShouldReturnCorrectLength()
+    public void GetSecurityToken_ReturnsTokenWithCorrectLength()
     {
         // Arrange
         var provider = new OAuthStateProvider();
@@ -17,7 +17,7 @@ public class OAuthStateProviderTests
     }
 
     [Fact]
-    public void GetSecurityToken_ShouldReturnDifferentTokens()
+    public void GetSecurityToken_ReturnsDifferentTokens()
     {
         // Arrange
         var provider = new OAuthStateProvider();
@@ -31,7 +31,7 @@ public class OAuthStateProviderTests
     }
 
     [Fact]
-    public void GetSecurityToken_ShouldReturnDifferentTokensWithTheSameLength_WhenCalledMultipleTimes()
+    public void GetSecurityToken_CalledMultipleTimes_ReturnsDifferentTokensWithTheSameLength()
     {
         // Arrange
         var provider = new OAuthStateProvider();

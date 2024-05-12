@@ -46,8 +46,8 @@ public class GoogleAuthServiceTests
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
-        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var client = ArrangeHttpClient();
+        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);
@@ -64,8 +64,8 @@ public class GoogleAuthServiceTests
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
-        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var client = ArrangeHttpClient();
+        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);
@@ -106,8 +106,8 @@ public class GoogleAuthServiceTests
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
-        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var client = ArrangeHttpClient();
+        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);
@@ -124,8 +124,8 @@ public class GoogleAuthServiceTests
     {
         // Arrange
         var (googleConfigOptions, logger) = ArrangeDependencies();
-        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var client = ArrangeHttpClient();
+        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var state = new StateModel(SecurityToken, Guid.Empty);
@@ -265,8 +265,8 @@ public class GoogleAuthServiceTests
     public async Task RetrieveTokens_ReturnTokens()
     {
         var (googleConfigOptions, logger) = ArrangeDependencies();
-        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var client = ArrangeHttpClient();
+        var oAuthProvider = Substitute.For<IOAuthStateProvider>();
         var tokenStorage = Substitute.For<ITokenStorage>();
 
         var service = new GoogleAuthService(oAuthProvider, client, googleConfigOptions, tokenStorage, logger);

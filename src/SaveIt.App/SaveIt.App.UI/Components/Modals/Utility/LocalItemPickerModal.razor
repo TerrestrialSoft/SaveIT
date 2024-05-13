@@ -40,28 +40,26 @@
         <div class="d-flex flex-wrap" autofocus>
             @foreach (var item in _items)
             {
-                @if (item.Item.IsDirectory)
-                {
-                    <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
-                         @ondblclick="() => MoveToDirectory(item)"
-                         @onclick="() => SelectItem(item)">
-                        <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
-                        <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                <Tooltip Title="@item.Item.Name">
+                    @if (item.Item.IsDirectory)
+                    {
+                        <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
+                             @ondblclick="() => MoveToDirectory(item)"
+                             @onclick="() => SelectItem(item)">
+                            <img src="img/icons/folder-icon.svg" alt="@item.Item.Name" class="item-img" />
                             <p class="item-name">@item.Item.Name</p>
-                        </Tooltip>
-                    </div>
-                }
-                else
-                {
-                    <div class="d-flex flex-column align-items-center m-2 @(item.IsSelected ? "selected-item" : "") item"
-                         @onclick="() => SelectItem(item)"
-                         @ondblclick="() => SelectAndPickAsync(item)">
-                        <img src="img/icons/file-icon.svg" alt="File" class="item-img" />
-                        <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column align-items-center m-2 @(item.IsSelected ? "selected-item" : "") item"
+                             @onclick="() => SelectItem(item)"
+                             @ondblclick="() => SelectAndPickAsync(item)">
+                            <img src="img/icons/file-icon.svg" alt="@item.Item.Name" class="item-img" />
                             <p class="item-name">@item.Item.Name</p>
-                        </Tooltip>
-                    </div>
-                }
+                        </div>
+                    }
+                </Tooltip>
             }
         </div>
     }

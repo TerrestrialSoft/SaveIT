@@ -13,6 +13,10 @@
     height: 6rem;
 }
 
+.item>p{
+    min-height: 2rem;
+}
+
 .item-name {
     overflow: hidden;
     white-space: nowrap;

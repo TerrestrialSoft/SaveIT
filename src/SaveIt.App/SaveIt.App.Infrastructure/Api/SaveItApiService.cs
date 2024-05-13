@@ -40,6 +40,11 @@ public class SaveItApiService(HttpClient httpClient) : ISaveItApiService
             return Result.Fail(ApiErrors.InvalidAuthorization());
         }
 
+        if (!response.IsSuccessStatusCode)
+        {
+            return Result.Fail(ApiErrors.General());
+        }
+
         var token = await response.Content.ReadFromJsonAsync<OAuthAccessTokenModel>(cancellationToken);
 
         ArgumentNullException.ThrowIfNull(token);

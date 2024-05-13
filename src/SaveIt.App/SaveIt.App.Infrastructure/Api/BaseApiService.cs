@@ -215,7 +215,8 @@ public class BaseApiService(HttpClient httpClient, IAccountSecretsRepository acc
             }
             else
             {
-                if (accessTokenResult.HasError<ApiErrors.AuthorizationError>())
+                if (accessTokenResult.HasError<ApiErrors.AuthorizationError>()
+                    || accessTokenResult.HasError<ApiErrors.GeneralError>())
                 {
                     await _storageAccountsRepository.UnauthorizeAccountAsync(storageAccountId);
                 }

@@ -7,7 +7,7 @@ using SaveIt.App.UI.Models.GameSaves;
 namespace SaveIt.App.UI.Components.Modals.GameSaves;
 public partial class CreateGameSaveModal
 {
-    public const string Title = "Create Game Save";
+    public const string Title = "Add Game Save";
 
     [Inject]
     private IGameRepository GameRepository { get; set; } = default!;

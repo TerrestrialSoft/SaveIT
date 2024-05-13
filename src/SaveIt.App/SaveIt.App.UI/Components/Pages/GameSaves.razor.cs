@@ -133,7 +133,7 @@ public partial class GameSaves
                     await _createNewGameSaveModal.HideAsync();
                     _gameSaves.Add(gs.ToViewModel()!);
                     await _grid.RefreshDataAsync();
-                    ToastMessageService.Notify(new(ToastType.Success, "Game save created successfully."));
+                    ToastMessageService.Notify(new(ToastType.Success, "Game save added successfully."));
                 })
             }
         };
@@ -157,7 +157,7 @@ public partial class GameSaves
                     await _createGameModal.HideAsync();
                     _gameSaves.Add(game.GameSaves![0].ToViewModel()!);
                     await _grid.RefreshDataAsync();
-                    ToastMessageService.Notify(new(ToastType.Success, "New game created successfully."));
+                    ToastMessageService.Notify(new(ToastType.Success, "New game added successfully."));
                 })
             },
         };

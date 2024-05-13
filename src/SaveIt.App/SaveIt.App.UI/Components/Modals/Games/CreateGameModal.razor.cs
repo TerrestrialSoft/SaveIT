@@ -8,7 +8,7 @@ using SaveIt.App.UI.Models.Games;
 namespace SaveIt.App.UI.Components.Modals.Games;
 public partial class CreateGameModal
 {
-    public const string Title = "Create New Game";
+    public const string Title = "Add New Game";
 
     [Inject]
     private ToastService ToastService { get; set; } = default!;

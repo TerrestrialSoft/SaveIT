@@ -65,9 +65,11 @@ public partial class EditGameSave
         {
             { nameof(StorageAuthorizationModal.OnClose), EventCallback.Factory.Create(this, async () =>
                 {
-                    await RefreshStorageAccountsAsync();
                     await ModalAuthorizeStorage.HideAsync();
                     await ModalCurrent.ShowAsync();
+                    await RefreshStorageAccountsAsync();
+                    Model.StorageAccountId = _storageAccounts[^1].Id;
+                    Model.RemoteGameSaveFile = null;
                 })
             }
         };
@@ -111,7 +113,7 @@ public partial class EditGameSave
         Model.RemoteGameSaveFile = null;
     }
 
-    private async Task StorageAccountChanged(Guid? id)
+    private async Task ChangeStorageAccountAsync(Guid? id)
     {
         if (Model.RemoteGameSaveFile is not null)
         {
@@ -123,7 +125,8 @@ public partial class EditGameSave
                 NoButtonColor = ButtonColor.Secondary,
                 Size = DialogSize.Large,
                 IsVerticallyCentered = true,
-                DialogCssClass = "fs-5"
+                DialogCssClass = "fs-5",
+                Dismissable = false
             };
 
             var wasCancelled = await confirmDialog.ShowAsync(

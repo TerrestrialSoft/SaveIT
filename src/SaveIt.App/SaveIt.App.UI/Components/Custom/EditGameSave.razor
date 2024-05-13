@@ -20,7 +20,7 @@
             </label>
             @if (_storageAccounts.Any())
             {
-                <InputSelect ValueChanged="@((Guid? id) => StorageAccountChanged(id))"
+                <InputSelect ValueChanged="@((Guid? id) => ChangeStorageAccountAsync(id))"
                              Value="@Model.StorageAccountId"
                              ValueExpression="@(() => Model.StorageAccountId)"
                              class="p-2 w-75 form-control form-select">

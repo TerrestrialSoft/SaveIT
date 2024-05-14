@@ -19,11 +19,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.AddApplicationEndpoints();
-
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+app.AddApplicationEndpoints();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

@@ -10,7 +10,7 @@ public partial class MainPage : ContentPage
     }
 
 #if WINDOWS
-    bool _foundWindow;
+    private bool _foundWindow;
 
     protected override void OnHandlerChanged()
     {

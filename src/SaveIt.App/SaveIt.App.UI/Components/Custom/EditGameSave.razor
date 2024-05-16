@@ -55,7 +55,7 @@
                         SelectedFile="@Model.LocalGameSaveFile"
                         OnPickerClicked="ShowLocalFolderPickerModal"
                         OnPathCleared="ClearLocalGameSavePath"
-                        HelpText="Select the game save folder that is saved on your local device." />
+                        HelpText="Select the folder where the game world data is stored on your local device." />
             <div class="ms-4">
                 <ValidationMessage For="() => Model.LocalGameSaveFile" />
             </div>
@@ -68,7 +68,7 @@
                         SelectedFile="@Model.RemoteGameSaveFile"
                         OnPickerClicked="ShowRemoteFolderPickerModal"
                         OnPathCleared="ClearRemoteGameSavePath"
-                        HelpText="Select a folder on your cloud storage where your game save and other application work files will be saved." />
+                        HelpText="Select a folder on the cloud storage to store the specific data for this game save, where game world backups and other application files will be stored." />
             <div class="ms-4">
                 <ValidationMessage For="() => Model.RemoteGameSaveFile" />
             </div>

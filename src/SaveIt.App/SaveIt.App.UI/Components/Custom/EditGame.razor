@@ -4,7 +4,7 @@
             <label class="fs-5">
                 Game Name
                 <RequiredMark />
-                <Help Text="Enter the name of the game you want to create a profile for." />
+                <Help Text="Enter any game name used to identify the game within this app." />
             </label>
             <InputText @bind-Value="Model.Name" placeholder="Game Name" class="w-75 form-control" />
             <ValidationMessage For="() => Model.Name" />
@@ -13,7 +13,7 @@
             <label class="fs-5">
                 Username
                 <RequiredMark />
-                <Help Text="Enter your username under which you want to appear within this application when saving game progress for this particular game." />
+                <Help Text="Enter a username that will be displayed to other players in the app when you host a game." />
             </label>
             <InputText @bind-Value="Model.Username" placeholder="Username" class="w-75 form-control" />
             <ValidationMessage For="() => Model.Username" />

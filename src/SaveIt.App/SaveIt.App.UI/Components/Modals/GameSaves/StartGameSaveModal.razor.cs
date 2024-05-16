@@ -43,6 +43,8 @@ public partial class StartGameSaveModal
     private bool _preparingSave = false;
     private bool _fixingGameSaveConflict = false;
 
+    private ConfirmDialog _confirmDialog = default!;
+
     protected override async Task OnParametersSetAsync()
     {
         _finishingGame = false;
@@ -177,6 +179,17 @@ public partial class StartGameSaveModal
 
     private async Task DiscardProgressAndCloseAsync()
     {
+        var dialogResult = await _confirmDialog.ShowDialogAsync("Discard",
+            "Are you sure you want to discard the progress?",
+            "This action cannot be undone.",
+            "Discard",
+            "Cancel");
+
+        if (!dialogResult)
+        {
+            return;
+        }
+
         _finishingGame = true;
         StateHasChanged();
 

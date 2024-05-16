@@ -78,6 +78,8 @@ public partial class ShareGameSaveModal
             return;
         }
 
+        ToastService.Notify(new ToastMessage(ToastType.Success, "Game Save shared successfully."));
+
         _model = new ShareWithCreateModel();
 
         users.Clear();

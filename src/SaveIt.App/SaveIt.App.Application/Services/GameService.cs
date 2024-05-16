@@ -48,7 +48,15 @@ public class GameService(IProcessService _processService, IGameSaveRepository _g
             var result = await _externalStorageService.CreateFileAsync(gameSave.StorageAccountId, _lockFileName, lockFile,
                 gameSave.RemoteLocationId, cancellationToken);
 
-            return result;
+            if(result.IsFailed)
+            {
+                return result;
+            }
+
+            gameSave.IsHosting = true;
+            await _gameSaveRepository.UpdateAsync(gameSave);
+
+            return Result.Ok();
         }
 
         var lockfileResult = await _externalStorageService

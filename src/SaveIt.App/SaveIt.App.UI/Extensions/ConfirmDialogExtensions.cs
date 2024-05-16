@@ -38,7 +38,8 @@ public static class ConfirmDialogExtensions
             NoButtonColor = ButtonColor.Light,
             Size = DialogSize.Large,
             IsVerticallyCentered = true,
-            DialogCssClass = "fs-5"
+            DialogCssClass = "fs-5",
+            Dismissable = false
         };
 
         var confirmation = await dialog.ShowAsync(

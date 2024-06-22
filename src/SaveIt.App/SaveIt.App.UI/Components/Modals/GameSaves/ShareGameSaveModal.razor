@@ -45,12 +45,13 @@
         }
 
         <Grid @ref="_grid"
-                TItem="ShareWithModel"
-                Class="table table-hover table-bordered table-striped"
-                DataProvider="ShareWithUsersDataProvider"
-                Responsive="true"
-                AllowPaging="true"
-                AllowSorting="true">
+            TItem="ShareWithModel"
+            Class="table table-hover table-bordered table-striped"
+            DataProvider="ShareWithUsersDataProvider"
+            Responsive="true"
+            AllowPaging="true"
+            AutoHidePaging="true"
+            AllowSorting="true">
 
             <GridColumn TItem="ShareWithModel" HeaderText="Email" PropertyName="Email" SortKeySelector="x => x.Email">
                 @context.Username <span class="text-muted">

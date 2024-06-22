@@ -17,7 +17,7 @@ public static class ModelExtensions
             Name = item.Name,
             ParentId = item.ParentId,
             IsDirectory = item.FileType == FileItemType.Folder,
-            SharedWithMe = item.ShareWithMe,
+            IsShared = item.ShareWithMe,
             DriveId = item.DriveId
         };
     }

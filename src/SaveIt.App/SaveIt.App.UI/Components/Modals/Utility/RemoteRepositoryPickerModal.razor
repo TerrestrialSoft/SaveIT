@@ -43,7 +43,12 @@
                     <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
                             @onclick="() => SelectItem(item)"
                             @ondblclick="() => MoveToItem(item)">
-                        <img src="img/icons/folder-icon.svg" alt="Folder" class="item-img" />
+
+                        <img src="@(item.Item.IsShared
+                                ? "img/icons/folder-shared-icon.svg"
+                                : "img/icons/folder-icon.svg")"
+                                alt="Folder" class="item-img" />
+
                         <Tooltip Title="@item.Item.Name" Placement="TooltipPlacement.Bottom">
                             <p class="item-name">@item.Item.Name</p>
                         </Tooltip>

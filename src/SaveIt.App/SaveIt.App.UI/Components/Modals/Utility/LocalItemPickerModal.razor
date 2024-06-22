@@ -1,18 +1,21 @@
 ﻿<div class="m-2 min-size-content">
     <div class="d-flex align-items-center mb-3">
         <div class="me-4">
-            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory" Disabled="@_isLoading">
+            <Button Color="ButtonColor.Secondary" Outline="true" @onclick="ChangeToParentDirectory" Disabled="@(_isLoading || _showingDrives)">
                 <Icon Name="IconName.ArrowUp" />
             </Button>
         </div>
         <div class="flex-grow-1">
-            <EditForm Model="_localFilePathModel" autocomplete="off">
-                <InputText @bind-Value="_localFilePathModel.Path"
-                    @onkeydown="OnPathKeyPressed"
-                    @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)"
-                    @onfocusout="UpdateSelectedPath"
-                    Class="fs-5 w-100" />
-            </EditForm>
+            @if(!_showingDrives)
+            {
+                <EditForm Model="_localFilePathModel" autocomplete="off">
+                    <InputText @bind-Value="_localFilePathModel.Path"
+                               @onkeydown="OnPathKeyPressed"
+                               @oninput="@(e => _localFilePathModel.Path = e.Value?.ToString()!)"
+                               @onfocusout="UpdateSelectedPath"
+                               Class="fs-5 w-100" />
+                </EditForm>
+            }
         </div>
     </div>
 
@@ -41,12 +44,16 @@
             @foreach (var item in _items)
             {
                 <Tooltip Title="@item.Item.Name">
-                    @if (item.Item.IsDirectory)
+                    @if (item.Item.IsDirectory || item.Item.IsDrive)
                     {
                         <div class="d-flex flex-column align-items-center @(item.IsSelected ? "selected-item" : "") m-2 item"
                              @ondblclick="() => MoveToDirectory(item)"
                              @onclick="() => SelectItem(item)">
-                            <img src="img/icons/folder-icon.svg" alt="@item.Item.Name" class="item-img" />
+                            <img src="@(item.Item.IsDirectory
+                                    ? "img/icons/folder-icon.svg"
+                                    : "img/icons/drive-icon.svg")"
+                                alt="@item.Item.Name"
+                                class="item-img" />
                             <p class="item-name">@item.Item.Name</p>
                         </div>
                     }
@@ -72,6 +79,11 @@
                 @string.Join(", ", AllowedExtensions)
             </div>
         }
-        <Button Color="ButtonColor.Primary" @onclick="PickItemAsync" Class="fs-5 p-2 pe-3 ps-3" Disabled="@_isLoading">Select</Button>
+        <Button Color="ButtonColor.Primary"
+            @onclick="PickItemAsync"
+            Class="fs-5 p-2 pe-3 ps-3"
+            Disabled="@CanPickItem()">
+            Select
+        </Button>
     </div>
 </div>

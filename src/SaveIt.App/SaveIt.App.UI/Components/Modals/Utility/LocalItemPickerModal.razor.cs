@@ -1,6 +1,7 @@
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using SaveIt.App.UI.Models;
 
 namespace SaveIt.App.UI.Components.Modals.Utility;
@@ -30,6 +31,8 @@ public partial class LocalItemPickerModal
     private bool _isLoading = false;
     private string? _error;
     private string? _information;
+    private bool _showingDrives = false;
+
 
     protected override void OnInitialized()
     {
@@ -55,12 +58,29 @@ public partial class LocalItemPickerModal
     }
 
     private static SelectedItemViewModel<LocalFileItemModel> GetFolderItem(string path)
-        => new(new LocalFileItemModel
+    {
+        var parent = Directory.GetParent(path);
+
+        return new(new LocalFileItemModel
         {
-            Name = Path.GetFileName(path)!,
-            Path = Directory.GetParent(path)?.FullName ?? "",
+            Name = parent is not null
+                ? Path.GetFileName(path)!
+                : Path.TrimEndingDirectorySeparator(new DirectoryInfo(path).Name),
+            Path = parent?.FullName ?? "",
             IsDirectory = true
         });
+    }
+
+    private static SelectedItemViewModel<LocalFileItemModel> GetDriveItem(string driveName)
+    {
+        var driveInfo = driveName.TrimEnd(Path.DirectorySeparatorChar);
+        return new(new LocalFileItemModel
+        {
+            Name = driveInfo,
+            Path = driveName,
+            IsDrive = true
+        });
+    }
 
     private void OnPathKeyPressed(KeyboardEventArgs e)
     {
@@ -106,6 +126,25 @@ public partial class LocalItemPickerModal
         try
         {
             _isLoading = true;
+
+            if(_showingDrives)
+            {
+                try
+                {
+                    var drives = DriveInfo.GetDrives();
+                    _items.AddRange(drives.Select(x => GetDriveItem(x.Name)));
+                }
+                catch (Exception)
+                {
+                    _error = "Application has no permission to view the contents of this folder.";
+                    return;
+                }
+
+                _isLoading = false;
+
+                return;
+            }
+
             var info = "No items found in this folder.";
             if (ShowMode == LocalPickerMode.Folders || ShowMode == LocalPickerMode.Both)
             {
@@ -149,6 +188,7 @@ public partial class LocalItemPickerModal
         catch (Exception)
         {
             _items.Clear();
+            _isLoading = false;
             _error = "Application has no permission to view the contents of this folder.";
         }
     }
@@ -162,12 +202,20 @@ public partial class LocalItemPickerModal
 
     private void MoveToDirectory(SelectedItemViewModel<LocalFileItemModel> model)
     {
-        if (!model.Item.IsDirectory)
+        if (!model.Item.IsDirectory && !model.Item.IsDrive)
         {
             return;
         }
 
-        _selectedFile = model;
+        if (_showingDrives)
+        {
+            _showingDrives = false;
+        }
+        else
+        {
+            _selectedFile = model;
+        }
+
         RedrawItems();
     }
 
@@ -190,7 +238,15 @@ public partial class LocalItemPickerModal
             return;
         }
 
-        _selectedFile = GetFolderItem(parentPath);
+        if (parentPath == null)
+        {
+            _showingDrives = true;
+        }
+        else
+        {
+            _selectedFile = GetFolderItem(parentPath);
+        }
+        
         RedrawItems();
     }
 
@@ -206,12 +262,37 @@ public partial class LocalItemPickerModal
         item.IsSelected = true;
     }
 
+    private bool CanPickItem()
+    {
+        var selectedItem = _items.Find(x => x.IsSelected);
+
+        return _isLoading
+            || (_showingDrives && selectedItem is null)
+            || (string.IsNullOrEmpty(_selectedFile.Item.Path) && selectedItem is null);
+    }
+
     private async Task PickItemAsync()
     {
         var selectedItem = _items.Find(x => x.IsSelected);
 
+        if(selectedItem is null && _showingDrives)
+        {
+            return;
+        }
+
+        if(selectedItem is not null && selectedItem.Item.IsDrive)
+        {
+            MoveToDirectory(selectedItem);
+            return;
+        }
+
         if (selectedItem is null && (PickerMode == LocalPickerMode.Folders || PickerMode == LocalPickerMode.Both))
         {
+            if(string.IsNullOrEmpty(_selectedFile.Item.Path))
+            {
+                return;
+            }
+
             await OnItemSelected.InvokeAsync(_selectedFile.Item);
             return;
         }

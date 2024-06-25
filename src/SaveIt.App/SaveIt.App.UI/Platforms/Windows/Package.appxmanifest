@@ -6,13 +6,13 @@
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
   IgnorableNamespaces="uap rescap">
 
-  <Identity Name="maui-package-name-placeholder" Publisher="CN=User Name" Version="0.0.0.0" />
+  <Identity Name="31359Terrhsoft.SaveIt-GameSaveSharingApp" Publisher="CN=2F287285-2381-4051-9564-0143D8F46C3A" Version="1.0.0.0" />
 
   <mp:PhoneIdentity PhoneProductId="F8197D9E-25FC-409C-AD76-83F4A003A342" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>$placeholder$</DisplayName>
-    <PublisherDisplayName>User Name</PublisherDisplayName>
+    <DisplayName>SaveIt - Game Save Sharing App</DisplayName>
+    <PublisherDisplayName>Terrhsoft</PublisherDisplayName>
     <Logo>$placeholder$.png</Logo>
   </Properties>
 

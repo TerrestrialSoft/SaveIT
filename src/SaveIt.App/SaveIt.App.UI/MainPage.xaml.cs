@@ -1,4 +1,5 @@
 ﻿using Microsoft.Maui.Platform;
+using Microsoft.UI.Windowing;
 
 namespace SaveIt.App.UI;
 
@@ -20,7 +21,7 @@ public partial class MainPage : ContentPage
         {
             var window = GetParentWindow();
 
-            if ((window?.Handler?.PlatformView as MauiWinUIWindow)?.GetAppWindow() is var appWindow)
+            if ((window?.Handler?.PlatformView as MauiWinUIWindow)?.GetAppWindow() is AppWindow appWindow)
             {
                 appWindow.Changed += AppWindow_Changed;
                 _foundWindow = true;
@@ -28,7 +29,7 @@ public partial class MainPage : ContentPage
         }
     }
 
-    private void AppWindow_Changed(Microsoft.UI.Windowing.AppWindow sender, Microsoft.UI.Windowing.AppWindowChangedEventArgs args)
+    private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
     {
         if (args.DidPositionChange)
         {
